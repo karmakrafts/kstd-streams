@@ -34,5 +34,8 @@ std::vector<int> elements(...);
 const auto sum = cxxstreams::make_stream(elements).sum();
 ```
 
+As long as the stream value type (`int` in our case) provides an implementation for `operator+` you can use the sum operation
+to sum up all the elements operated upon by the stream.
+
 We effectively reduced the amount of code required by three quarters! Of course, you can do a lot more with streams than just 
 calculating the sum of a set of elements.
