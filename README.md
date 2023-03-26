@@ -1,4 +1,4 @@
-# cxxstreams
+# <img src="https://raw.githubusercontent.com/KitsuneAlex/cxxstreams/master/branding/logo.svg" width="6%"></img> cxxstreams
 Are you looking for map, filter, reduce and more on any standard container?  
 Do you want it to be a constexpr-ready zero-cost abstraction?  
 **Look no further!**
