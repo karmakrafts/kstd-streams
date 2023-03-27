@@ -23,7 +23,7 @@
 #include <type_traits>
 
 namespace cxxstreams {
-    template<typename T>
+    template<typename T> //
     requires(std::is_move_assignable_v<T>)
     struct SingletStreamable final {
         using value_type = T;
@@ -35,13 +35,13 @@ namespace cxxstreams {
 
         public:
 
-        explicit constexpr SingletStreamable(value_type element) noexcept :
-            _element(std::move(element)),
-            _is_consumed(false)
-        {}
+        explicit constexpr SingletStreamable(value_type element) noexcept:
+                _element(std::move(element)),
+                _is_consumed(false) {
+        }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
-            if(_is_consumed) {
+            if (_is_consumed) {
                 return std::nullopt;
             }
 

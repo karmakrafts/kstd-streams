@@ -28,7 +28,7 @@ TEST(cxxstreams_Stream, TestCollect) {
     const auto result = cxxstreams::make_stream(test_values).collect<std::vector>();
     ASSERT_EQ(result.size(), num_test_values);
 
-    for(size_t i = 0; i < num_test_values; i++) {
+    for (size_t i = 0; i < num_test_values; i++) {
         ASSERT_EQ(result[i], test_values[i]);
     }
 }
@@ -64,7 +64,7 @@ TEST(cxxstreams_Stream, TestLimit) {
 
     ASSERT_EQ(result.size(), max_count);
 
-    for(size_t i = 0; i < max_count; i++) {
+    for (size_t i = 0; i < max_count; i++) {
         ASSERT_EQ(result[i], test_values[i]);
     }
 }

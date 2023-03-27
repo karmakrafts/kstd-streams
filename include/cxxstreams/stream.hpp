@@ -31,7 +31,7 @@
 #include "limiting_stream.hpp"
 
 namespace cxxstreams {
-    template<typename T, typename S, typename IMPL>
+    template<typename T, typename S, typename IMPL> //
     requires(concepts::is_streamable<S>)
     class Stream {
         protected:
@@ -45,9 +45,9 @@ namespace cxxstreams {
 
         public:
 
-        explicit constexpr Stream(S streamable) noexcept :
-                _streamable(std::move(streamable))
-        {}
+        explicit constexpr Stream(S streamable) noexcept:
+                _streamable(std::move(streamable)) {
+        }
 
         template<typename F>
         requires(std::is_convertible_v<F, std::function<void(T&)>>)
@@ -64,7 +64,7 @@ namespace cxxstreams {
             auto& self = get_self();
             auto element = self.next();
 
-            while(element) {
+            while (element) {
                 result++;
                 element = self.next();
             }
@@ -74,13 +74,13 @@ namespace cxxstreams {
 
         template<template<typename, typename...> typename C>
         requires(std::is_default_constructible_v<C<T>> && (concepts::has_add_assign<C<T>> || concepts::has_push_back<C<T>>))
-        [[nodiscard]] constexpr auto collect() noexcept -> C<T> {
+        [[nodiscard]] constexpr auto collect() noexcept -> C <T> {
             C<T> result;
             auto& self = get_self();
             auto element = self.next();
 
-            while(element) {
-                if constexpr(concepts::has_add_assign<C<T>>) {
+            while (element) {
+                if constexpr (concepts::has_add_assign<C<T>>) {
                     result += std::move(*element);
                 }
                 else {

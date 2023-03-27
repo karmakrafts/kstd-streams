@@ -22,7 +22,7 @@
 #include "concepts.hpp"
 
 namespace cxxstreams {
-    template<typename T, typename S, typename IMPL>
+    template<typename T, typename S, typename IMPL> //
     requires(concepts::is_streamable<S>)
     class Stream;
 }

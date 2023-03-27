@@ -24,7 +24,7 @@
 #include "stream_fwd.hpp"
 
 namespace cxxstreams {
-    template<typename S>
+    template<typename S> //
     struct LimitingStream final : public Stream<typename S::value_type, S, LimitingStream<S>> {
         using self_type = LimitingStream<S>;
         using value_type = typename S::value_type;
@@ -36,14 +36,14 @@ namespace cxxstreams {
 
         public:
 
-        constexpr LimitingStream(S streamable, size_t max_count) noexcept :
+        constexpr LimitingStream(S streamable, size_t max_count) noexcept:
                 Stream<value_type, S, self_type>(std::move(streamable)),
                 _max_count(max_count),
-                _count(0)
-        {}
+                _count(0) {
+        }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
-            if(_count == _max_count) {
+            if (_count == _max_count) {
                 return std::nullopt;
             }
 

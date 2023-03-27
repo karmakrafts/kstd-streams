@@ -25,7 +25,7 @@
 #include "concepts.hpp"
 
 namespace cxxstreams {
-    template<typename S, typename F>
+    template<typename S, typename F> //
     requires(concepts::is_streamable<S> && std::is_convertible_v<F, std::function<void(typename S::value_type&)>>)
     struct FilteringStream final : public Stream<typename S::value_type, S, FilteringStream<S, F>> {
         using self_type = FilteringStream<S, F>;
@@ -37,19 +37,19 @@ namespace cxxstreams {
 
         public:
 
-        constexpr FilteringStream(S streamable, F&& filter) noexcept :
+        constexpr FilteringStream(S streamable, F&& filter) noexcept:
                 Stream<value_type, S, self_type>(std::move(streamable)),
-                _filter(std::forward<F>(filter))
-        {}
+                _filter(std::forward<F>(filter)) {
+        }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
             auto element = this->_streamable.next();
 
-            if(!element) {
+            if (!element) {
                 return std::nullopt;
             }
 
-            while(element && !_filter(*element)) {
+            while (element && !_filter(*element)) {
                 element = this->_streamable.next();
             }
 

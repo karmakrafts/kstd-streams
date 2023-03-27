@@ -23,23 +23,23 @@
 #include <optional>
 
 namespace cxxstreams::concepts {
-    template<typename T>
+    template<typename T> //
     concept has_add_assign = requires(T type) {
         type += type;
     };
 
-    template<typename T>
+    template<typename T> //
     concept has_push_back = requires(T type, typename T::value_type value) {
         type.push_back(value);
     };
 
-    template<typename T>
+    template<typename T> //
     concept is_streamable = requires(T type) {
         typename T::value_type;
         requires std::same_as<decltype(type.next()), std::optional<typename T::value_type>>;
     };
 
-    template<typename T>
+    template<typename T> //
     concept is_iterator = requires(T type) {
         typename T::value_type;
         ++type;
@@ -54,7 +54,7 @@ namespace cxxstreams::concepts {
         requires std::same_as<decltype(type != type), bool>;
     };
 
-    template<typename T>
+    template<typename T> //
     concept is_const_iterable = requires(T type) {
         typename T::const_iterator;
         type.cbegin();
@@ -63,7 +63,7 @@ namespace cxxstreams::concepts {
         requires std::same_as<decltype(type.cend()), typename T::const_iterator>;
     };
 
-    template<typename T>
+    template<typename T> //
     concept is_const_reverse_iterable = requires(T type) {
         typename T::const_iterator;
         type.crbegin();

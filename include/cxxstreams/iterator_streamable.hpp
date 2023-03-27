@@ -23,7 +23,7 @@
 #include "concepts.hpp"
 
 namespace cxxstreams {
-    template<typename I>
+    template<typename I> //
     requires(concepts::is_iterator<I>)
     struct IteratorStreamable final {
         using value_type = typename I::value_type;
@@ -35,13 +35,13 @@ namespace cxxstreams {
 
         public:
 
-        constexpr IteratorStreamable(I begin, I end) noexcept :
+        constexpr IteratorStreamable(I begin, I end) noexcept:
                 _current(std::move(begin)),
-                _end(std::move(end))
-        {}
+                _end(std::move(end)) {
+        }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
-            if(_current == _end) {
+            if (_current == _end) {
                 return std::nullopt;
             }
 
