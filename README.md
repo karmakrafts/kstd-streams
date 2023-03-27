@@ -4,7 +4,7 @@ Do you want it to be a constexpr-ready zero-cost abstraction?
 **Look no further!**
 
 cxxstreams is a highly optimized, constexpr-ready collection stream library for C++20.  
-It is a standalone adaption of the **kstd::stream** API found inside the [kstd library](https://git.karmakrafts.dev/kk/kstd)
+Originally developed as part of the [kstd library](https://git.karmakrafts.dev/kk/kstd)
 by Karma Krafts.
 
 ### Using cxxstreams
