@@ -25,13 +25,15 @@
 
 namespace cxxstreams {
     template<typename S>
+    requires(concepts::is_streamable<S>)
     struct BasicStream final : public Stream<typename S::value_type, S, BasicStream<S>> {
+        using self_type = BasicStream<S>;
         using value_type = typename S::value_type;
 
         public:
 
         explicit constexpr BasicStream(S streamable) noexcept :
-                Stream<value_type, S, BasicStream<S>>(std::move(streamable))
+                Stream<value_type, S, self_type>(std::move(streamable))
         {}
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
