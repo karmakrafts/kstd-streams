@@ -209,6 +209,6 @@ namespace cxxstreams {
     template<typename T, template<typename, typename...> typename C>
     requires(concepts::is_const_reverse_iterable<C<T>>)
     [[nodiscard]] constexpr auto make_reverse_stream(const C<T>& container) noexcept -> BasicStream<IteratorStreamable<typename C<T>::const_iterator>> {
-        return BasicStream(IteratorStreamable(container.cbegin(), container.cend()));
+        return BasicStream(IteratorStreamable(container.crbegin(), container.crend()));
     }
 }
