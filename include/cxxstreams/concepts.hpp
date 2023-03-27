@@ -24,6 +24,16 @@
 
 namespace cxxstreams::concepts {
     template<typename T>
+    concept has_add_assign = requires(T type) {
+        type += type;
+    };
+
+    template<typename T>
+    concept has_push_back = requires(T type, typename T::value_type value) {
+        type.push_back(value);
+    };
+
+    template<typename T>
     concept is_streamable = requires(T type) {
         typename T::value_type;
         requires std::same_as<decltype(type.next()), std::optional<typename T::value_type>>;
@@ -45,20 +55,20 @@ namespace cxxstreams::concepts {
     };
 
     template<typename T>
-    concept is_iterable = requires(T type) {
-        typename T::iterator;
-        type.begin();
-        type.end();
-        requires std::same_as<decltype(type.begin()), typename T::iterator>;
-        requires std::same_as<decltype(type.end()), typename T::iterator>;
-    };
-
-    template<typename T>
     concept is_const_iterable = requires(T type) {
         typename T::const_iterator;
         type.cbegin();
         type.cend();
         requires std::same_as<decltype(type.cbegin()), typename T::const_iterator>;
         requires std::same_as<decltype(type.cend()), typename T::const_iterator>;
+    };
+
+    template<typename T>
+    concept is_const_reverse_iterable = requires(T type) {
+        typename T::const_iterator;
+        type.crbegin();
+        type.crend();
+        requires std::same_as<decltype(type.crbegin()), typename T::const_iterator>;
+        requires std::same_as<decltype(type.crend()), typename T::const_iterator>;
     };
 }
