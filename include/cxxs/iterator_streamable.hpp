@@ -19,41 +19,35 @@
 
 #pragma once
 
-#include <functional>
 #include <optional>
-#include "stream_fwd.hpp"
 #include "concepts.hpp"
 
-namespace cxxstreams {
-    template<typename S, typename F> //
-    requires(concepts::is_streamable<S> && std::is_convertible_v<F, std::function<void(typename S::value_type&)>>)
-    struct FilteringStream final : public Stream<typename S::value_type, S, FilteringStream<S, F>> {
-        using self_type = FilteringStream<S, F>;
-        using value_type = typename S::value_type;
+namespace cxxs {
+    template<typename I> //
+    requires(concepts::is_iterator<I>)
+    struct IteratorStreamable final {
+        using value_type = typename I::value_type;
 
         private:
 
-        F _filter;
+        I _current;
+        I _end;
 
         public:
 
-        constexpr FilteringStream(S streamable, F&& filter) noexcept:
-                Stream<value_type, S, self_type>(std::move(streamable)),
-                _filter(std::forward<F>(filter)) {
+        constexpr IteratorStreamable(I begin, I end) noexcept:
+                _current(std::move(begin)),
+                _end(std::move(end)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
-            auto element = this->_streamable.next();
-
-            if (!element) {
+            if (_current == _end) {
                 return std::nullopt;
             }
 
-            while (element && !_filter(*element)) {
-                element = this->_streamable.next();
-            }
-
-            return element;
+            auto& result = *_current;
+            ++_current;
+            return std::make_optional(std::move(result));
         }
     };
 }

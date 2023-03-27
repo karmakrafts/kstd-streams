@@ -1,4 +1,4 @@
-// Copyright $year.today Karma Krafts & associates
+// Copyright 2023 Karma Krafts & associates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,33 +20,33 @@
 #pragma once
 
 #include <optional>
-#include "stream_fwd.hpp"
+#include <type_traits>
 
-namespace cxxstreams {
-    template<typename R, typename S, typename M> //
-    struct MappingStream final : public Stream<R, S, MappingStream<R, S, M>> {
-        using self_type = MappingStream<R, S, M>;
-        using value_type = R;
+namespace cxxs {
+    template<typename T> //
+    requires(std::is_move_assignable_v<T>)
+    struct SingletStreamable final {
+        using value_type = T;
 
         private:
 
-        M _mapper;
+        value_type _element;
+        bool _is_consumed;
 
         public:
 
-        constexpr MappingStream(S streamable, M&& mapper) noexcept:
-                Stream<value_type, S, self_type>(std::move(streamable)),
-                _mapper(std::forward<M>(mapper)) {
+        explicit constexpr SingletStreamable(value_type element) noexcept:
+                _element(std::move(element)),
+                _is_consumed(false) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
-            auto element = this->_streamable.next();
-
-            if (!element) {
+            if (_is_consumed) {
                 return std::nullopt;
             }
 
-            return std::make_optional(std::move(_mapper(std::move(*element))));
+            _is_consumed = true;
+            return std::make_optional(std::move(_element));
         }
     };
 }

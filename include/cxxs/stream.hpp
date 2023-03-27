@@ -31,7 +31,7 @@
 #include "limiting_stream.hpp"
 #include "mapping_stream.hpp"
 
-namespace cxxstreams {
+namespace cxxs {
     template<typename T, typename S, typename IMPL> //
     requires(concepts::is_streamable<S>)
     class Stream {

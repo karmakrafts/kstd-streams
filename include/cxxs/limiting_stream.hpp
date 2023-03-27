@@ -20,34 +20,35 @@
 #pragma once
 
 #include <optional>
-#include "concepts.hpp"
+#include <cstdint>
+#include "stream_fwd.hpp"
 
-namespace cxxstreams {
-    template<typename I> //
-    requires(concepts::is_iterator<I>)
-    struct IteratorStreamable final {
-        using value_type = typename I::value_type;
+namespace cxxs {
+    template<typename S> //
+    struct LimitingStream final : public Stream<typename S::value_type, S, LimitingStream<S>> {
+        using self_type = LimitingStream<S>;
+        using value_type = typename S::value_type;
 
         private:
 
-        I _current;
-        I _end;
+        size_t _max_count;
+        size_t _count;
 
         public:
 
-        constexpr IteratorStreamable(I begin, I end) noexcept:
-                _current(std::move(begin)),
-                _end(std::move(end)) {
+        constexpr LimitingStream(S streamable, size_t max_count) noexcept:
+                Stream<value_type, S, self_type>(std::move(streamable)),
+                _max_count(max_count),
+                _count(0) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
-            if (_current == _end) {
+            if (_count == _max_count) {
                 return std::nullopt;
             }
 
-            auto& result = *_current;
-            ++_current;
-            return std::make_optional(std::move(result));
+            ++_count;
+            return this->_streamable.next();
         }
     };
 }

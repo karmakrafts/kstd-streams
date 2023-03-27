@@ -19,34 +19,41 @@
 
 #pragma once
 
+#include <functional>
 #include <optional>
-#include <type_traits>
+#include "stream_fwd.hpp"
+#include "concepts.hpp"
 
-namespace cxxstreams {
-    template<typename T> //
-    requires(std::is_move_assignable_v<T>)
-    struct SingletStreamable final {
-        using value_type = T;
+namespace cxxs {
+    template<typename S, typename F> //
+    requires(concepts::is_streamable<S> && std::is_convertible_v<F, std::function<void(typename S::value_type&)>>)
+    struct FilteringStream final : public Stream<typename S::value_type, S, FilteringStream<S, F>> {
+        using self_type = FilteringStream<S, F>;
+        using value_type = typename S::value_type;
 
         private:
 
-        value_type _element;
-        bool _is_consumed;
+        F _filter;
 
         public:
 
-        explicit constexpr SingletStreamable(value_type element) noexcept:
-                _element(std::move(element)),
-                _is_consumed(false) {
+        constexpr FilteringStream(S streamable, F&& filter) noexcept:
+                Stream<value_type, S, self_type>(std::move(streamable)),
+                _filter(std::forward<F>(filter)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
-            if (_is_consumed) {
+            auto element = this->_streamable.next();
+
+            if (!element) {
                 return std::nullopt;
             }
 
-            _is_consumed = true;
-            return std::make_optional(std::move(_element));
+            while (element && !_filter(*element)) {
+                element = this->_streamable.next();
+            }
+
+            return element;
         }
     };
 }

@@ -19,14 +19,14 @@
 
 #include <vector>
 #include <gtest/gtest.h>
-#include <cxxstreams/stream.hpp>
+#include <cxxs/stream.hpp>
 
 const std::vector<float> test_values({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
 const std::size_t num_test_values = test_values.size();
 
-TEST(cxxstreams_Stream, TestReduce) {
+TEST(cxxs_Stream, TestReduce) {
     // @formatter:off
-    const auto result = cxxstreams::make_stream(test_values)
+    const auto result = cxxs::make_stream(test_values)
         .reduce([](auto a, auto b) { return a * b; });
     // @formatter:on
 
@@ -34,19 +34,19 @@ TEST(cxxstreams_Stream, TestReduce) {
     ASSERT_EQ(*result, 1417.5F);
 }
 
-TEST(cxxstreams_Stream, TestSum) {
-    const auto result = cxxstreams::make_stream(test_values).sum();
+TEST(cxxs_Stream, TestSum) {
+    const auto result = cxxs::make_stream(test_values).sum();
     ASSERT_TRUE(result);
     ASSERT_EQ(*result, 22.0F);
 }
 
-TEST(cxxstreams_Stream, TestFindFirst) {
-    auto result = cxxstreams::make_stream(test_values).find_first();
+TEST(cxxs_Stream, TestFindFirst) {
+    auto result = cxxs::make_stream(test_values).find_first();
     ASSERT_TRUE(result);
     ASSERT_EQ(*result, 1.0F);
 
     // @formatter:off
-    result = cxxstreams::make_stream(test_values)
+    result = cxxs::make_stream(test_values)
         .filter([](auto x) { return x == 3.0F; })
         .find_first();
     // @formatter:on
@@ -55,7 +55,7 @@ TEST(cxxstreams_Stream, TestFindFirst) {
     ASSERT_EQ(*result, 3.0F);
 
     // @formatter:off
-    result = cxxstreams::make_stream(test_values)
+    result = cxxs::make_stream(test_values)
         .filter([](auto x) { return x > 10.0F; })
         .find_first();
     // @formatter:on
@@ -63,8 +63,8 @@ TEST(cxxstreams_Stream, TestFindFirst) {
     ASSERT_FALSE(result);
 }
 
-TEST(cxxstreams_Stream, TestCollect) {
-    const auto result = cxxstreams::make_stream(test_values).collect<std::vector>();
+TEST(cxxs_Stream, TestCollect) {
+    const auto result = cxxs::make_stream(test_values).collect<std::vector>();
     ASSERT_EQ(result.size(), num_test_values);
 
     for (size_t i = 0; i < num_test_values; i++) {
@@ -72,14 +72,14 @@ TEST(cxxstreams_Stream, TestCollect) {
     }
 }
 
-TEST(cxxstreams_Stream, TestCount) {
-    const auto result = cxxstreams::make_stream(test_values).count();
+TEST(cxxs_Stream, TestCount) {
+    const auto result = cxxs::make_stream(test_values).count();
     ASSERT_EQ(result, num_test_values);
 }
 
-TEST(cxxstreams_Stream, TestFilter) {
+TEST(cxxs_Stream, TestFilter) {
     // @formatter:off
-    const auto result = cxxstreams::make_stream(test_values)
+    const auto result = cxxs::make_stream(test_values)
         .filter([](auto x) { return (static_cast<std::int32_t>(x) & 1) == 0; })
         .collect<std::vector>();
     // @formatter:on
@@ -92,9 +92,9 @@ TEST(cxxstreams_Stream, TestFilter) {
     ASSERT_EQ(result[3], 4.5F);
 }
 
-TEST(cxxstreams_Stream, TestMap) {
+TEST(cxxs_Stream, TestMap) {
     // @formatter:off
-    const auto result1 = cxxstreams::make_stream(test_values)
+    const auto result1 = cxxs::make_stream(test_values)
         .map([](auto x) { return x; })
         .collect<std::vector>();
     // @formatter:on
@@ -106,7 +106,7 @@ TEST(cxxstreams_Stream, TestMap) {
     }
 
     // @formatter:off
-    const auto result2 = cxxstreams::make_stream(test_values)
+    const auto result2 = cxxs::make_stream(test_values)
         .map([](auto x) { return static_cast<int32_t>(x); })
         .collect<std::vector>();
     // @formatter:on
@@ -124,23 +124,23 @@ TEST(cxxstreams_Stream, TestMap) {
     ASSERT_EQ(result2[7], 4);
 }
 
-TEST(cxxstreams_Stream, TestMin) {
-    const auto result = cxxstreams::make_stream(test_values).min();
+TEST(cxxs_Stream, TestMin) {
+    const auto result = cxxs::make_stream(test_values).min();
     ASSERT_TRUE(result);
     ASSERT_EQ(*result, 1.0F);
 }
 
-TEST(cxxstreams_Stream, TestMax) {
-    const auto result = cxxstreams::make_stream(test_values).max();
+TEST(cxxs_Stream, TestMax) {
+    const auto result = cxxs::make_stream(test_values).max();
     ASSERT_TRUE(result);
     ASSERT_EQ(*result, 4.5F);
 }
 
-TEST(cxxstreams_Stream, TestLimit) {
+TEST(cxxs_Stream, TestLimit) {
     constexpr std::size_t max_count = 4;
 
     // @formatter:off
-    const auto result = cxxstreams::make_stream(test_values)
+    const auto result = cxxs::make_stream(test_values)
         .limit(max_count)
         .collect<std::vector>();
     // @formatter:on

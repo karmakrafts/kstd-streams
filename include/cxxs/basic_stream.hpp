@@ -23,7 +23,7 @@
 #include "stream_fwd.hpp"
 #include "concepts.hpp"
 
-namespace cxxstreams {
+namespace cxxs {
     template<typename S> //
     requires(concepts::is_streamable<S>)
     struct BasicStream final : public Stream<typename S::value_type, S, BasicStream<S>> {

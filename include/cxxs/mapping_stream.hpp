@@ -1,4 +1,4 @@
-// Copyright 2023 Karma Krafts & associates
+// Copyright $year.today Karma Krafts & associates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,35 +20,36 @@
 #pragma once
 
 #include <optional>
-#include <cstdint>
+#include <functional>
+#include <type_traits>
 #include "stream_fwd.hpp"
 
-namespace cxxstreams {
-    template<typename S> //
-    struct LimitingStream final : public Stream<typename S::value_type, S, LimitingStream<S>> {
-        using self_type = LimitingStream<S>;
-        using value_type = typename S::value_type;
+namespace cxxs {
+    template<typename R, typename S, typename M> //
+    requires(concepts::is_streamable<S> && std::is_convertible_v<M, std::function<R(typename S::value_type)>>)
+    struct MappingStream final : public Stream<R, S, MappingStream<R, S, M>> {
+        using self_type = MappingStream<R, S, M>;
+        using value_type = R;
 
         private:
 
-        size_t _max_count;
-        size_t _count;
+        M _mapper;
 
         public:
 
-        constexpr LimitingStream(S streamable, size_t max_count) noexcept:
+        constexpr MappingStream(S streamable, M&& mapper) noexcept:
                 Stream<value_type, S, self_type>(std::move(streamable)),
-                _max_count(max_count),
-                _count(0) {
+                _mapper(std::forward<M>(mapper)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
-            if (_count == _max_count) {
+            auto element = this->_streamable.next();
+
+            if (!element) {
                 return std::nullopt;
             }
 
-            ++_count;
-            return this->_streamable.next();
+            return std::make_optional(std::move(_mapper(std::move(*element))));
         }
     };
 }

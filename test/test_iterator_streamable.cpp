@@ -19,11 +19,11 @@
 
 #include <vector>
 #include <gtest/gtest.h>
-#include <cxxstreams/iterator_streamable.hpp>
+#include <cxxs/iterator_streamable.hpp>
 
 TEST(cxxstreams_IteratorStreamable, TestIterate) {
     std::vector<float> values({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
-    auto streamable = cxxstreams::IteratorStreamable(values.cbegin(), values.cend());
+    auto streamable = cxxs::IteratorStreamable(values.cbegin(), values.cend());
 
     for (const auto value: values) {
         auto element = streamable.next();

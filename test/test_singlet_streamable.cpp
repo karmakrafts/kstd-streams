@@ -18,11 +18,11 @@
  */
 
 #include <gtest/gtest.h>
-#include <cxxstreams/singlet_streamable.hpp>
+#include <cxxs/singlet_streamable.hpp>
 
 TEST(cxxstreams_SingletStreamable, TestIterate) {
     float value = 1337.0F;
-    auto streamable = cxxstreams::SingletStreamable(value);
+    auto streamable = cxxs::SingletStreamable(value);
     auto element = streamable.next();
 
     ASSERT_TRUE(element);

@@ -21,7 +21,7 @@
 
 #include "concepts.hpp"
 
-namespace cxxstreams {
+namespace cxxs {
     template<typename T, typename S, typename IMPL> //
     requires(concepts::is_streamable<S>)
     class Stream;
