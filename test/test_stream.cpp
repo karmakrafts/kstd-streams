@@ -53,6 +53,38 @@ TEST(cxxstreams_Stream, TestFilter) {
     ASSERT_EQ(result[3], 4.5F);
 }
 
+TEST(cxxstreams_Stream, TestMap) {
+    // @formatter:off
+    const auto result1 = cxxstreams::make_stream(test_values)
+        .map([](auto x) { return x; })
+        .collect<std::vector>();
+    // @formatter:on
+
+    ASSERT_EQ(result1.size(), num_test_values);
+
+    for (size_t i = 0; i < num_test_values; i++) {
+        ASSERT_EQ(result1[i], test_values[i]);
+    }
+
+    // @formatter:off
+    const auto result2 = cxxstreams::make_stream(test_values)
+        .map([](auto x) { return static_cast<int32_t>(x); })
+        .collect<std::vector>();
+    // @formatter:on
+
+    ASSERT_EQ(result2.size(), num_test_values);
+
+    ASSERT_EQ(result2[0], 1);
+    ASSERT_EQ(result2[1], 2);
+    ASSERT_EQ(result2[2], 3);
+    ASSERT_EQ(result2[3], 4);
+
+    ASSERT_EQ(result2[4], 1);
+    ASSERT_EQ(result2[5], 2);
+    ASSERT_EQ(result2[6], 3);
+    ASSERT_EQ(result2[7], 4);
+}
+
 TEST(cxxstreams_Stream, TestLimit) {
     constexpr std::size_t max_count = 4;
 

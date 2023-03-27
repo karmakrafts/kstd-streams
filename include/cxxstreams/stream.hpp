@@ -29,6 +29,7 @@
 #include "basic_stream.hpp"
 #include "filtering_stream.hpp"
 #include "limiting_stream.hpp"
+#include "mapping_stream.hpp"
 
 namespace cxxstreams {
     template<typename T, typename S, typename IMPL> //
@@ -36,7 +37,7 @@ namespace cxxstreams {
     class Stream {
         protected:
 
-        S _streamable;
+        [[maybe_unused]] S _streamable;
 
         [[nodiscard]] constexpr auto get_self() noexcept -> IMPL& {
             static_assert(concepts::is_streamable<IMPL>, "Implementation is not streamable");
@@ -52,11 +53,17 @@ namespace cxxstreams {
         template<typename F>
         requires(std::is_convertible_v<F, std::function<void(T&)>>)
         [[nodiscard]] constexpr auto filter(F&& filter) noexcept -> FilteringStream<IMPL, F> {
-            return FilteringStream(std::move(get_self()), std::forward<F>(filter));
+            return FilteringStream<IMPL, F>(std::move(get_self()), std::forward<F>(filter));
+        }
+
+        template<typename M, typename R = std::invoke_result_t<M, T>>
+        requires(std::is_convertible_v<M, std::function<R(T)>>)
+        [[nodiscard]] constexpr auto map(M&& mapper) noexcept -> MappingStream<R, IMPL, M> {
+            return MappingStream<R, IMPL, M>(std::move(get_self()), std::forward<M>(mapper));
         }
 
         [[nodiscard]] constexpr auto limit(size_t max_count) noexcept -> LimitingStream<IMPL> {
-            return LimitingStream(std::move(get_self()), max_count);
+            return LimitingStream<IMPL>(std::move(get_self()), max_count);
         }
 
         [[nodiscard]] constexpr auto count() noexcept -> size_t {
