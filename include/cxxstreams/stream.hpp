@@ -70,6 +70,35 @@ namespace cxxstreams {
             return get_self().next();
         }
 
+        template<typename F>
+        requires(std::is_convertible_v<F, std::function<T(T, T)>>)
+        [[nodiscard]] constexpr auto reduce(F&& function) noexcept -> std::optional<T> {
+            auto& self = get_self();
+            auto element = self.next();
+
+            if (!element) {
+                return std::nullopt;
+            }
+
+            auto acc = std::move(*element);
+            auto next = self.next();
+
+            while (next) {
+                acc = std::move(function(std::move(acc), std::move(*next)));
+                next = self.next();
+            }
+
+            return std::make_optional(acc);
+        }
+
+        [[nodiscard]] constexpr auto sum() noexcept -> std::optional<T> {
+            static_assert(concepts::has_add<T>, "Stream value type doesn't implement operator+");
+
+            return reduce([](auto a, auto b) {
+                return a + b;
+            });
+        }
+
         [[nodiscard]] constexpr auto min() noexcept -> std::optional<T> {
             static_assert(concepts::has_lth<T> || concepts::has_gth<T>, "Stream value type doesn't implement operator< or operator>");
 

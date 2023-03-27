@@ -23,6 +23,11 @@
 #include <optional>
 
 namespace cxxstreams::concepts {
+    template<typename T> concept has_add = requires(T type) {
+        type + type;
+        requires std::convertible_to<decltype(type + type), T>;
+    };
+
     template<typename T> //
     concept has_add_assign = requires(T type) {
         type += type;

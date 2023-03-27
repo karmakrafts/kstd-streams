@@ -24,6 +24,22 @@
 const std::vector<float> test_values({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
 const std::size_t num_test_values = test_values.size();
 
+TEST(cxxstreams_Stream, TestReduce) {
+    // @formatter:off
+    const auto result = cxxstreams::make_stream(test_values)
+        .reduce([](auto a, auto b) { return a * b; });
+    // @formatter:on
+
+    ASSERT_TRUE(result);
+    ASSERT_EQ(*result, 1417.5F);
+}
+
+TEST(cxxstreams_Stream, TestSum) {
+    const auto result = cxxstreams::make_stream(test_values).sum();
+    ASSERT_TRUE(result);
+    ASSERT_EQ(*result, 22.0F);
+}
+
 TEST(cxxstreams_Stream, TestFindFirst) {
     auto result = cxxstreams::make_stream(test_values).find_first();
     ASSERT_TRUE(result);
