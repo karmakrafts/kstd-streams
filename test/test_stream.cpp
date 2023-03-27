@@ -47,3 +47,19 @@ TEST(cxxstreams_Stream, TestFilter) {
     ASSERT_EQ(result[2], 2.5F);
     ASSERT_EQ(result[3], 4.5F);
 }
+
+TEST(cxxstreams_Stream, TestLimit) {
+    constexpr std::size_t max_count = 4;
+
+    // @formatter:off
+    const auto result = cxxstreams::make_stream(test_values)
+        .limit(max_count)
+        .collect<std::vector>();
+    // @formatter:on
+
+    ASSERT_EQ(result.size(), max_count);
+
+    for(size_t i = 0; i < max_count; i++) {
+        ASSERT_EQ(result[i], test_values[i]);
+    }
+}

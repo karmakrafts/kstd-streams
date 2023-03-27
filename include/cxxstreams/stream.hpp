@@ -28,6 +28,7 @@
 #include "singlet_streamable.hpp"
 #include "basic_stream.hpp"
 #include "filtering_stream.hpp"
+#include "limiting_stream.hpp"
 
 namespace cxxstreams {
     template<typename T, typename S, typename IMPL>
@@ -52,6 +53,10 @@ namespace cxxstreams {
         requires(std::is_convertible_v<F, std::function<void(T&)>>)
         [[nodiscard]] constexpr auto filter(F&& filter) noexcept -> FilteringStream<IMPL, F> {
             return FilteringStream(std::move(get_self()), std::forward<F>(filter));
+        }
+
+        [[nodiscard]] constexpr auto limit(size_t max_count) noexcept -> LimitingStream<IMPL> {
+            return LimitingStream(std::move(get_self()), max_count);
         }
 
         template<template<typename, typename...> typename C>
