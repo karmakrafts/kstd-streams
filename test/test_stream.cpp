@@ -33,6 +33,11 @@ TEST(cxxstreams_Stream, TestCollect) {
     }
 }
 
+TEST(cxxstreams_Stream, TestCount) {
+    const auto result = cxxstreams::make_stream(test_values).count();
+    ASSERT_EQ(result, num_test_values);
+}
+
 TEST(cxxstreams_Stream, TestFilter) {
     // @formatter:off
     const auto result = cxxstreams::make_stream(test_values)

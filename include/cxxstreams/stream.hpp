@@ -59,6 +59,19 @@ namespace cxxstreams {
             return LimitingStream(std::move(get_self()), max_count);
         }
 
+        [[nodiscard]] constexpr auto count() noexcept -> size_t {
+            size_t result = 0;
+            auto& self = get_self();
+            auto element = self.next();
+
+            while(element) {
+                result++;
+                element = self.next();
+            }
+
+            return result;
+        }
+
         template<template<typename, typename...> typename C>
         requires(std::is_default_constructible_v<C<T>> && (concepts::has_add_assign<C<T>> || concepts::has_push_back<C<T>>))
         [[nodiscard]] constexpr auto collect() noexcept -> C<T> {
