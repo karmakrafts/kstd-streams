@@ -29,6 +29,18 @@ namespace cxxstreams::concepts {
     };
 
     template<typename T> //
+    concept has_lth = requires(T type) {
+        type < type;
+        requires std::same_as<decltype(type < type), bool>;
+    };
+
+    template<typename T> //
+    concept has_gth = requires(T type) {
+        type > type;
+        requires std::same_as<decltype(type > type), bool>;
+    };
+
+    template<typename T> //
     concept has_push_back = requires(T type, typename T::value_type value) {
         type.push_back(value);
     };

@@ -24,6 +24,29 @@
 const std::vector<float> test_values({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
 const std::size_t num_test_values = test_values.size();
 
+TEST(cxxstreams_Stream, TestFindFirst) {
+    auto result = cxxstreams::make_stream(test_values).find_first();
+    ASSERT_TRUE(result);
+    ASSERT_EQ(*result, 1.0F);
+
+    // @formatter:off
+    result = cxxstreams::make_stream(test_values)
+        .filter([](auto x) { return x == 3.0F; })
+        .find_first();
+    // @formatter:on
+
+    ASSERT_TRUE(result);
+    ASSERT_EQ(*result, 3.0F);
+
+    // @formatter:off
+    result = cxxstreams::make_stream(test_values)
+        .filter([](auto x) { return x > 10.0F; })
+        .find_first();
+    // @formatter:on
+
+    ASSERT_FALSE(result);
+}
+
 TEST(cxxstreams_Stream, TestCollect) {
     const auto result = cxxstreams::make_stream(test_values).collect<std::vector>();
     ASSERT_EQ(result.size(), num_test_values);
@@ -83,6 +106,18 @@ TEST(cxxstreams_Stream, TestMap) {
     ASSERT_EQ(result2[5], 2);
     ASSERT_EQ(result2[6], 3);
     ASSERT_EQ(result2[7], 4);
+}
+
+TEST(cxxstreams_Stream, TestMin) {
+    const auto result = cxxstreams::make_stream(test_values).min();
+    ASSERT_TRUE(result);
+    ASSERT_EQ(*result, 1.0F);
+}
+
+TEST(cxxstreams_Stream, TestMax) {
+    const auto result = cxxstreams::make_stream(test_values).max();
+    ASSERT_TRUE(result);
+    ASSERT_EQ(*result, 4.5F);
 }
 
 TEST(cxxstreams_Stream, TestLimit) {

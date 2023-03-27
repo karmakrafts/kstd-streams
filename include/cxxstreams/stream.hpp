@@ -66,6 +66,76 @@ namespace cxxstreams {
             return LimitingStream<IMPL>(std::move(get_self()), max_count);
         }
 
+        [[nodiscard]] constexpr auto find_first() noexcept -> std::optional<T> {
+            return get_self().next();
+        }
+
+        [[nodiscard]] constexpr auto min() noexcept -> std::optional<T> {
+            static_assert(concepts::has_lth<T> || concepts::has_gth<T>, "Stream value type doesn't implement operator< or operator>");
+
+            auto& self = get_self();
+            auto element = self.next();
+
+            if (!element) {
+                return std::nullopt;
+            }
+
+            auto result = std::move(*element);
+            element = self.next();
+
+            while (element) {
+                auto value = std::move(*element);
+
+                if constexpr (concepts::has_lth<T>) {
+                    if (value < result) {
+                        result = std::move(value);
+                    }
+                }
+                else {
+                    if (!(value > result)) { // NOLINT: clang-tidy doesn't understand what we're doing here
+                        result = std::move(value);
+                    }
+                }
+
+                element = self.next();
+            }
+
+            return std::make_optional(result);
+        }
+
+        [[nodiscard]] constexpr auto max() noexcept -> std::optional<T> {
+            static_assert(concepts::has_lth<T> || concepts::has_gth<T>, "Stream value type doesn't implement operator< or operator>");
+
+            auto& self = get_self();
+            auto element = self.next();
+
+            if (!element) {
+                return std::nullopt;
+            }
+
+            auto result = std::move(*element);
+            element = self.next();
+
+            while (element) {
+                auto value = std::move(*element);
+
+                if constexpr (concepts::has_lth<T>) {
+                    if (value > result) {
+                        result = std::move(value);
+                    }
+                }
+                else {
+                    if (!(value < result)) { // NOLINT: clang-tidy doesn't understand what we're doing here
+                        result = std::move(value);
+                    }
+                }
+
+                element = self.next();
+            }
+
+            return std::make_optional(result);
+        }
+
         [[nodiscard]] constexpr auto count() noexcept -> size_t {
             size_t result = 0;
             auto& self = get_self();
