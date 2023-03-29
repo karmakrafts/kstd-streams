@@ -14,7 +14,7 @@
 
 /**
  * @author Alexander Hinze
- * @since 27/03/2023
+ * @since 29/03/2023
  */
 
 #pragma once
@@ -23,33 +23,38 @@
 #include <functional>
 #include <type_traits>
 #include "stream_fwd.hpp"
+#include "concepts.hpp"
 
 namespace cxxs {
-    template<typename R, typename S, typename M> //
-    requires(concepts::is_streamable<S> && std::is_convertible_v<M, std::function<R(typename S::value_type&)>>)
-    struct MappingStream final : public Stream<R, S, MappingStream<R, S, M>> {
-        using self_type = MappingStream<R, S, M>;
-        using value_type = R;
+    template<typename S1, typename S2> //
+    requires(concepts::is_streamable<S1> && concepts::is_streamable<S2> && std::same_as<typename S1::value_type, typename S2::value_type>)
+    struct ChainingStream final : public Stream<typename S1::value_type, S1, ChainingStream<S1, S2>> {
+        using self_type = ChainingStream<S1, S2>;
+        using value_type = typename S1::value_type;
 
         private:
 
-        M _mapper;
+        S2 _other_streamable;
 
         public:
 
-        constexpr MappingStream(S streamable, M&& mapper) noexcept:
-                Stream<value_type, S, self_type>(std::move(streamable)),
-                _mapper(std::forward<M>(mapper)) {
+        constexpr ChainingStream(S1 streamable, S2 other_streamable) noexcept:
+                Stream<value_type, S1, self_type>(std::move(streamable)),
+                _other_streamable(std::move(other_streamable)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
             auto element = this->_streamable.next();
 
             if (!element) {
-                return std::nullopt;
+                element = _other_streamable.next();
+
+                if (!element) {
+                    return std::nullopt;
+                }
             }
 
-            return std::make_optional(std::move(_mapper(*element)));
+            return element;
         }
     };
 }

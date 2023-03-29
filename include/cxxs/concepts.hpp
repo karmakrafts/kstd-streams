@@ -53,6 +53,7 @@ namespace cxxs::concepts {
     template<typename T> //
     concept is_streamable = requires(T type) {
         typename T::value_type;
+        type.next();
         requires std::same_as<decltype(type.next()), std::optional<typename T::value_type>>;
     };
 
@@ -76,8 +77,8 @@ namespace cxxs::concepts {
         typename T::const_iterator;
         type.cbegin();
         type.cend();
-        requires std::same_as<decltype(type.cbegin()), typename T::const_iterator>;
-        requires std::same_as<decltype(type.cend()), typename T::const_iterator>;
+        requires is_iterator<decltype(type.cbegin())>;
+        requires is_iterator<decltype(type.cend())>;
     };
 
     template<typename T> //
@@ -85,7 +86,7 @@ namespace cxxs::concepts {
         typename T::const_iterator;
         type.crbegin();
         type.crend();
-        requires std::same_as<decltype(type.crbegin()), typename T::const_iterator>;
-        requires std::same_as<decltype(type.crend()), typename T::const_iterator>;
+        requires is_iterator<decltype(type.crbegin())>;
+        requires is_iterator<decltype(type.crend())>;
     };
 }

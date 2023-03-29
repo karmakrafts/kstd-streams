@@ -31,21 +31,21 @@ namespace cxxs {
         private:
 
         value_type _element;
-        bool _is_consumed;
+        bool _has_data;
 
         public:
 
         explicit constexpr SingletStreamable(value_type element) noexcept:
                 _element(std::move(element)),
-                _is_consumed(false) {
+                _has_data(true) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
-            if (_is_consumed) {
+            if (!_has_data) {
                 return std::nullopt;
             }
 
-            _is_consumed = true;
+            _has_data = false;
             return std::make_optional(std::move(_element));
         }
     };

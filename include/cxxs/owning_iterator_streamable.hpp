@@ -1,4 +1,4 @@
-// Copyright 2023 Karma Krafts & associates
+// Copyright $year.today Karma Krafts & associates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,31 +14,33 @@
 
 /**
  * @author Alexander Hinze
- * @since 27/03/2023
+ * @since 29/03/2023
  */
 
 #pragma once
 
-#include <optional>
-#include "concepts.hpp"
 #include "stream_fwd.hpp"
+#include "concepts.hpp"
 
 namespace cxxs {
-    template<typename I> //
-    requires(concepts::is_iterator<I>)
-    struct IteratorStreamable final {
-        using value_type = typename I::value_type;
+    template<typename T, template<typename, typename...> typename C> //
+    requires(concepts::is_const_iterable<C<T>>)
+    struct OwningIteratorStreamable final {
+        using value_type = T;
+        using iterator = typename C<T>::const_iterator;
 
         private:
 
-        I _current;
-        I _end;
+        C<T> _container;
+        iterator _current;
+        iterator _end;
 
         public:
 
-        constexpr IteratorStreamable(I begin, I end) noexcept:
-                _current(std::move(begin)),
-                _end(std::move(end)) {
+        explicit constexpr OwningIteratorStreamable(C<T> container) noexcept:
+                _container(std::move(container)),
+                _current(_container.cbegin()),
+                _end(_container.cend()) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

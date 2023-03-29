@@ -22,7 +22,27 @@
 #include "concepts.hpp"
 
 namespace cxxs {
+    template<typename I> //
+    requires(concepts::is_iterator<I>)
+    struct IteratorStreamable;
+
+    template<typename T, template<typename, typename...> typename C> //
+    requires(concepts::is_const_iterable<C<T>>)
+    struct OwningIteratorStreamable;
+
     template<typename T, typename S, typename IMPL> //
     requires(concepts::is_streamable<S>)
     class Stream;
+
+    template<typename S> //
+    requires(concepts::is_streamable<S>)
+    struct BasicStream;
+
+    template<typename T, template<typename, typename...> typename C>
+    requires(concepts::is_const_iterable<C<T>>)
+    [[nodiscard]] constexpr auto stream(const C<T>& container) noexcept -> BasicStream<IteratorStreamable<typename C<T>::const_iterator>>;
+
+    template<typename T, template<typename, typename...> typename C>
+    requires(concepts::is_const_iterable<C<T>>)
+    [[nodiscard]] constexpr auto owning(C<T> container) noexcept -> BasicStream<OwningIteratorStreamable<T, C>>;
 }

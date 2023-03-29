@@ -10,7 +10,7 @@ by Karma Krafts.
 ### Using cxxstreams
 In order to use the stream API, simply make sure you include the cxxstreams header:
 ```cpp 
-#include <cxxstreams/stream.hpp>
+#include <cxxs/stream.hpp>
 ```
 
 ### Why streams are amazing
@@ -31,7 +31,7 @@ Now let's take a look at the cxxstreams equivalent to that code:
 
 ```cpp 
 std::vector<int> elements(...);
-const auto sum = cxxstreams::make_stream(elements).sum();
+const auto sum = cxxs::stream(elements).sum();
 ```
 
 As long as the stream value type (`int` in our case) provides an implementation for `operator+` you can use the sum operation

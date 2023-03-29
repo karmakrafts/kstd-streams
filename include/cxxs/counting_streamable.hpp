@@ -1,4 +1,4 @@
-// Copyright 2023 Karma Krafts & associates
+// Copyright $year.today Karma Krafts & associates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,39 +14,40 @@
 
 /**
  * @author Alexander Hinze
- * @since 27/03/2023
+ * @since 29/03/2023
  */
 
 #pragma once
 
 #include <optional>
-#include "concepts.hpp"
-#include "stream_fwd.hpp"
+#include <functional>
 
 namespace cxxs {
-    template<typename I> //
-    requires(concepts::is_iterator<I>)
-    struct IteratorStreamable final {
-        using value_type = typename I::value_type;
+    template<typename T>
+    struct CountingStreamable final {
+        using value_type = T;
 
         private:
 
-        I _current;
-        I _end;
+        T _value;
+        size_t _max_count;
+        size_t _count;
 
         public:
 
-        constexpr IteratorStreamable(I begin, I end) noexcept:
-                _current(std::move(begin)),
-                _end(std::move(end)) {
+        constexpr CountingStreamable(T value, size_t max_count) noexcept:
+                _value(std::move(value)),
+                _max_count(max_count),
+                _count(0) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
-            if (_current == _end) {
+            if (_count == _max_count) {
                 return std::nullopt;
             }
 
-            return std::make_optional(*_current++);
+            ++_count;
+            return std::make_optional(_value);
         }
     };
 }
