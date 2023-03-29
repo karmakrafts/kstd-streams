@@ -283,6 +283,57 @@ namespace cxxs {
             }
         }
 
+        template<typename P>
+        requires(std::is_convertible_v<P, std::function<bool(T&)>>)
+        [[nodiscard]] constexpr auto all_match(P&& predicate) noexcept -> bool {
+            auto& self = get_self();
+            auto element = self.next();
+
+            while (element) {
+                if (!predicate(*element)) {
+                    return false;
+                }
+
+                element = self.next();
+            }
+
+            return true;
+        }
+
+        template<typename P>
+        requires(std::is_convertible_v<P, std::function<bool(T&)>>)
+        [[nodiscard]] constexpr auto any_match(P&& predicate) noexcept -> bool {
+            auto& self = get_self();
+            auto element = self.next();
+
+            while (element) {
+                if (predicate(*element)) {
+                    return true;
+                }
+
+                element = self.next();
+            }
+
+            return false;
+        }
+
+        template<typename P>
+        requires(std::is_convertible_v<P, std::function<bool(T&)>>)
+        [[nodiscard]] constexpr auto none_match(P&& predicate) noexcept -> bool {
+            auto& self = get_self();
+            auto element = self.next();
+
+            while (element) {
+                if (predicate(*element)) {
+                    return false;
+                }
+
+                element = self.next();
+            }
+
+            return true;
+        }
+
         template<template<typename, typename...> typename C>
         requires(std::is_default_constructible_v<C<T>> && (concepts::has_add_assign<C<T>> || concepts::has_push_back<C<T>>))
         [[nodiscard]] constexpr auto collect() noexcept -> C <T> {

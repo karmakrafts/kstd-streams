@@ -26,7 +26,7 @@
 
 namespace cxxs {
     template<typename S, typename LM, typename LS, typename RM, typename RS> //
-    requires(std::is_convertible_v<LM, std::function<LS(typename S::value_type&)>>&& std::is_convertible_v<RM, std::function<RS(typename S::value_type & )>>)
+    requires(std::is_convertible_v<LM, std::function<LS(typename S::value_type&)>> && std::is_convertible_v<RM, std::function<RS(typename S::value_type&)>>)
     struct FlatZippingStream final : public Stream<std::pair<typename LS::value_type, typename RS::value_type>, S, FlatZippingStream<S, LM, LS, RM, RS>> {
         using self_type = FlatZippingStream<S, LM, LS, RM, RS>;
         using left_type = typename LS::value_type;

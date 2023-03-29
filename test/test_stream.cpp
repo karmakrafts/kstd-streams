@@ -37,6 +37,36 @@ struct Foo final {
     }
 };
 
+TEST(cxxs_Stream, TestAnyMatch) {
+    ASSERT_TRUE(cxxs::stream(test_values).any_match([](auto& x) {
+        return x > 1.0F;
+    }));
+
+    ASSERT_FALSE(cxxs::stream(test_values).any_match([](auto& x) {
+        return x < 0.0F;
+    }));
+}
+
+TEST(cxxs_Stream, TestAllMatch) {
+    ASSERT_TRUE(cxxs::stream(test_values).all_match([](auto& x) {
+        return x > 0.0F;
+    }));
+
+    ASSERT_FALSE(cxxs::stream(test_values).all_match([](auto& x) {
+        return x > 2.0F;
+    }));
+}
+
+TEST(cxxs_Stream, TestNoneMatch) {
+    ASSERT_TRUE(cxxs::stream(test_values).none_match([](auto& x) {
+        return x > 5.0F;
+    }));
+    
+    ASSERT_FALSE(cxxs::stream(test_values).none_match([](auto& x) {
+        return x > 0.0F;
+    }));
+}
+
 TEST(cxxs_Stream, TestPeek) {
     // @formatter:off
     const auto result = cxxs::stream(test_values)
