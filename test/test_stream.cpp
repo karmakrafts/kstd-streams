@@ -37,10 +37,40 @@ struct Foo final {
     }
 };
 
+TEST(cxxs_Stream, TestPeek) {
+    // @formatter:off
+    const auto result = cxxs::stream(test_values)
+        .peek([](auto& x) { x += 0.5F; })
+        .collect<std::vector>();
+    // @formatter:on
+
+    ASSERT_EQ(result.size(), num_test_values);
+
+    for (size_t i = 0; i < num_test_values; i++) {
+        ASSERT_EQ(result[i], test_values[i] + 0.5F);
+    }
+}
+
+TEST(cxxs_Stream, TestForEach) {
+    size_t index = 0;
+
+    cxxs::stream(test_values).for_each([&index](auto& x) {
+        ASSERT_EQ(x, test_values[index++]);
+    });
+}
+
+TEST(cxxs_Stream, TestForEachIndexed) {
+    cxxs::stream(test_values).for_each_indexed([](auto& x, auto i) {
+        ASSERT_EQ(x, test_values[i]);
+    });
+}
+
 TEST(cxxs_Stream, TestZip) {
+    // @formatter:off
     std::vector<Foo> values({{10, 12.0F},
-                             {12, 14.0F},
-                             {14, 16.0F}});
+        {12, 14.0F},
+        {14, 16.0F}});
+    // @formatter:on
 
     // @formatter:off
     const auto result = cxxs::stream(values)
@@ -63,9 +93,11 @@ TEST(cxxs_Stream, TestZip) {
 }
 
 TEST(cxxs_Stream, TestFlatZip) {
+    // @formatter:off
     std::vector<Foo> values({{10, 12.0F},
-                             {12, 14.0F},
-                             {14, 16.0F}});
+        {12, 14.0F},
+        {14, 16.0F}});
+    // @formatter:on
     const auto num_values = values.size();
 
     std::vector<std::vector<Foo>> nested_values({values, values, values});

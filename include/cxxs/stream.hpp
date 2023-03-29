@@ -40,6 +40,7 @@
 #include "distinct_stream.hpp"
 #include "zipping_stream.hpp"
 #include "flat_zipping_stream.hpp"
+#include "peeking_stream.hpp"
 
 namespace cxxs {
     template<typename T, typename S, typename IMPL> //
@@ -100,6 +101,12 @@ namespace cxxs {
         requires(std::is_convertible_v<LM, std::function<LS(T&)>> && std::is_convertible_v<RM, std::function<RS(T&)>>)
         [[nodiscard]] constexpr auto flat_zip(LM&& left_mapper, RM&& right_mapper) noexcept -> FlatZippingStream<IMPL, LM, LS, RM, RS> {
             return FlatZippingStream<IMPL, LM, LS, RM, RS>(std::move(get_self()), std::forward<LM>(left_mapper), std::forward<RM>(right_mapper));
+        }
+
+        template<typename F>
+        requires(std::is_convertible_v<F, std::function<void(T&)>>)
+        [[nodiscard]] constexpr auto peek(F&& function) noexcept -> PeekingStream<IMPL, F> {
+            return PeekingStream<IMPL, F>(std::move(get_self()), std::forward<F>(function));
         }
 
         [[nodiscard]] constexpr auto limit(size_t max_count) noexcept -> LimitingStream<IMPL> {
@@ -249,6 +256,31 @@ namespace cxxs {
             }
 
             return result;
+        }
+
+        template<typename F>
+        requires(std::is_convertible_v<F, std::function<void(T&)>>)
+        constexpr auto for_each(F&& function) noexcept -> void {
+            auto& self = get_self();
+            auto element = self.next();
+
+            while (element) {
+                function(*element);
+                element = self.next();
+            }
+        }
+
+        template<typename F>
+        requires(std::is_convertible_v<F, std::function<void(T&, size_t)>>)
+        constexpr auto for_each_indexed(F&& function) noexcept -> void {
+            auto& self = get_self();
+            auto element = self.next();
+            size_t index = 0;
+
+            while (element) {
+                function(*element, index++);
+                element = self.next();
+            }
         }
 
         template<template<typename, typename...> typename C>
