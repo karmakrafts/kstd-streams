@@ -126,6 +126,23 @@ namespace cxxs {
             return get_self().next();
         }
 
+        [[nodiscard]] constexpr auto find_last() noexcept -> std::optional<T> {
+            auto& self = get_self();
+            auto element = self.next();
+
+            while (element) {
+                auto next = self.next();
+
+                if (!next) {
+                    break;
+                }
+
+                element = std::move(next);
+            }
+
+            return element;
+        }
+
         template<typename F>
         requires(std::is_convertible_v<F, std::function<T(T, T)>>)
         [[nodiscard]] constexpr auto reduce(F&& function) noexcept -> std::optional<T> {
@@ -260,7 +277,7 @@ namespace cxxs {
             auto element = self.next();
             size_t index = 0;
 
-            while(element && index < max_count) {
+            while (element && index < max_count) {
                 *(elements + index) = std::move(*element);
                 element = self.next();
                 index++;

@@ -108,7 +108,7 @@ TEST(cxxs_Stream, TestCollectToMemory) {
 
     ASSERT_EQ(target.size(), num_test_values);
 
-    for(size_t i = 0; i < num_test_values; i++) {
+    for (size_t i = 0; i < num_test_values; i++) {
         ASSERT_EQ(target[i], test_values[i]);
     }
 }
@@ -223,6 +223,30 @@ TEST(cxxs_Stream, TestFindFirst) {
     // @formatter:on
 
     ASSERT_FALSE(result);
+}
+
+TEST(cxxs_Stream, TestFindLast) {
+    auto result = cxxs::stream(test_values).find_last();
+    ASSERT_TRUE(result);
+    ASSERT_EQ(*result, 4.5F);
+
+    // @formatter:off
+    result = cxxs::stream(test_values)
+        .filter([](auto& x) { return x == 3.0F; })
+        .find_last();
+    // @formatter:on
+
+    ASSERT_TRUE(result);
+    ASSERT_EQ(*result, 3.0F);
+
+    // @formatter:off
+    result = cxxs::stream(test_values)
+        .filter([](auto& x) { return x > 2.0F && x < 4.0F; })
+        .find_last();
+    // @formatter:on
+
+    ASSERT_TRUE(result);
+    ASSERT_EQ(*result, 3.5F);
 }
 
 TEST(cxxs_Stream, TestCollect) {
