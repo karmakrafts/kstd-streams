@@ -23,7 +23,7 @@
 #include <functional>
 
 namespace cxxs {
-    template<typename T>
+    template<typename T> //
     struct CountingStreamable final {
         using value_type = T;
 

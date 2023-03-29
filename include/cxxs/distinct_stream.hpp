@@ -25,7 +25,7 @@
 #include "stream_fwd.hpp"
 
 namespace cxxs {
-    template<typename S>
+    template<typename S> //
     struct DistinctStream final : public Stream<typename S::value_type, S, DistinctStream<S>> {
         using self_type = DistinctStream<S>;
         using value_type = typename S::value_type;

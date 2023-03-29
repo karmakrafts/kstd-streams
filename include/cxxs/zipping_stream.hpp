@@ -26,7 +26,8 @@
 #include "stream_fwd.hpp"
 
 namespace cxxs {
-    template<typename S, typename LM, typename L, typename RM, typename R> requires(std::is_convertible_v<LM, std::function<L(typename S::value_type&)>> && std::is_convertible_v<RM, std::function<R(typename S::value_type&)>>)
+    template<typename S, typename LM, typename L, typename RM, typename R> //
+    requires(std::is_convertible_v<LM, std::function<L(typename S::value_type&)>>&& std::is_convertible_v<RM, std::function<R(typename S::value_type & )>>)
     struct ZippingStream final : public Stream<std::pair<L, R>, S, ZippingStream<S, LM, L, RM, R>> {
         using self_type = ZippingStream<S, LM, L, RM, R>;
         using value_type = std::pair<L, R>;

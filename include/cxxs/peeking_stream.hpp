@@ -25,7 +25,8 @@
 #include "stream_fwd.hpp"
 
 namespace cxxs {
-    template<typename S, typename F> requires(std::is_convertible_v<F, std::function<void(typename S::value_type&)>>)
+    template<typename S, typename F> //
+    requires(std::is_convertible_v<F, std::function<void(typename S::value_type&)>>)
     struct PeekingStream final : public Stream<typename S::value_type, S, PeekingStream<S, F>> {
         using self_type = PeekingStream<S, F>;
         using value_type = typename S::value_type;
