@@ -21,6 +21,7 @@
 
 #include <optional>
 #include <functional>
+#include <type_traits>
 
 #include "concepts.hpp"
 #include "stream_fwd.hpp"
@@ -37,6 +38,8 @@
 #include "mapping_stream.hpp"
 #include "flat_mapping_stream.hpp"
 #include "distinct_stream.hpp"
+#include "zipping_stream.hpp"
+#include "flat_zipping_stream.hpp"
 
 namespace cxxs {
     template<typename T, typename S, typename IMPL> //
@@ -87,6 +90,18 @@ namespace cxxs {
             return FlatMappingStream<IMPL, RS, M>(std::move(get_self()), std::forward<M>(mapper));
         }
 
+        template<typename LM, typename L = std::invoke_result_t<LM, T&>, typename RM, typename R = std::invoke_result_t<RM, T&>>
+        requires(std::is_convertible_v<LM, std::function<L(T&)>> && std::is_convertible_v<RM, std::function<R(T&)>>)
+        [[nodiscard]] constexpr auto zip(LM&& left_mapper, RM&& right_mapper) noexcept -> ZippingStream<IMPL, LM, L, RM, R> {
+            return ZippingStream<IMPL, LM, L, RM, R>(std::move(get_self()), std::forward<LM>(left_mapper), std::forward<RM>(right_mapper));
+        }
+
+        template<typename LM, typename LS = std::invoke_result_t<LM, T&>, typename RM, typename RS = std::invoke_result_t<RM, T&>>
+        requires(std::is_convertible_v<LM, std::function<LS(T&)>> && std::is_convertible_v<RM, std::function<RS(T&)>>)
+        [[nodiscard]] constexpr auto flat_zip(LM&& left_mapper, RM&& right_mapper) noexcept -> FlatZippingStream<IMPL, LM, LS, RM, RS> {
+            return FlatZippingStream<IMPL, LM, LS, RM, RS>(std::move(get_self()), std::forward<LM>(left_mapper), std::forward<RM>(right_mapper));
+        }
+
         [[nodiscard]] constexpr auto limit(size_t max_count) noexcept -> LimitingStream<IMPL> {
             return LimitingStream<IMPL>(std::move(get_self()), max_count);
         }
@@ -98,8 +113,8 @@ namespace cxxs {
         [[nodiscard]] constexpr auto skip(size_t count) noexcept -> IMPL& {
             auto& self = get_self();
 
-            for(size_t i = 0; i < count; i++) {
-                if(!self.next()) {
+            for (size_t i = 0; i < count; i++) {
+                if (!self.next()) {
                     break;
                 }
             }
