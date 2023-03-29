@@ -21,7 +21,7 @@
 #include <gtest/gtest.h>
 #include <cxxs/counting_streamable.hpp>
 
-TEST(cxxstreams_CountingStreamable, TestIterate) {
+TEST(cxxs_CountingStreamable, TestIterate) {
     std::vector<float> values({3.0F, 3.0F, 3.0F, 3.0F, 3.0F, 3.0F, 3.0F, 3.0F, 3.0F, 3.0F});
     auto streamable = cxxs::CountingStreamable(3.0F, values.size());
 

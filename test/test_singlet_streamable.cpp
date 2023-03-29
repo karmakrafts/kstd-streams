@@ -20,7 +20,7 @@
 #include <gtest/gtest.h>
 #include <cxxs/singlet_streamable.hpp>
 
-TEST(cxxstreams_SingletStreamable, TestIterate) {
+TEST(cxxs_SingletStreamable, TestIterate) {
     float value = 1337.0F;
     auto streamable = cxxs::SingletStreamable(value);
     auto element = streamable.next();

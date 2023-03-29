@@ -21,7 +21,7 @@
 #include <gtest/gtest.h>
 #include <cxxs/owning_iterator_streamable.hpp>
 
-TEST(cxxstreams_OwningIteratorStreamable, TestIterate) {
+TEST(cxxs_OwningIteratorStreamable, TestIterate) {
     std::vector<float> values({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
     auto owned_values = values;
     auto streamable = cxxs::OwningIteratorStreamable(std::move(owned_values));

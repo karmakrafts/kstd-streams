@@ -21,7 +21,7 @@
 #include <gtest/gtest.h>
 #include <cxxs/iterator_streamable.hpp>
 
-TEST(cxxstreams_IteratorStreamable, TestIterate) {
+TEST(cxxs_IteratorStreamable, TestIterate) {
     std::vector<float> values({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
     auto streamable = cxxs::IteratorStreamable(values.cbegin(), values.cend());
 
