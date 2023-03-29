@@ -61,7 +61,7 @@ TEST(cxxs_Stream, TestNoneMatch) {
     ASSERT_TRUE(cxxs::stream(test_values).none_match([](auto& x) {
         return x > 5.0F;
     }));
-    
+
     ASSERT_FALSE(cxxs::stream(test_values).none_match([](auto& x) {
         return x > 0.0F;
     }));
@@ -338,6 +338,27 @@ TEST(cxxs_Stream, TestFilter) {
     ASSERT_EQ(result[1], 4.0F);
     ASSERT_EQ(result[2], 2.5F);
     ASSERT_EQ(result[3], 4.5F);
+}
+
+TEST(cxxs_Stream, TestFilterNotNull) {
+    std::vector<const float*> pointers;
+
+    for (const auto& value: test_values) {
+        pointers.push_back(&value);
+        pointers.push_back(nullptr);
+    }
+
+    // @formatter:off
+    const auto result = cxxs::stream(pointers)
+        .filter_not_null()
+        .collect<std::vector>();
+    // @formatter:on
+
+    ASSERT_EQ(result.size(), num_test_values);
+
+    for (size_t i = 0; i < num_test_values; i++) {
+        ASSERT_EQ(*result[i], test_values[i]);
+    }
 }
 
 TEST(cxxs_Stream, TestMap) {

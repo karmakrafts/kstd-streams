@@ -79,6 +79,14 @@ namespace cxxs {
             return FilteringStream<IMPL, F>(std::move(get_self()), std::forward<F>(filter));
         }
 
+        [[nodiscard]] constexpr auto filter_not_null() noexcept -> decltype(auto) {
+            static_assert(std::is_pointer_v<T>, "Stream value type is not a pointer");
+
+            return filter([](auto& value) {
+                return value != nullptr;
+            });
+        }
+
         template<typename M, typename R = std::invoke_result_t<M, T&>>
         requires(std::is_convertible_v<M, std::function<R(T&)>>)
         [[nodiscard]] constexpr auto map(M&& mapper) noexcept -> MappingStream<R, IMPL, M> {
