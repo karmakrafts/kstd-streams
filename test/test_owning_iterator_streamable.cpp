@@ -26,7 +26,7 @@ TEST(cxxstreams_OwningIteratorStreamable, TestIterate) {
     auto owned_values = values;
     auto streamable = cxxs::OwningIteratorStreamable(std::move(owned_values));
 
-    for (const auto value : values) {
+    for (const auto value: values) {
         auto element = streamable.next();
         ASSERT_TRUE(element);
         ASSERT_EQ(*element, value);

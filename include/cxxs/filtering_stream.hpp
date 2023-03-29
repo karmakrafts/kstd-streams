@@ -26,7 +26,7 @@
 
 namespace cxxs {
     template<typename S, typename F> //
-    requires(concepts::is_streamable<S> && std::is_convertible_v<F, std::function<void(typename S::value_type&)>>)
+    requires(std::is_convertible_v<F, std::function<void(typename S::value_type&)>>)
     struct FilteringStream final : public Stream<typename S::value_type, S, FilteringStream<S, F>> {
         using self_type = FilteringStream<S, F>;
         using value_type = typename S::value_type;

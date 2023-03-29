@@ -36,6 +36,7 @@
 #include "limiting_stream.hpp"
 #include "mapping_stream.hpp"
 #include "flat_mapping_stream.hpp"
+#include "distinct_stream.hpp"
 
 namespace cxxs {
     template<typename T, typename S, typename IMPL> //
@@ -88,6 +89,10 @@ namespace cxxs {
 
         [[nodiscard]] constexpr auto limit(size_t max_count) noexcept -> LimitingStream<IMPL> {
             return LimitingStream<IMPL>(std::move(get_self()), max_count);
+        }
+
+        [[nodiscard]] constexpr auto distinct() noexcept -> DistinctStream<IMPL> {
+            return DistinctStream<IMPL>(std::move(get_self()));
         }
 
         [[nodiscard]] constexpr auto find_first() noexcept -> std::optional<T> {

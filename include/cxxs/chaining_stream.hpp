@@ -27,7 +27,7 @@
 
 namespace cxxs {
     template<typename S1, typename S2> //
-    requires(concepts::is_streamable<S1> && concepts::is_streamable<S2> && std::same_as<typename S1::value_type, typename S2::value_type>)
+    requires(std::same_as<typename S1::value_type, typename S2::value_type>)
     struct ChainingStream final : public Stream<typename S1::value_type, S1, ChainingStream<S1, S2>> {
         using self_type = ChainingStream<S1, S2>;
         using value_type = typename S1::value_type;
