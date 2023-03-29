@@ -50,8 +50,9 @@ namespace cxxs {
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
             while (true) {
                 if (_current) {
-                    auto left_element = _current->first.next();
-                    auto right_element = _current->second.next();
+                    auto& [left_stream, right_stream] = *_current;
+                    auto left_element = left_stream.next();
+                    auto right_element = right_stream.next();
 
                     if (!left_element || !right_element) {
                         _current.reset();

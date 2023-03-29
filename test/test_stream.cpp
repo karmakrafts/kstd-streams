@@ -55,10 +55,10 @@ TEST(cxxs_Stream, TestZip) {
     ASSERT_EQ(result.size(), num_values);
 
     for (size_t i = 0; i < num_values; i++) {
-        auto& foo = values[i];
-        auto& pair = result[i];
-        ASSERT_EQ(pair.first, foo.i_value);
-        ASSERT_EQ(pair.second, foo.f_value);
+        auto& [expected_int, expected_float] = values[i];
+        auto& [actual_int, actual_float] = result[i];
+        ASSERT_EQ(actual_int, expected_int);
+        ASSERT_EQ(actual_float, actual_float);
     }
 }
 
@@ -84,11 +84,14 @@ TEST(cxxs_Stream, TestFlatZip) {
     size_t sub_index = 0;
 
     for (size_t i = 0; i < flat_count; i++) {
-        auto& foo = values[sub_index];
-        auto& pair = result[i];
+        auto& [expected_int, expected_float] = values[sub_index];
+        auto& [left_foo, right_foo] = result[i];
 
-        ASSERT_EQ(pair.first, foo);
-        ASSERT_EQ(pair.second, foo);
+        ASSERT_EQ(left_foo.i_value, expected_int);
+        ASSERT_EQ(left_foo.f_value, expected_float);
+
+        ASSERT_EQ(right_foo.i_value, expected_int);
+        ASSERT_EQ(right_foo.f_value, expected_float);
 
         if (sub_index < num_values - 1) {
             sub_index++;
