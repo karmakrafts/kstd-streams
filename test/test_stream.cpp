@@ -99,6 +99,17 @@ TEST(cxxs_Stream, TestFlatZip) {
     }
 }
 
+TEST(cxxs_Stream, TestCollectToMemory) {
+    std::vector<float> target(num_test_values);
+    cxxs::stream(test_values).collect_to_memory(target.data(), num_test_values);
+
+    ASSERT_EQ(target.size(), num_test_values);
+
+    for(size_t i = 0; i < num_test_values; i++) {
+        ASSERT_EQ(target[i], test_values[i]);
+    }
+}
+
 TEST(cxxs_Stream, TestSkip) {
     const auto num_values = num_test_values - 2;
 

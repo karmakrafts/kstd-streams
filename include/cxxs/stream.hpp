@@ -255,6 +255,18 @@ namespace cxxs {
             return result;
         }
 
+        constexpr auto collect_to_memory(T* elements, size_t max_count) noexcept -> void {
+            auto& self = get_self();
+            auto element = self.next();
+            size_t index = 0;
+
+            while(element && index < max_count) {
+                *(elements + index) = std::move(*element);
+                element = self.next();
+                index++;
+            }
+        }
+
         // Chain operators (append)
 
         template<typename S2>
