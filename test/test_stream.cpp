@@ -37,6 +37,37 @@ struct Foo final {
     }
 };
 
+TEST(cxxs_Stream, TestDerefAll) {
+    std::vector<const float*> pointers;
+
+    for (const auto& value: test_values) {
+        pointers.push_back(&value);
+    }
+
+    const auto result = cxxs::stream(pointers).deref_all().collect<std::vector>();
+    ASSERT_EQ(result.size(), num_test_values);
+
+    for (size_t i = 0; i < num_test_values; i++) {
+        ASSERT_EQ(result[i], test_values[i]);
+    }
+}
+
+TEST(cxxs_Stream, TestDerefNotNull) {
+    std::vector<const float*> pointers;
+
+    for (const auto& value: test_values) {
+        pointers.push_back(&value);
+        pointers.push_back(nullptr);
+    }
+
+    const auto result = cxxs::stream(pointers).deref_not_null().collect<std::vector>();
+    ASSERT_EQ(result.size(), num_test_values);
+
+    for (size_t i = 0; i < num_test_values; i++) {
+        ASSERT_EQ(result[i], test_values[i]);
+    }
+}
+
 TEST(cxxs_Stream, TestAnyMatch) {
     ASSERT_TRUE(cxxs::stream(test_values).any_match([](auto& x) {
         return x > 1.0F;

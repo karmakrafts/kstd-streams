@@ -342,6 +342,22 @@ namespace cxxs {
             return true;
         }
 
+        [[nodiscard]] constexpr auto deref_all() noexcept -> decltype(auto) {
+            static_assert(std::is_pointer_v<T>, "Stream value type is not a pointer");
+
+            return map([](auto& value) {
+                return *value;
+            });
+        }
+
+        [[nodiscard]] constexpr auto deref_not_null() noexcept -> decltype(auto) {
+            static_assert(std::is_pointer_v<T>, "Stream value type is not a pointer");
+
+            return filter_not_null().map([](auto& value) {
+                return *value;
+            });
+        }
+
         template<template<typename, typename...> typename C>
         requires(std::is_default_constructible_v<C<T>> && (concepts::has_add_assign<C<T>> || concepts::has_push_back<C<T>>))
         [[nodiscard]] constexpr auto collect() noexcept -> C <T> {
@@ -413,6 +429,12 @@ namespace cxxs {
         requires(concepts::is_const_iterable<C<T>>)
         [[nodiscard]] constexpr auto operator ||(C<T>&& container) noexcept -> decltype(auto) {
             return pre_chain(owning(std::forward<C<T>>(container)));
+        }
+
+        // Deref operator (find first)
+
+        [[nodiscard]] constexpr auto operator *() noexcept -> std::optional<T> {
+            return find_first();
         }
     };
 
