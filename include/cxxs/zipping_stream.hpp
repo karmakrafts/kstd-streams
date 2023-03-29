@@ -1,4 +1,4 @@
-// Copyright $year.today Karma Krafts & associates
+// Copyright 2023 Karma Krafts & associates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 
 namespace cxxs {
     template<typename S, typename LM, typename L, typename RM, typename R> //
-    requires(std::is_convertible_v<LM, std::function<L(typename S::value_type&)>>&& std::is_convertible_v<RM, std::function<R(typename S::value_type & )>>)
+    requires(std::is_convertible_v<LM, std::function<L(typename S::value_type&)>> && std::is_convertible_v<RM, std::function<R(typename S::value_type&)>>)
     struct ZippingStream final : public Stream<std::pair<L, R>, S, ZippingStream<S, LM, L, RM, R>> {
         using self_type = ZippingStream<S, LM, L, RM, R>;
         using value_type = std::pair<L, R>;

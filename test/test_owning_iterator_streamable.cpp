@@ -1,4 +1,4 @@
-// Copyright $year.today Karma Krafts & associates
+// Copyright 2023 Karma Krafts & associates
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
