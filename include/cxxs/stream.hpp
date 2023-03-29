@@ -82,7 +82,7 @@ namespace cxxs {
         }
 
         template<typename M, typename RS = std::invoke_result_t<M, T&>>
-        requires(std::is_convertible_v<M, std::function<RS(T&)>>)
+        requires(std::is_convertible_v<M, std::function<RS(T&)>> && concepts::is_streamable<RS>)
         [[nodiscard]] constexpr auto flat_map(M&& mapper) noexcept -> FlatMappingStream<IMPL, RS, M> {
             return FlatMappingStream<IMPL, RS, M>(std::move(get_self()), std::forward<M>(mapper));
         }
