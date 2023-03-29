@@ -24,6 +24,16 @@
 const std::vector<float> test_values({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
 const size_t num_test_values = test_values.size();
 
+TEST(cxxs_Stream, TestSkip) {
+    const auto num_values = num_test_values - 2;
+    const auto result = cxxs::stream(test_values).skip(2).collect<std::vector>();
+    ASSERT_EQ(result.size(), num_values);
+
+    for(size_t i = 0; i < num_values; i++) {
+        ASSERT_EQ(result[i], test_values[i + 2]);
+    }
+}
+
 TEST(cxxs_Stream, TestDistinct) {
     std::vector<std::vector<float>> nested_values({test_values, test_values, test_values, test_values});
 

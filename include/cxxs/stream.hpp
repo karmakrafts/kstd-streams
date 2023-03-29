@@ -95,6 +95,18 @@ namespace cxxs {
             return DistinctStream<IMPL>(std::move(get_self()));
         }
 
+        [[nodiscard]] constexpr auto skip(size_t count) noexcept -> IMPL& {
+            auto& self = get_self();
+
+            for(size_t i = 0; i < count; i++) {
+                if(!self.next()) {
+                    break;
+                }
+            }
+
+            return self;
+        }
+
         [[nodiscard]] constexpr auto find_first() noexcept -> std::optional<T> {
             return get_self().next();
         }
