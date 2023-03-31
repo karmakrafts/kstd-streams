@@ -41,6 +41,7 @@
 #include "zipping_stream.hpp"
 #include "flat_zipping_stream.hpp"
 #include "peeking_stream.hpp"
+#include "dropping_stream.hpp"
 
 namespace cxxs {
     template<typename T, typename S, typename IMPL> //
@@ -115,6 +116,12 @@ namespace cxxs {
         requires(std::is_convertible_v<F, std::function<void(T&)>>)
         [[nodiscard]] constexpr auto peek(F&& function) noexcept -> PeekingStream<IMPL, F> {
             return PeekingStream<IMPL, F>(std::move(get_self()), std::forward<F>(function));
+        }
+
+        template<typename P>
+        requires(std::is_convertible_v<P, std::function<bool(T&)>>)
+        [[nodiscard]] constexpr auto drop_while(P&& predicate) noexcept -> DroppingStream<IMPL, P> {
+            return DroppingStream<IMPL, P>(std::move(get_self()), std::forward<P>(predicate));
         }
 
         [[nodiscard]] constexpr auto limit(size_t max_count) noexcept -> LimitingStream<IMPL> {
@@ -373,6 +380,22 @@ namespace cxxs {
                     result.push_back(std::move(*element));
                 }
 
+                element = self.next();
+            }
+
+            return result;
+        }
+
+        template<size_t EXTENT, template<typename, size_t, typename...> typename SEQ>
+        requires(EXTENT > 0)
+        [[nodiscard]] constexpr auto collect_sequence() noexcept -> SEQ <T, EXTENT> {
+            SEQ<T, EXTENT> result;
+            auto& self = get_self();
+            auto element = self.next();
+            size_t index = 0;
+
+            while (element && index < EXTENT) {
+                result[index++] = std::move(*element);
                 element = self.next();
             }
 

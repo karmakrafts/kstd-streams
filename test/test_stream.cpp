@@ -371,6 +371,21 @@ TEST(cxxs_Stream, TestFilter) {
     ASSERT_EQ(result[3], 4.5F);
 }
 
+TEST(cxxs_Stream, TestDropWhile) {
+    // @formatter:off
+    const auto result = cxxs::stream(test_values)
+        .drop_while([](auto& x) { return x < 3.0F; })
+        .collect<std::vector>();
+    // @formatter:on
+
+    const auto num_remaining = test_values.size() - 2;
+    ASSERT_EQ(result.size(), num_remaining);
+
+    for (size_t i = 0; i < num_remaining; i++) {
+        ASSERT_EQ(result[i], test_values[i + 2]);
+    }
+}
+
 TEST(cxxs_Stream, TestFilterNotNull) {
     std::vector<const float*> pointers;
 
