@@ -356,7 +356,7 @@ TEST(cxxs_Stream, TestCollectToSequence) {
     const auto result = cxxs::stream(test_values).collect_sequence<extent, std::array>();
     ASSERT_EQ(result.size(), extent);
 
-    for(size_t i = 0; i < extent; i++) {
+    for (size_t i = 0; i < extent; i++) {
         ASSERT_EQ(result[i], test_values[i]);
     }
 }
@@ -393,6 +393,21 @@ TEST(cxxs_Stream, TestDropWhile) {
 
     for (size_t i = 0; i < num_remaining; i++) {
         ASSERT_EQ(result[i], test_values[i + 2]);
+    }
+}
+
+TEST(cxxs_Stream, TestTakeWhile) {
+    // @formatter:off
+    const auto result = cxxs::stream(test_values)
+        .take_while([](auto& x) { return x <= 4.0F; })
+        .collect<std::vector>();
+    // @formatter:on
+
+    const auto num_taken = test_values.size() - 1;
+    ASSERT_EQ(result.size(), num_taken);
+
+    for (size_t i = 0; i < num_taken; i++) {
+        ASSERT_EQ(result[i], test_values[i]);
     }
 }
 

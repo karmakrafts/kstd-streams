@@ -42,6 +42,7 @@
 #include "flat_zipping_stream.hpp"
 #include "peeking_stream.hpp"
 #include "dropping_stream.hpp"
+#include "taking_stream.hpp"
 
 namespace cxxs {
     template<typename T, typename S, typename IMPL> //
@@ -122,6 +123,12 @@ namespace cxxs {
         requires(std::is_convertible_v<P, std::function<bool(T&)>>)
         [[nodiscard]] constexpr auto drop_while(P&& predicate) noexcept -> DroppingStream<IMPL, P> {
             return DroppingStream<IMPL, P>(std::move(get_self()), std::forward<P>(predicate));
+        }
+
+        template<typename P>
+        requires(std::is_convertible_v<P, std::function<bool(T&)>>)
+        [[nodiscard]] constexpr auto take_while(P&& predicate) noexcept -> TakingStream <IMPL, P> {
+            return TakingStream<IMPL, P>(std::move(get_self()), std::forward<P>(predicate));
         }
 
         [[nodiscard]] constexpr auto limit(size_t max_count) noexcept -> LimitingStream<IMPL> {
