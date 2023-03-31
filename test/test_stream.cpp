@@ -351,6 +351,16 @@ TEST(cxxs_Stream, TestCollect) {
     }
 }
 
+TEST(cxxs_Stream, TestCollectToSequence) {
+    constexpr size_t extent = 4;
+    const auto result = cxxs::stream(test_values).collect_sequence<extent, std::array>();
+    ASSERT_EQ(result.size(), extent);
+
+    for(size_t i = 0; i < extent; i++) {
+        ASSERT_EQ(result[i], test_values[i]);
+    }
+}
+
 TEST(cxxs_Stream, TestCount) {
     const auto result = cxxs::stream(test_values).count();
     ASSERT_EQ(result, num_test_values);
