@@ -30,6 +30,7 @@
 #include "owning_iterator_streamable.hpp"
 #include "singlet_streamable.hpp"
 #include "counting_streamable.hpp"
+#include "draining_streamable.hpp"
 
 #include "basic_stream.hpp"
 #include "chaining_stream.hpp"
@@ -81,14 +82,6 @@ namespace cxxs {
             return FilteringStream<IMPL, F>(std::move(get_self()), std::forward<F>(filter));
         }
 
-        [[nodiscard]] constexpr auto filter_not_null() noexcept -> decltype(auto) {
-            static_assert(std::is_pointer_v<T>, "Stream value type is not a pointer");
-
-            return filter([](auto& value) {
-                return value != nullptr;
-            });
-        }
-
         template<typename M, typename R = std::invoke_result_t<M, T&>>
         requires(std::is_convertible_v<M, std::function<R(T&)>>)
         [[nodiscard]] constexpr auto map(M&& mapper) noexcept -> MappingStream<R, IMPL, M> {
@@ -137,6 +130,14 @@ namespace cxxs {
 
         [[nodiscard]] constexpr auto distinct() noexcept -> DistinctStream<IMPL> {
             return DistinctStream<IMPL>(std::move(get_self()));
+        }
+
+        [[nodiscard]] constexpr auto filter_not_null() noexcept -> decltype(auto) {
+            static_assert(std::is_pointer_v<T>, "Stream value type is not a pointer");
+
+            return filter([](auto& value) {
+                return value != nullptr;
+            });
         }
 
         [[nodiscard]] constexpr auto skip(size_t count) noexcept -> IMPL& {
@@ -373,20 +374,14 @@ namespace cxxs {
         }
 
         template<template<typename, typename...> typename C>
-        requires(std::is_default_constructible_v<C<T>> && (concepts::has_add_assign<C<T>> || concepts::has_push_back<C<T>>))
+        requires(std::is_default_constructible_v<C<T>> && concepts::has_push_back<C<T>>)
         [[nodiscard]] constexpr auto collect() noexcept -> C <T> {
             C<T> result;
             auto& self = get_self();
             auto element = self.next();
 
             while (element) {
-                if constexpr (concepts::has_add_assign<C<T>>) {
-                    result += std::move(*element);
-                }
-                else {
-                    result.push_back(std::move(*element));
-                }
-
+                result.push_back(std::move(*element));
                 element = self.next();
             }
 
@@ -419,6 +414,10 @@ namespace cxxs {
                 element = self.next();
                 index++;
             }
+        }
+
+        [[nodiscard]] constexpr auto evaluate() noexcept -> decltype(auto) {
+            return owning(collect<std::vector>());
         }
 
         // Chain operators (append)
@@ -484,6 +483,12 @@ namespace cxxs {
     requires(std::is_copy_assignable_v<T> && concepts::is_const_reverse_iterable<C<T>>)
     [[nodiscard]] constexpr auto reverse(const C<T>& container) noexcept -> BasicStream<IteratorStreamable<typename C<T>::const_iterator>> {
         return BasicStream(IteratorStreamable(container.crbegin(), container.crend()));
+    }
+
+    template<typename T, template<typename, typename...> typename C>
+    requires(std::is_copy_assignable_v<T> && concepts::is_iterable<C<T>> && concepts::has_erase<C<T>>)
+    [[nodiscard]] constexpr auto draining(C<T>& container) noexcept -> BasicStream<DrainingStreamable<T, C>> {
+        return BasicStream(DrainingStreamable(container));
     }
 
     template<typename T>

@@ -29,11 +29,6 @@ namespace cxxs::concepts {
     };
 
     template<typename T> //
-    concept has_add_assign = requires(T type) {
-        type += type;
-    };
-
-    template<typename T> //
     concept has_lth = requires(T type) {
         type < type;
         requires std::same_as<decltype(type < type), bool>;
@@ -48,6 +43,11 @@ namespace cxxs::concepts {
     template<typename T> //
     concept has_push_back = requires(T type, typename T::value_type value) {
         type.push_back(value);
+    };
+
+    template<typename T> //
+    concept has_erase = requires(T type, typename T::iterator value) {
+        type.erase(value);
     };
 
     template<typename T> //
@@ -88,5 +88,14 @@ namespace cxxs::concepts {
         type.crend();
         requires is_iterator<decltype(type.crbegin())>;
         requires is_iterator<decltype(type.crend())>;
+    };
+
+    template<typename T> //
+    concept is_iterable = requires(T type) {
+        typename T::iterator;
+        type.begin();
+        type.end();
+        requires is_iterator<decltype(type.begin())>;
+        requires is_iterator<decltype(type.end())>;
     };
 }
