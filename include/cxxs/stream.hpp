@@ -120,7 +120,7 @@ namespace cxxs {
 
         template<typename P>
         requires(std::is_convertible_v<P, std::function<bool(T&)>>)
-        [[nodiscard]] constexpr auto take_while(P&& predicate) noexcept -> TakingStream <IMPL, P> {
+        [[nodiscard]] constexpr auto take_while(P&& predicate) noexcept -> TakingStream<IMPL, P> {
             return TakingStream<IMPL, P>(std::move(get_self()), std::forward<P>(predicate));
         }
 
@@ -382,6 +382,27 @@ namespace cxxs {
 
             while (element) {
                 result.push_back(std::move(*element));
+                element = self.next();
+            }
+
+            return result;
+        }
+
+        template<template<typename, typename, typename...> typename M, // @formatter:off
+                typename KM, typename K = std::invoke_result_t<KM, T&>,
+                typename VM, typename V = std::invoke_result_t<VM, T&>>
+        requires(std::is_convertible_v<KM, std::function<K(T&)>>
+                && std::is_convertible_v<VM, std::function<V(T&)>>
+                && std::is_default_constructible_v<M<K, V>>
+                && concepts::has_key_value_indexer<K, V, M>) // @formatter:on
+        [[nodiscard]] constexpr auto collect_map(KM&& key_mapper, VM&& value_mapper) noexcept -> M <K, V> {
+            M<K, V> result;
+            auto& self = get_self();
+            auto element = self.next();
+
+            while (element) {
+                auto& value = *element;
+                result[key_mapper(value)] = std::move(value_mapper(value));
                 element = self.next();
             }
 

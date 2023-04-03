@@ -351,6 +351,23 @@ TEST(cxxs_Stream, TestCollect) {
     }
 }
 
+TEST(cxxs_Stream, TestCollectMap) {
+    size_t index = 0;
+
+    // @formatter:off
+    auto result = cxxs::stream(test_values).collect_map<std::unordered_map>(
+        [&index](auto& x) { return index++; },
+        [](auto& x) { return x; }
+    );
+    // @formatter:on
+
+    ASSERT_EQ(result.size(), num_test_values);
+
+    for (size_t i = 0; i < num_test_values; i++) {
+        ASSERT_EQ(result[i], test_values[i]);
+    }
+}
+
 TEST(cxxs_Stream, TestCollectToSequence) {
     constexpr size_t extent = 4;
     const auto result = cxxs::stream(test_values).collect_sequence<extent, std::array>();

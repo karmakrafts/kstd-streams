@@ -50,6 +50,11 @@ namespace cxxs::concepts {
         type.erase(value);
     };
 
+    template<typename K, typename V, template<typename, typename, typename...> typename M> //
+    concept has_key_value_indexer = requires(M<K, V> type, K key, V value) {
+        type[key] = value;
+    };
+
     template<typename T> //
     concept is_streamable = requires(T type) {
         typename T::value_type;

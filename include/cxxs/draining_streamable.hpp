@@ -11,8 +11,7 @@
 #include "stream_fwd.hpp"
 
 namespace cxxs {
-    template<typename T, template<typename, typename...> typename C>
-    requires(concepts::is_iterable<C<T>> && concepts::has_erase<C<T>>)
+    template<typename T, template<typename, typename...> typename C> requires(concepts::is_iterable<C<T>> && concepts::has_erase<C<T>>)
     struct DrainingStreamable final {
         using self_type = DrainingStreamable<T, C>;
         using value_type = T;
@@ -23,15 +22,15 @@ namespace cxxs {
 
         public:
 
-        explicit constexpr DrainingStreamable(C<T>& container) noexcept :
-                _container(container)
-        {}
+        explicit constexpr DrainingStreamable(C<T>& container) noexcept:
+                _container(container) {
+        }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
             auto begin = _container.begin();
             auto end = _container.end();
 
-            if(begin == end) {
+            if (begin == end) {
                 return std::nullopt;
             }
 
