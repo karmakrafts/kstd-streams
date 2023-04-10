@@ -44,6 +44,7 @@
 #include "peeking_stream.hpp"
 #include "dropping_stream.hpp"
 #include "taking_stream.hpp"
+#include "sorting_stream.hpp"
 
 namespace cxxs {
     template<typename T, typename S, typename IMPL> //
@@ -124,12 +125,31 @@ namespace cxxs {
             return TakingStream<IMPL, P>(std::move(get_self()), std::forward<P>(predicate));
         }
 
+        template<typename C>
+        requires(std::is_convertible_v<C, std::function<bool(const T&, const T&)>>)
+        [[nodiscard]] constexpr auto sorted(C&& comparator) noexcept -> SortingStream<IMPL, C> {
+            return SortingStream<IMPL, C>(std::move(get_self()), std::forward<C>(comparator));
+        }
+
         [[nodiscard]] constexpr auto limit(size_t max_count) noexcept -> LimitingStream<IMPL> {
             return LimitingStream<IMPL>(std::move(get_self()), max_count);
         }
 
         [[nodiscard]] constexpr auto distinct() noexcept -> DistinctStream<IMPL> {
             return DistinctStream<IMPL>(std::move(get_self()));
+        }
+
+        [[nodiscard]] constexpr auto sorted() noexcept -> decltype(auto) {
+            static_assert(concepts::has_lth<T> || concepts::has_gth<T>, "Stream value type doesn't implement operator< or operator>");
+
+            return sorted([](const auto& a, const auto& b) {
+                if constexpr (concepts::has_lth<T>) {
+                    return a < b;
+                }
+                else {
+                    return !(a > b); // NOLINT
+                }
+            });
         }
 
         [[nodiscard]] constexpr auto filter_not_null() noexcept -> decltype(auto) {

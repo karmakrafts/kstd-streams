@@ -26,6 +26,7 @@ namespace cxxs {
     template<typename T, template<typename, typename...> typename C> //
     requires(concepts::is_const_iterable<C<T>>)
     struct OwningIteratorStreamable final {
+        using self_type = OwningIteratorStreamable<T, C>;
         using value_type = T;
         using iterator = typename C<T>::const_iterator;
 
@@ -41,6 +42,38 @@ namespace cxxs {
                 _container(std::move(container)),
                 _current(_container.cbegin()),
                 _end(_container.cend()) {
+        }
+
+        constexpr OwningIteratorStreamable() noexcept:
+                _container(),
+                _current(_container.cbegin()),
+                _end(_container.cend()) {
+        }
+
+        constexpr OwningIteratorStreamable(const self_type& other) noexcept:
+                _container(other._container),
+                _current(_container.cbegin()),
+                _end(_container.cend()) {
+        }
+
+        constexpr OwningIteratorStreamable(self_type&& other) noexcept:
+                _container(std::move(other._container)),
+                _current(_container.cbegin()),
+                _end(_container.cend()) {
+        }
+
+        constexpr auto operator =(const self_type& other) noexcept -> self_type& {
+            _container = other._container;
+            _current = _container.cbegin();
+            _end = _container.cend();
+            return *this;
+        }
+
+        constexpr auto operator =(self_type&& other) noexcept -> self_type& {
+            _container = std::move(other._container);
+            _current = _container.cbegin();
+            _end = _container.cend();
+            return *this;
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

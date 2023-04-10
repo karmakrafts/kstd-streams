@@ -88,6 +88,44 @@ TEST(cxxs_Stream, TestCollectFromMap) {
     }
 }
 
+TEST(cxxs_Stream, TestSorted) {
+    // @formatter:off
+    const auto result = cxxs::stream(test_values)
+        .sorted([](const auto& a, const auto& b) { return a > b; })
+        .collect<std::vector>();
+    // @formatter:on
+
+    ASSERT_EQ(result.size(), num_test_values);
+
+    ASSERT_EQ(result[0], 4.5F);
+    ASSERT_EQ(result[1], 4.0F);
+    ASSERT_EQ(result[2], 3.5F);
+    ASSERT_EQ(result[3], 3.0F);
+    ASSERT_EQ(result[4], 2.5F);
+    ASSERT_EQ(result[5], 2.0F);
+    ASSERT_EQ(result[6], 1.5F);
+    ASSERT_EQ(result[7], 1.0F);
+}
+
+TEST(cxxs_Stream, TestSortedDefault) {
+    // @formatter:off
+    const auto result = cxxs::stream(test_values)
+        .sorted()
+        .collect<std::vector>();
+    // @formatter:on
+
+    ASSERT_EQ(result.size(), num_test_values);
+
+    ASSERT_EQ(result[7], 4.5F);
+    ASSERT_EQ(result[6], 4.0F);
+    ASSERT_EQ(result[5], 3.5F);
+    ASSERT_EQ(result[4], 3.0F);
+    ASSERT_EQ(result[3], 2.5F);
+    ASSERT_EQ(result[2], 2.0F);
+    ASSERT_EQ(result[1], 1.5F);
+    ASSERT_EQ(result[0], 1.0F);
+}
+
 TEST(cxxs_Stream, TestDerefAll) {
     std::vector<const float*> pointers;
 
