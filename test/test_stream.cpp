@@ -18,6 +18,10 @@
  */
 
 #include <vector>
+#include <unordered_map>
+#include <random>
+#include <string>
+#include <string_view>
 #include <gtest/gtest.h>
 #include <cxxs/stream.hpp>
 
@@ -36,6 +40,53 @@ struct Foo final {
         return i_value < other.i_value && f_value < other.f_value;
     }
 };
+
+[[nodiscard]] inline auto generate_string(size_t length = 16) noexcept -> std::string {
+    constexpr std::string_view allowed_chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+    std::random_device device;
+    std::mt19937 generator(device());
+    std::uniform_int_distribution<size_t> dist(0, allowed_chars.size() - 1);
+    std::string result;
+    result.resize(length);
+
+    for (size_t i = 0; i < length; i++) {
+        result[i] = allowed_chars[dist(generator)];
+    }
+
+    return result;
+}
+
+TEST(cxxs_Stream, TestCollectFromMap) {
+    constexpr size_t num_entries = 32;
+    std::unordered_map<std::string, float> entries;
+    std::vector<std::string> ordered_keys(num_entries);
+
+    for (size_t i = 0; i < num_entries; ++i) {
+        const auto key = generate_string();
+        entries[key] = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX); // NOLINT
+        ordered_keys[i] = key;
+    }
+
+    const auto keys = cxxs::stream(entries).map([](auto& x) {
+        return x.first;
+    }).collect<std::vector>();
+
+    ASSERT_EQ(keys.size(), ordered_keys.size());
+
+    for (size_t i = 0; i < num_entries; ++i) {
+        ASSERT_TRUE(std::find(ordered_keys.cbegin(), ordered_keys.cend(), keys[i]) != ordered_keys.cend());
+    }
+
+    const auto values = cxxs::stream(entries).map([](auto& x) {
+        return x.second;
+    }).collect<std::vector>();
+
+    ASSERT_EQ(values.size(), entries.size());
+
+    for (const auto& [key, value]: entries) {
+        ASSERT_TRUE(std::find(values.cbegin(), values.cend(), value) != values.cend());
+    }
+}
 
 TEST(cxxs_Stream, TestDerefAll) {
     std::vector<const float*> pointers;

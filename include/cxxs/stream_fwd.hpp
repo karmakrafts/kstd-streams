@@ -41,6 +41,10 @@ namespace cxxs {
     requires(std::is_copy_assignable_v<T> && concepts::is_const_iterable<C<T>>)
     [[nodiscard]] constexpr auto stream(const C<T>& container) noexcept -> BasicStream<IteratorStreamable<typename C<T>::const_iterator>>;
 
+    template<typename K, typename V, template<typename, typename, typename...> typename M>
+    requires(std::is_copy_assignable_v<K> && std::is_copy_assignable_v<V> && concepts::is_const_iterable<M<K, V>>)
+    [[nodiscard]] constexpr auto stream(const M<K, V>& container) noexcept -> BasicStream<IteratorStreamable<typename M<K, V>::const_iterator>>;
+
     template<typename T, template<typename, typename...> typename C>
     requires(std::is_copy_assignable_v<T> && concepts::is_const_iterable<C<T>>)
     [[nodiscard]] constexpr auto owning(C <T> container) noexcept -> BasicStream<OwningIteratorStreamable<T, C>>;
