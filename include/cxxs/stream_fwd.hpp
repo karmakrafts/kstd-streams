@@ -22,30 +22,28 @@
 #include "concepts.hpp"
 
 namespace cxxs {
-    template<typename I> //
-    requires(concepts::is_iterator<I>)
+    template<concepts::Iterator I> //
     struct IteratorStreamable;
 
-    template<typename T, template<typename, typename...> typename C> //
-    requires(concepts::is_const_iterable<C<T>>)
+    template<concepts::ConstIterable C> //
     struct OwningIteratorStreamable;
 
-    template<typename T, typename S, typename IMPL> //
-    requires(concepts::is_streamable<S>)
+    template<typename T, concepts::Streamable S, typename IMPL> //
     class Stream;
 
     template<typename S> //
     struct BasicStream;
 
     template<typename T, template<typename, typename...> typename C>
-    requires(std::is_copy_assignable_v<T> && concepts::is_const_iterable<C<T>>)
+    requires(std::is_copy_assignable_v<T> && concepts::ConstIterable<C<T>>)
     [[nodiscard]] constexpr auto stream(const C<T>& container) noexcept -> BasicStream<IteratorStreamable<typename C<T>::const_iterator>>;
 
     template<typename K, typename V, template<typename, typename, typename...> typename M>
-    requires(std::is_copy_assignable_v<K> && std::is_copy_assignable_v<V> && concepts::is_const_iterable<M<K, V>>)
+    requires(std::is_copy_assignable_v<K> && std::is_copy_assignable_v<V> && concepts::ConstIterable<M<K, V>>)
     [[nodiscard]] constexpr auto stream(const M<K, V>& container) noexcept -> BasicStream<IteratorStreamable<typename M<K, V>::const_iterator>>;
 
     template<typename T, template<typename, typename...> typename C>
-    requires(std::is_copy_assignable_v<T> && concepts::is_const_iterable<C<T>>)
-    [[nodiscard]] constexpr auto owning(C <T> container) noexcept -> BasicStream<OwningIteratorStreamable<T, C>>;
+    requires(std::is_copy_assignable_v<T> && concepts::ConstIterable<C<T>>)
+    [[nodiscard]] constexpr auto owning(C<T> container) noexcept -> BasicStream<OwningIteratorStreamable<C < T>>
+    >;
 }

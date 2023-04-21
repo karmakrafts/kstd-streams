@@ -26,8 +26,7 @@
 #include "stream_fwd.hpp"
 
 namespace cxxs {
-    template<typename S, typename RS, typename M> //
-    requires(std::is_convertible_v<M, std::function<RS(typename S::value_type&)>> && concepts::is_streamable<RS>)
+    template<typename S, concepts::Streamable RS, concepts::Function<RS(typename S::value_type&)> M> //
     struct FlatMappingStream final : public Stream<typename RS::value_type, S, FlatMappingStream<S, RS, M>> {
         using self_type = FlatMappingStream<S, RS, M>;
         using value_type = typename RS::value_type;

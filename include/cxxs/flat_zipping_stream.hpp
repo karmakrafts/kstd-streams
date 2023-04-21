@@ -23,12 +23,12 @@
 #include <functional>
 #include <type_traits>
 #include "stream_fwd.hpp"
+#include "concepts.hpp"
 
 namespace cxxs {
-    template<typename S, typename LM, typename LS, typename RM, typename RS> //
-    requires(std::is_convertible_v<LM, std::function<LS(typename S::value_type&)>> && std::is_convertible_v<RM, std::function<RS(typename S::value_type&)>>)
-    struct FlatZippingStream final : public Stream<std::pair<typename LS::value_type, typename RS::value_type>, S, FlatZippingStream<S, LM, LS, RM, RS>> {
-        using self_type = FlatZippingStream<S, LM, LS, RM, RS>;
+    template<typename S, typename LS, typename RS, concepts::Function<LS(typename S::value_type&)> LM, concepts::Function<RS(typename S::value_type&)> RM> //
+    struct FlatZippingStream final : public Stream<std::pair<typename LS::value_type, typename RS::value_type>, S, FlatZippingStream<S, LS, RS, LM, RM>> {
+        using self_type = FlatZippingStream<S, LS, RS, LM, RM>;
         using left_type = typename LS::value_type;
         using right_type = typename RS::value_type;
         using value_type = std::pair<left_type, right_type>;

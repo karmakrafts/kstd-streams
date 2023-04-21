@@ -47,15 +47,14 @@
 #include "sorting_stream.hpp"
 
 namespace cxxs {
-    template<typename T, typename S, typename IMPL> //
-    requires(concepts::is_streamable<S>)
+    template<typename T, concepts::Streamable S, typename IMPL> //
     class Stream {
         protected:
 
         [[maybe_unused]] S _streamable;
 
         [[nodiscard]] constexpr auto get_self() noexcept -> IMPL& {
-            static_assert(concepts::is_streamable<IMPL>, "Implementation is not streamable");
+            static_assert(concepts::Streamable<IMPL>, "Implementation is not streamable");
             return static_cast<IMPL&>(*this);
         }
 
@@ -65,68 +64,61 @@ namespace cxxs {
                 _streamable(std::move(streamable)) {
         }
 
-        template<typename S2>
-        requires(concepts::is_streamable<S2>)
+        template<concepts::Streamable S2>
         [[nodiscard]] constexpr auto chain(S2 other) noexcept -> ChainingStream<IMPL, S2> {
             return ChainingStream<IMPL, S2>(std::move(get_self()), std::move(other));
         }
 
-        template<typename S2>
-        requires(concepts::is_streamable<S2>)
+        template<concepts::Streamable S2>
         [[nodiscard]] constexpr auto pre_chain(S2 other) noexcept -> ChainingStream<S2, IMPL> {
             return ChainingStream<S2, IMPL>(std::move(other), std::move(get_self()));
         }
 
-        template<typename F>
-        requires(std::is_convertible_v<F, std::function<void(T&)>>)
+        template<concepts::Function<void(T&)> F>
         [[nodiscard]] constexpr auto filter(F&& filter) noexcept -> FilteringStream<IMPL, F> {
             return FilteringStream<IMPL, F>(std::move(get_self()), std::forward<F>(filter));
         }
 
         template<typename M, typename R = std::invoke_result_t<M, T&>>
-        requires(std::is_convertible_v<M, std::function<R(T&)>>)
+        requires(concepts::Function<M, R(T&)>)
         [[nodiscard]] constexpr auto map(M&& mapper) noexcept -> MappingStream<R, IMPL, M> {
             return MappingStream<R, IMPL, M>(std::move(get_self()), std::forward<M>(mapper));
         }
 
         template<typename M, typename RS = std::invoke_result_t<M, T&>>
-        requires(std::is_convertible_v<M, std::function<RS(T&)>> && concepts::is_streamable<RS>)
+        requires(concepts::Function<M, RS(T&)> && concepts::Streamable<RS>)
         [[nodiscard]] constexpr auto flat_map(M&& mapper) noexcept -> FlatMappingStream<IMPL, RS, M> {
             return FlatMappingStream<IMPL, RS, M>(std::move(get_self()), std::forward<M>(mapper));
         }
 
         template<typename LM, typename L = std::invoke_result_t<LM, T&>, typename RM, typename R = std::invoke_result_t<RM, T&>>
-        requires(std::is_convertible_v<LM, std::function<L(T&)>> && std::is_convertible_v<RM, std::function<R(T&)>>)
-        [[nodiscard]] constexpr auto zip(LM&& left_mapper, RM&& right_mapper) noexcept -> ZippingStream<IMPL, LM, L, RM, R> {
-            return ZippingStream<IMPL, LM, L, RM, R>(std::move(get_self()), std::forward<LM>(left_mapper), std::forward<RM>(right_mapper));
+        requires(concepts::Function<LM, L(T&)> && concepts::Function<RM, R(T&)>)
+        [[nodiscard]] constexpr auto zip(LM&& left_mapper, RM&& right_mapper) noexcept -> ZippingStream<IMPL, L, R, LM, RM> {
+            return ZippingStream<IMPL, L, R, LM, RM>(std::move(get_self()), std::forward<LM>(left_mapper), std::forward<RM>(right_mapper));
         }
 
         template<typename LM, typename LS = std::invoke_result_t<LM, T&>, typename RM, typename RS = std::invoke_result_t<RM, T&>>
-        requires(std::is_convertible_v<LM, std::function<LS(T&)>> && std::is_convertible_v<RM, std::function<RS(T&)>>)
-        [[nodiscard]] constexpr auto flat_zip(LM&& left_mapper, RM&& right_mapper) noexcept -> FlatZippingStream<IMPL, LM, LS, RM, RS> {
-            return FlatZippingStream<IMPL, LM, LS, RM, RS>(std::move(get_self()), std::forward<LM>(left_mapper), std::forward<RM>(right_mapper));
+        requires(concepts::Function<LM, LS(T&)> && concepts::Function<RM, RS(T&)>)
+        [[nodiscard]] constexpr auto flat_zip(LM&& left_mapper, RM&& right_mapper) noexcept -> FlatZippingStream<IMPL, LS, RS, LM, RM> {
+            return FlatZippingStream<IMPL, LS, RS, LM, RM>(std::move(get_self()), std::forward<LM>(left_mapper), std::forward<RM>(right_mapper));
         }
 
-        template<typename F>
-        requires(std::is_convertible_v<F, std::function<void(T&)>>)
+        template<concepts::Function<void(T&)> F>
         [[nodiscard]] constexpr auto peek(F&& function) noexcept -> PeekingStream<IMPL, F> {
             return PeekingStream<IMPL, F>(std::move(get_self()), std::forward<F>(function));
         }
 
-        template<typename P>
-        requires(std::is_convertible_v<P, std::function<bool(T&)>>)
+        template<concepts::Function<bool(T&)> P>
         [[nodiscard]] constexpr auto drop_while(P&& predicate) noexcept -> DroppingStream<IMPL, P> {
             return DroppingStream<IMPL, P>(std::move(get_self()), std::forward<P>(predicate));
         }
 
-        template<typename P>
-        requires(std::is_convertible_v<P, std::function<bool(T&)>>)
+        template<concepts::Function<bool(T&)> P>
         [[nodiscard]] constexpr auto take_while(P&& predicate) noexcept -> TakingStream<IMPL, P> {
             return TakingStream<IMPL, P>(std::move(get_self()), std::forward<P>(predicate));
         }
 
-        template<typename C>
-        requires(std::is_convertible_v<C, std::function<bool(const T&, const T&)>>)
+        template<concepts::Function<bool(const T&, const T&)> C>
         [[nodiscard]] constexpr auto sorted(C&& comparator) noexcept -> SortingStream<IMPL, C> {
             return SortingStream<IMPL, C>(std::move(get_self()), std::forward<C>(comparator));
         }
@@ -140,10 +132,10 @@ namespace cxxs {
         }
 
         [[nodiscard]] constexpr auto sorted() noexcept -> decltype(auto) {
-            static_assert(concepts::has_lth<T> || concepts::has_gth<T>, "Stream value type doesn't implement operator< or operator>");
+            static_assert(concepts::LessThanComparable<T> || concepts::GreaterThanComparable<T>, "Stream value type doesn't implement operator< or operator>");
 
             return sorted([](const auto& a, const auto& b) {
-                if constexpr (concepts::has_lth<T>) {
+                if constexpr (concepts::LessThanComparable<T>) {
                     return a < b;
                 }
                 else {
@@ -193,8 +185,7 @@ namespace cxxs {
             return element;
         }
 
-        template<typename F>
-        requires(std::is_convertible_v<F, std::function<T(T, T)>>)
+        template<concepts::Function<T(T, T)> F>
         [[nodiscard]] constexpr auto reduce(F&& function) noexcept -> std::optional<T> {
             auto& self = get_self();
             auto element = self.next();
@@ -215,7 +206,7 @@ namespace cxxs {
         }
 
         [[nodiscard]] constexpr auto sum() noexcept -> std::optional<T> {
-            static_assert(concepts::has_add<T>, "Stream value type doesn't implement operator+");
+            static_assert(concepts::Addable<T>, "Stream value type doesn't implement operator+");
 
             return reduce([](auto a, auto b) {
                 return a + b;
@@ -223,7 +214,7 @@ namespace cxxs {
         }
 
         [[nodiscard]] constexpr auto min() noexcept -> std::optional<T> {
-            static_assert(concepts::has_lth<T> || concepts::has_gth<T>, "Stream value type doesn't implement operator< or operator>");
+            static_assert(concepts::LessThanComparable<T> || concepts::GreaterThanComparable<T>, "Stream value type doesn't implement operator< or operator>");
 
             auto& self = get_self();
             auto element = self.next();
@@ -238,7 +229,7 @@ namespace cxxs {
             while (element) {
                 auto value = std::move(*element);
 
-                if constexpr (concepts::has_lth<T>) {
+                if constexpr (concepts::LessThanComparable<T>) {
                     if (value < result) {
                         result = std::move(value);
                     }
@@ -256,7 +247,7 @@ namespace cxxs {
         }
 
         [[nodiscard]] constexpr auto max() noexcept -> std::optional<T> {
-            static_assert(concepts::has_lth<T> || concepts::has_gth<T>, "Stream value type doesn't implement operator< or operator>");
+            static_assert(concepts::LessThanComparable<T> || concepts::LessThanComparable<T>, "Stream value type doesn't implement operator< or operator>");
 
             auto& self = get_self();
             auto element = self.next();
@@ -271,7 +262,7 @@ namespace cxxs {
             while (element) {
                 auto value = std::move(*element);
 
-                if constexpr (concepts::has_gth<T>) {
+                if constexpr (concepts::GreaterThanComparable<T>) {
                     if (value > result) {
                         result = std::move(value);
                     }
@@ -301,8 +292,7 @@ namespace cxxs {
             return result;
         }
 
-        template<typename F>
-        requires(std::is_convertible_v<F, std::function<void(T&)>>)
+        template<concepts::Function<void(T&)> F>
         constexpr auto for_each(F&& function) noexcept -> void {
             auto& self = get_self();
             auto element = self.next();
@@ -313,8 +303,7 @@ namespace cxxs {
             }
         }
 
-        template<typename F>
-        requires(std::is_convertible_v<F, std::function<void(T&, size_t)>>)
+        template<concepts::Function<void(T&, size_t)> F>
         constexpr auto for_each_indexed(F&& function) noexcept -> void {
             auto& self = get_self();
             auto element = self.next();
@@ -326,8 +315,7 @@ namespace cxxs {
             }
         }
 
-        template<typename P>
-        requires(std::is_convertible_v<P, std::function<bool(T&)>>)
+        template<concepts::Function<bool(T&)> P>
         [[nodiscard]] constexpr auto all_match(P&& predicate) noexcept -> bool {
             auto& self = get_self();
             auto element = self.next();
@@ -343,8 +331,7 @@ namespace cxxs {
             return true;
         }
 
-        template<typename P>
-        requires(std::is_convertible_v<P, std::function<bool(T&)>>)
+        template<concepts::Function<bool(T&)> P>
         [[nodiscard]] constexpr auto any_match(P&& predicate) noexcept -> bool {
             auto& self = get_self();
             auto element = self.next();
@@ -360,8 +347,7 @@ namespace cxxs {
             return false;
         }
 
-        template<typename P>
-        requires(std::is_convertible_v<P, std::function<bool(T&)>>)
+        template<concepts::Function<bool(T&)> P>
         [[nodiscard]] constexpr auto none_match(P&& predicate) noexcept -> bool {
             auto& self = get_self();
             auto element = self.next();
@@ -394,7 +380,7 @@ namespace cxxs {
         }
 
         template<template<typename, typename...> typename C>
-        requires(std::is_default_constructible_v<C<T>> && concepts::has_push_back<C<T>>)
+        requires(concepts::Pushable<C<T>> && std::is_default_constructible_v<C<T>>)
         [[nodiscard]] constexpr auto collect() noexcept -> C <T> {
             C<T> result;
             auto& self = get_self();
@@ -411,10 +397,10 @@ namespace cxxs {
         template<template<typename, typename, typename...> typename M, // @formatter:off
                 typename KM, typename K = std::invoke_result_t<KM, T&>,
                 typename VM, typename V = std::invoke_result_t<VM, T&>>
-        requires(std::is_convertible_v<KM, std::function<K(T&)>>
-                && std::is_convertible_v<VM, std::function<V(T&)>>
+        requires(concepts::Function<KM, K(T&)>
+                && concepts::Function<VM, V(T&)>
                 && std::is_default_constructible_v<M<K, V>>
-                && concepts::has_key_value_indexer<K, V, M>) // @formatter:on
+                && concepts::Indexable<K, V, M>) // @formatter:on
         [[nodiscard]] constexpr auto collect_map(KM&& key_mapper, VM&& value_mapper) noexcept -> M <K, V> {
             M<K, V> result;
             auto& self = get_self();
@@ -463,42 +449,30 @@ namespace cxxs {
 
         // Chain operators (append)
 
-        template<typename S2>
-        requires(concepts::is_streamable<S2>)
-        [[nodiscard]] constexpr auto operator |(S2 other) noexcept -> decltype(auto) {
+        [[nodiscard]] constexpr auto operator |(concepts::Streamable auto other) noexcept -> decltype(auto) {
             return chain(std::move(other));
         }
 
-        template<template<typename, typename...> typename C>
-        requires(concepts::is_const_iterable<C<T>>)
-        [[nodiscard]] constexpr auto operator |(const C<T>& container) noexcept -> decltype(auto) {
+        [[nodiscard]] constexpr auto operator |(const concepts::ConstIterable auto& container) noexcept -> decltype(auto) {
             return chain(stream(container));
         }
 
-        template<template<typename, typename...> typename C>
-        requires(concepts::is_const_iterable<C<T>>)
-        [[nodiscard]] constexpr auto operator |(C<T>&& container) noexcept -> decltype(auto) {
-            return chain(owning(std::forward<C<T>>(container)));
+        [[nodiscard]] constexpr auto operator |(concepts::ConstIterable auto&& container) noexcept -> decltype(auto) {
+            return chain(owning(std::forward(container)));
         }
 
         // Pre-chain operators (prepend)
 
-        template<typename S2>
-        requires(concepts::is_streamable<S2>)
-        [[nodiscard]] constexpr auto operator ||(S2 other) noexcept -> decltype(auto) {
+        [[nodiscard]] constexpr auto operator ||(concepts::Streamable auto other) noexcept -> decltype(auto) {
             return pre_chain(std::move(other));
         }
 
-        template<template<typename, typename...> typename C>
-        requires(concepts::is_const_iterable<C<T>>)
-        [[nodiscard]] constexpr auto operator ||(const C<T>& container) noexcept -> decltype(auto) {
+        [[nodiscard]] constexpr auto operator ||(const concepts::ConstIterable auto& container) noexcept -> decltype(auto) {
             return pre_chain(stream(container));
         }
 
-        template<template<typename, typename...> typename C>
-        requires(concepts::is_const_iterable<C<T>>)
-        [[nodiscard]] constexpr auto operator ||(C<T>&& container) noexcept -> decltype(auto) {
-            return pre_chain(owning(std::forward<C<T>>(container)));
+        [[nodiscard]] constexpr auto operator ||(concepts::ConstIterable auto&& container) noexcept -> decltype(auto) {
+            return pre_chain(owning(std::forward(container)));
         }
 
         // Deref operator (find first)
@@ -509,44 +483,49 @@ namespace cxxs {
     };
 
     template<typename T, template<typename, typename...> typename C>
-    requires(std::is_copy_assignable_v<T> && concepts::is_const_iterable<C<T>>)
+    requires(std::is_copy_assignable_v<T> && concepts::ConstIterable<C<T>>)
     [[nodiscard]] constexpr auto stream(const C<T>& container) noexcept -> BasicStream<IteratorStreamable<typename C<T>::const_iterator>> {
         return BasicStream(IteratorStreamable(container.cbegin(), container.cend()));
     }
 
     template<typename K, typename V, template<typename, typename, typename...> typename M>
-    requires(std::is_copy_assignable_v<K> && std::is_copy_assignable_v<V> && concepts::is_const_iterable<M<K, V>>)
+    requires(std::is_copy_assignable_v<K> && std::is_copy_assignable_v<V> && concepts::ConstIterable<M<K, V>>)
     [[nodiscard]] constexpr auto stream(const M<K, V>& container) noexcept -> BasicStream<IteratorStreamable<typename M<K, V>::const_iterator>> {
         return BasicStream(IteratorStreamable(container.cbegin(), container.cend()));
     }
 
     template<typename T, template<typename, typename...> typename C>
-    requires(std::is_copy_assignable_v<T> && concepts::is_const_iterable<C<T>>)
-    [[nodiscard]] constexpr auto owning(C<T> container) noexcept -> BasicStream<OwningIteratorStreamable<T, C>> {
-        return BasicStream(OwningIteratorStreamable(std::move(container)));
-    }
+    requires(std::is_copy_assignable_v<T> && concepts::ConstIterable<C<T>>)
+    [[nodiscard]] constexpr auto owning(C<T> container) noexcept -> BasicStream<OwningIteratorStreamable<C < T>>
+    > {
+    return
+    BasicStream(OwningIteratorStreamable(std::move(container)));
+}
 
-    template<typename T, template<typename, typename...> typename C>
-    requires(std::is_copy_assignable_v<T> && concepts::is_const_reverse_iterable<C<T>>)
-    [[nodiscard]] constexpr auto reverse(const C<T>& container) noexcept -> BasicStream<IteratorStreamable<typename C<T>::const_iterator>> {
-        return BasicStream(IteratorStreamable(container.crbegin(), container.crend()));
-    }
+template<typename T, template<typename, typename...> typename C>
+requires(std::is_copy_assignable_v<T>&& concepts::ConstReverseIterable<C<T>>)
+[[nodiscard]] constexpr auto reverse(const C <T>& container) noexcept -> BasicStream <IteratorStreamable<typename C<T>::const_iterator>> {
+    return BasicStream(IteratorStreamable(container.crbegin(), container.crend()));
+}
 
-    template<typename T, template<typename, typename...> typename C>
-    requires(std::is_copy_assignable_v<T> && concepts::is_iterable<C<T>> && concepts::has_erase<C<T>>)
-    [[nodiscard]] constexpr auto draining(C<T>& container) noexcept -> BasicStream<DrainingStreamable<T, C>> {
-        return BasicStream(DrainingStreamable(container));
-    }
+template<typename T, template<typename, typename...> typename C> requires(std::is_copy_assignable_v<T>&& concepts::Iterable<C<T>>&& concepts::Erasable<C<T>>
+)
+[[nodiscard]] constexpr auto draining(C<T>& container) noexcept -> BasicStream <DrainingStreamable<C < T>>
+> {
+return
+BasicStream (DrainingStreamable(container));
+}
 
-    template<typename T>
-    requires(std::is_copy_assignable_v<T>)
-    [[nodiscard]] constexpr auto singlet(T value) noexcept -> BasicStream<SingletStreamable<T>> {
-        return BasicStream(SingletStreamable(std::move(value)));
-    }
+template<typename T>
+requires(std::is_copy_assignable_v<T>)
+[[nodiscard]] constexpr auto singlet(T value) noexcept -> BasicStream <SingletStreamable<T>> {
+    return BasicStream(SingletStreamable(std::move(value)));
+}
 
-    template<typename T>
-    requires(std::is_copy_assignable_v<T>)
-    [[nodiscard]] constexpr auto counting(T value, size_t max_count) noexcept -> BasicStream<CountingStreamable<T>> {
-        return BasicStream(CountingStreamable(std::move(value), max_count));
-    }
+template<typename T>
+requires(std::is_copy_assignable_v<T>)
+[[nodiscard]] constexpr auto counting(T value, size_t max_count) noexcept -> BasicStream <CountingStreamable<T>> {
+    return BasicStream(CountingStreamable(std::move(value), max_count));
+}
+
 }

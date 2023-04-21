@@ -23,22 +23,21 @@
 #include "concepts.hpp"
 
 namespace cxxs {
-    template<typename T, template<typename, typename...> typename C> //
-    requires(concepts::is_const_iterable<C<T>>)
+    template<concepts::ConstIterable C> //
     struct OwningIteratorStreamable final {
-        using self_type = OwningIteratorStreamable<T, C>;
-        using value_type = T;
-        using iterator = typename C<T>::const_iterator;
+        using self_type = OwningIteratorStreamable<C>;
+        using iterator = typename C::const_iterator;
+        using value_type = typename iterator::value_type;
 
         private:
 
-        C<T> _container;
+        C _container;
         iterator _current;
         iterator _end;
 
         public:
 
-        explicit constexpr OwningIteratorStreamable(C<T> container) noexcept:
+        explicit constexpr OwningIteratorStreamable(C container) noexcept:
                 _container(std::move(container)),
                 _current(_container.cbegin()),
                 _end(_container.cend()) {

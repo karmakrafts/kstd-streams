@@ -25,7 +25,7 @@
 #include "stream_fwd.hpp"
 
 namespace cxxs {
-    template<typename S, typename P> requires(std::is_convertible_v<P, std::function<bool(typename S::value_type&)>>)
+    template<typename S, concepts::Function<bool(typename S::value_type&)> P>
     struct TakingStream final : public Stream<typename S::value_type, S, TakingStream<S, P>> {
         using self_type = TakingStream<S, P>;
         using value_type = typename S::value_type;
@@ -37,7 +37,8 @@ namespace cxxs {
         public:
 
         constexpr TakingStream(S streamable, P&& predicate) noexcept:
-                Stream<value_type, S, self_type>(std::move(streamable)) {
+                Stream<value_type, S, self_type>(std::move(streamable)),
+                _predicate(std::forward<P>(predicate)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

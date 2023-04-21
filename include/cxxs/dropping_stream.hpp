@@ -25,8 +25,7 @@
 #include "stream_fwd.hpp"
 
 namespace cxxs {
-    template<typename S, typename P> //
-    requires(std::is_convertible_v<P, std::function<bool(typename S::value_type&)>>)
+    template<typename S, concepts::Function<bool(typename S::value_type&)> P> //
     struct DroppingStream final : public Stream<typename S::value_type, S, DroppingStream<S, P>> {
         using self_type = DroppingStream<S, P>;
         using value_type = typename S::value_type;

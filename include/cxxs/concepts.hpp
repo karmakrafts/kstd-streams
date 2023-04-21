@@ -23,47 +23,51 @@
 #include <optional>
 
 namespace cxxs::concepts {
-    template<typename T> concept has_add = requires(T type) {
+    template<typename T, typename S> concept Function = requires {
+        requires std::convertible_to<T, std::function<S>>;
+    };
+
+    template<typename T> concept Addable = requires(T type) {
         type + type;
         requires std::convertible_to<decltype(type + type), T>;
     };
 
     template<typename T> //
-    concept has_lth = requires(T type) {
+    concept LessThanComparable = requires(T type) {
         type < type;
         requires std::same_as<decltype(type < type), bool>;
     };
 
     template<typename T> //
-    concept has_gth = requires(T type) {
+    concept GreaterThanComparable = requires(T type) {
         type > type;
         requires std::same_as<decltype(type > type), bool>;
     };
 
     template<typename T> //
-    concept has_push_back = requires(T type, typename T::value_type value) {
+    concept Pushable = requires(T type, typename T::value_type value) {
         type.push_back(value);
     };
 
     template<typename T> //
-    concept has_erase = requires(T type, typename T::iterator value) {
+    concept Erasable = requires(T type, typename T::iterator value) {
         type.erase(value);
     };
 
     template<typename K, typename V, template<typename, typename, typename...> typename M> //
-    concept has_key_value_indexer = requires(M<K, V> type, K key, V value) {
+    concept Indexable = requires(M<K, V> type, K key, V value) {
         type[key] = value;
     };
 
     template<typename T> //
-    concept is_streamable = requires(T type) {
+    concept Streamable = requires(T type) {
         typename T::value_type;
         type.next();
         requires std::same_as<decltype(type.next()), std::optional<typename T::value_type>>;
     };
 
     template<typename T> //
-    concept is_iterator = requires(T type) {
+    concept Iterator = requires(T type) {
         typename T::value_type;
         ++type;
         type++;
@@ -78,29 +82,29 @@ namespace cxxs::concepts {
     };
 
     template<typename T> //
-    concept is_const_iterable = requires(T type) {
+    concept ConstIterable = requires(T type) {
         typename T::const_iterator;
         type.cbegin();
         type.cend();
-        requires is_iterator<decltype(type.cbegin())>;
-        requires is_iterator<decltype(type.cend())>;
+        requires Iterator<decltype(type.cbegin())>;
+        requires Iterator<decltype(type.cend())>;
     };
 
     template<typename T> //
-    concept is_const_reverse_iterable = requires(T type) {
+    concept ConstReverseIterable = requires(T type) {
         typename T::const_iterator;
         type.crbegin();
         type.crend();
-        requires is_iterator<decltype(type.crbegin())>;
-        requires is_iterator<decltype(type.crend())>;
+        requires Iterator<decltype(type.crbegin())>;
+        requires Iterator<decltype(type.crend())>;
     };
 
     template<typename T> //
-    concept is_iterable = requires(T type) {
+    concept Iterable = requires(T type) {
         typename T::iterator;
         type.begin();
         type.end();
-        requires is_iterator<decltype(type.begin())>;
-        requires is_iterator<decltype(type.end())>;
+        requires Iterator<decltype(type.begin())>;
+        requires Iterator<decltype(type.end())>;
     };
 }

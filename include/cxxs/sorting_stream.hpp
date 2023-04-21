@@ -14,14 +14,14 @@
 #include "owning_iterator_streamable.hpp"
 
 namespace cxxs {
-    template<typename S, typename C> requires(std::is_convertible_v<C, std::function<bool(const typename S::value_type&, const typename S::value_type&)>>)
+    template<typename S, concepts::Function<bool(const typename S::value_type&, const typename S::value_type&)> C> //
     struct SortingStream final : public Stream<typename S::value_type, S, SortingStream<S, C>> {
         using self_type = SortingStream<S, C>;
         using value_type = typename S::value_type;
 
         private:
 
-        OwningIteratorStreamable<value_type, std::vector> _sorted_streamable;
+        OwningIteratorStreamable<std::vector<value_type>> _sorted_streamable;
 
         public:
 

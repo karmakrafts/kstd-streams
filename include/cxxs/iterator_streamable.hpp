@@ -24,8 +24,7 @@
 #include "stream_fwd.hpp"
 
 namespace cxxs {
-    template<typename I> //
-    requires(concepts::is_iterator<I>)
+    template<concepts::Iterator I> //
     struct IteratorStreamable final {
         using value_type = typename I::value_type;
 

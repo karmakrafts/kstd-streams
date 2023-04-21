@@ -25,8 +25,7 @@
 #include "stream_fwd.hpp"
 
 namespace cxxs {
-    template<typename R, typename S, typename M> //
-    requires(std::is_convertible_v<M, std::function<R(typename S::value_type&)>>)
+    template<typename R, typename S, concepts::Function<R(typename S::value_type&)> M> //
     struct MappingStream final : public Stream<R, S, MappingStream<R, S, M>> {
         using self_type = MappingStream<R, S, M>;
         using value_type = R;
