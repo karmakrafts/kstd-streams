@@ -29,7 +29,7 @@ namespace cxxs {
         constexpr SortingStream(S streamable, C&& comparator) noexcept:
                 Stream<value_type, S, self_type>(std::move(streamable)) {
             std::vector<value_type> elements;
-            collect_into(this->_streamable, elements);
+            collect_into<S, std::vector<value_type>>(this->_streamable, elements);
             std::sort(elements.begin(), elements.end(), std::forward<C>(comparator));
             _sorted_streamable = OwningIteratorStreamable(std::move(elements));
         }
