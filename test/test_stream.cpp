@@ -17,6 +17,7 @@
  * @since 27/03/2023
  */
 
+#include <array>
 #include <vector>
 #include <unordered_map>
 #include <random>
