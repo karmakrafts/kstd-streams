@@ -1,19 +1,29 @@
 # <img src="https://raw.githubusercontent.com/KitsuneAlex/cxxstreams/master/branding/logo.svg" width="6%"></img> cxxstreams
+
 Are you looking for map, filter, reduce and more on any standard container?  
 Do you want it to be a constexpr-ready zero-cost abstraction?  
 **Look no further!**
 
 cxxstreams is a highly optimized, constexpr-ready collection stream library for C++20.  
-Originally developed as part of the [kstd library](https://git.karmakrafts.dev/kk/kstd)
-by Karma Krafts.
+
+### Cloning cxxstreams
+
+If you clone this repository for whatever purpose, don't forget to initialize the submodules using the following command:
+
+```shell
+git submodule update --init
+```
 
 ### Using cxxstreams
+
 In order to use the stream API, simply make sure you include the cxxstreams header:
-```cpp 
+
+```cpp
 #include <cxxs/stream.hpp>
 ```
 
 ### Why streams are amazing
+
 As an example, let's use computing the sum of all elements within a `std::vector<int>`.  
 Simple enough, right? If you've got some experience with programming in C++, your solution
 would most likely look somewhat like this:
@@ -29,7 +39,7 @@ for(const auto element : elements) {
 That is quite a lot of code for such a simple operation, but that's what you get with a language as verbose as C++..  
 Now let's take a look at the cxxstreams equivalent to that code:
 
-```cpp 
+```cpp
 std::vector<int> elements(...);
 const auto sum = cxxs::stream(elements).sum();
 ```
