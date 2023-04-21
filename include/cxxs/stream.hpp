@@ -394,13 +394,8 @@ namespace cxxs {
             return result;
         }
 
-        template<template<typename, typename, typename...> typename M, // @formatter:off
-                typename KM, typename K = std::invoke_result_t<KM, T&>,
-                typename VM, typename V = std::invoke_result_t<VM, T&>>
-        requires(concepts::Function<KM, K(T&)>
-                && concepts::Function<VM, V(T&)>
-                && std::is_default_constructible_v<M<K, V>>
-                && concepts::Indexable<K, V, M>) // @formatter:on
+        template<template<typename, typename, typename...> typename M, typename KM, typename K = std::invoke_result_t<KM, T&>, typename VM, typename V = std::invoke_result_t<VM, T&>>
+        requires(concepts::Function<KM, K(T&)> && concepts::Function<VM, V(T&)> && std::is_default_constructible_v<M<K, V>> && concepts::Indexable<K, V, M>)
         [[nodiscard]] constexpr auto collect_map(KM&& key_mapper, VM&& value_mapper) noexcept -> M <K, V> {
             M<K, V> result;
             auto& self = get_self();
@@ -482,50 +477,37 @@ namespace cxxs {
         }
     };
 
-    template<typename T, template<typename, typename...> typename C>
-    requires(std::is_copy_assignable_v<T> && concepts::ConstIterable<C<T>>)
-    [[nodiscard]] constexpr auto stream(const C<T>& container) noexcept -> BasicStream<IteratorStreamable<typename C<T>::const_iterator>> {
+    template<concepts::ConstIterable C>
+    [[nodiscard]] constexpr auto stream(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>> {
         return BasicStream(IteratorStreamable(container.cbegin(), container.cend()));
     }
 
-    template<typename K, typename V, template<typename, typename, typename...> typename M>
-    requires(std::is_copy_assignable_v<K> && std::is_copy_assignable_v<V> && concepts::ConstIterable<M<K, V>>)
-    [[nodiscard]] constexpr auto stream(const M<K, V>& container) noexcept -> BasicStream<IteratorStreamable<typename M<K, V>::const_iterator>> {
-        return BasicStream(IteratorStreamable(container.cbegin(), container.cend()));
+    template<concepts::ConstIterable C>
+    [[nodiscard]] constexpr auto owning(C container) noexcept -> BasicStream<OwningIteratorStreamable<C>> {
+        return BasicStream(OwningIteratorStreamable(std::move(container)));
     }
 
-    template<typename T, template<typename, typename...> typename C>
-    requires(std::is_copy_assignable_v<T> && concepts::ConstIterable<C<T>>)
-    [[nodiscard]] constexpr auto owning(C<T> container) noexcept -> BasicStream<OwningIteratorStreamable<C < T>>
-    > {
-    return
-    BasicStream(OwningIteratorStreamable(std::move(container)));
-}
+    template<concepts::ConstReverseIterable C>
+    [[nodiscard]] constexpr auto reverse(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>> {
+        return BasicStream(IteratorStreamable(container.crbegin(), container.crend()));
+    }
 
-template<typename T, template<typename, typename...> typename C>
-requires(std::is_copy_assignable_v<T>&& concepts::ConstReverseIterable<C<T>>)
-[[nodiscard]] constexpr auto reverse(const C <T>& container) noexcept -> BasicStream <IteratorStreamable<typename C<T>::const_iterator>> {
-    return BasicStream(IteratorStreamable(container.crbegin(), container.crend()));
-}
+    template<concepts::Iterable C>
+    requires(concepts::Erasable<C>)
+    [[nodiscard]] constexpr auto draining(C& container) noexcept -> BasicStream<DrainingStreamable<C>> {
+        return BasicStream(DrainingStreamable(container));
+    }
 
-template<typename T, template<typename, typename...> typename C> requires(std::is_copy_assignable_v<T>&& concepts::Iterable<C<T>>&& concepts::Erasable<C<T>>
-)
-[[nodiscard]] constexpr auto draining(C<T>& container) noexcept -> BasicStream <DrainingStreamable<C < T>>
-> {
-return
-BasicStream (DrainingStreamable(container));
-}
+    template<typename T>
+    requires(std::is_copy_assignable_v<T>)
+    [[nodiscard]] constexpr auto singlet(T value) noexcept -> BasicStream<SingletStreamable<T>> {
+        return BasicStream(SingletStreamable(std::move(value)));
+    }
 
-template<typename T>
-requires(std::is_copy_assignable_v<T>)
-[[nodiscard]] constexpr auto singlet(T value) noexcept -> BasicStream <SingletStreamable<T>> {
-    return BasicStream(SingletStreamable(std::move(value)));
-}
-
-template<typename T>
-requires(std::is_copy_assignable_v<T>)
-[[nodiscard]] constexpr auto counting(T value, size_t max_count) noexcept -> BasicStream <CountingStreamable<T>> {
-    return BasicStream(CountingStreamable(std::move(value), max_count));
-}
+    template<typename T>
+    requires(std::is_copy_assignable_v<T>)
+    [[nodiscard]] constexpr auto counting(T value, size_t max_count) noexcept -> BasicStream<CountingStreamable<T>> {
+        return BasicStream(CountingStreamable(std::move(value), max_count));
+    }
 
 }

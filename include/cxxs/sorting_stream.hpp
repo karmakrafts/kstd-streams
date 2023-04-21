@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <optional>
 #include <vector>
+#include <algorithm>
 #include "stream_fwd.hpp"
 #include "stream_utils.hpp"
 #include "owning_iterator_streamable.hpp"
