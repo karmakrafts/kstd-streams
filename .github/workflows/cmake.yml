@@ -47,3 +47,22 @@ jobs:
       - name: Test
         working-directory: ${{github.workspace}}/build-macos
         run: ctest -C ${{env.BUILD_TYPE}}
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Initialize submodules
+        run: git submodule update --init
+
+      - name: Configure CMake
+        run: cmake -B ${{github.workspace}}/build-windows -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build-windows --config ${{env.BUILD_TYPE}}
+
+      - name: Test
+        working-directory: ${{github.workspace}}/build-windows
+        run: ctest -C ${{env.BUILD_TYPE}}
