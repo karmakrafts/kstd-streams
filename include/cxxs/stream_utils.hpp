@@ -12,7 +12,7 @@
 namespace cxxs {
     template<concepts::Streamable S, template<typename, typename...> typename C>
     requires(std::is_default_constructible_v<C<typename S::value_type>>)
-    constexpr auto collect_streamable(S& streamable, C<typename S::value_type>& container) noexcept -> void {
+    constexpr auto collect_into(S& streamable, C<typename S::value_type>& container) noexcept -> void {
         auto element = streamable.next();
 
         while (element) {
@@ -23,9 +23,9 @@ namespace cxxs {
 
     template<concepts::Streamable S, template<typename, typename...> typename C>
     requires(std::is_default_constructible_v<C<typename S::value_type>>)
-    constexpr auto collect_streamable(S& streamable) noexcept -> C<typename S::value_type> {
+    constexpr auto collect(S& streamable) noexcept -> C<typename S::value_type> {
         C<typename S::value_type> result;
-        collect_streamable(streamable, result);
+        collect_into(streamable, result);
         return result;
     }
 }
