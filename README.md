@@ -1,12 +1,12 @@
-# <img src="https://raw.githubusercontent.com/KitsuneAlex/cxxstreams/master/branding/logo.svg" width="6%"></img> cxxstreams
+# <img src="https://raw.githubusercontent.com/KitsuneAlex/kstd-streams/master/branding/logo.svg" width="6%"></img> kstd-streams
 
 Are you looking for map, filter, reduce and more on any standard container?  
 Do you want it to be a constexpr-ready zero-cost abstraction?  
 **Look no further!**
 
-cxxstreams is a highly optimized, constexpr-ready collection stream library for C++20.  
+kstd-streams is a highly optimized, constexpr-ready collection stream library for C++20.  
 
-### Cloning cxxstreams
+### Cloning kstd-streams
 
 If you clone this repository for whatever purpose, don't forget to initialize the submodules using the following command:
 
@@ -14,12 +14,12 @@ If you clone this repository for whatever purpose, don't forget to initialize th
 git submodule update --init
 ```
 
-### Using cxxstreams
+### Using kstd-streams
 
-In order to use the stream API, simply make sure you include the cxxstreams header:
+In order to use the stream API, simply make sure you include the kstd-streams header:
 
 ```cpp
-#include <cxxs/stream.hpp>
+#include <kstd/streams/stream.hpp>
 ```
 
 ### Why streams are amazing
@@ -37,11 +37,11 @@ for(const auto element : elements) {
 ```
 
 That is quite a lot of code for such a simple operation, but that's what you get with a language as verbose as C++..  
-Now let's take a look at the cxxstreams equivalent to that code:
+Now let's take a look at the kstd-streams equivalent to that code:
 
 ```cpp
 std::vector<int> elements(...);
-const auto sum = cxxs::stream(elements).sum();
+const auto sum = kstd::streams::stream(elements).sum();
 ```
 
 As long as the stream value type (`int` in our case) provides an implementation for `operator+` you can use the sum operation
