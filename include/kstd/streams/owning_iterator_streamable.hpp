@@ -22,7 +22,7 @@
 #include "stream_fwd.hpp"
 #include "concepts.hpp"
 
-namespace cxxs {
+namespace kstd::streams {
     template<concepts::ConstIterable C> //
     struct OwningIteratorStreamable final {
         using self_type = OwningIteratorStreamable<C>;

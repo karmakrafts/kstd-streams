@@ -19,11 +19,11 @@
 
 #include <vector>
 #include <gtest/gtest.h>
-#include <cxxs/iterator_streamable.hpp>
+#include "kstd/streams/iterator_streamable.hpp"
 
-TEST(cxxs_IteratorStreamable, TestIterate) {
+TEST(kstd_streams_IteratorStreamable, TestIterate) {
     std::vector<float> values({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
-    auto streamable = cxxs::IteratorStreamable(values.cbegin(), values.cend());
+    auto streamable = kstd::streams::IteratorStreamable(values.cbegin(), values.cend());
 
     for (const auto value: values) {
         auto element = streamable.next();

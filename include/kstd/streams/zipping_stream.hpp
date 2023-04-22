@@ -25,7 +25,7 @@
 #include <tuple>
 #include "stream_fwd.hpp"
 
-namespace cxxs {
+namespace kstd::streams {
     template<typename S, typename L, typename R, concepts::Function<L(typename S::value_type&)> LM, concepts::Function<R(typename S::value_type&)> RM> //
     struct ZippingStream final : public Stream<std::pair<L, R>, S, ZippingStream<S, L, R, LM, RM>> {
         using self_type = ZippingStream<S, L, R, LM, RM>;

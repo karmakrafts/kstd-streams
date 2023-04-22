@@ -20,35 +20,33 @@
 #pragma once
 
 #include <optional>
-#include <cstdint>
-#include "stream_fwd.hpp"
+#include <type_traits>
 
-namespace cxxs {
-    template<typename S> //
-    struct LimitingStream final : public Stream<typename S::value_type, S, LimitingStream<S>> {
-        using self_type = LimitingStream<S>;
-        using value_type = typename S::value_type;
+namespace kstd::streams {
+    template<typename T> //
+    requires(std::is_move_assignable_v<T>)
+    struct SingletStreamable final {
+        using value_type = T;
 
         private:
 
-        size_t _max_count;
-        size_t _count;
+        value_type _element;
+        bool _has_data;
 
         public:
 
-        constexpr LimitingStream(S streamable, size_t max_count) noexcept:
-                Stream<value_type, S, self_type>(std::move(streamable)),
-                _max_count(max_count),
-                _count(0) {
+        explicit constexpr SingletStreamable(value_type element) noexcept:
+                _element(std::move(element)),
+                _has_data(true) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
-            if (_count == _max_count) {
+            if (!_has_data) {
                 return std::nullopt;
             }
 
-            ++_count;
-            return this->_streamable.next();
+            _has_data = false;
+            return std::make_optional(std::move(_element));
         }
     };
 }

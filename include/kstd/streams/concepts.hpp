@@ -21,8 +21,9 @@
 
 #include <concepts>
 #include <optional>
+#include <functional>
 
-namespace cxxs::concepts {
+namespace kstd::streams::concepts {
     template<typename T, typename S> concept Function = requires {
         requires std::convertible_to<T, std::function<S>>;
     };

@@ -25,7 +25,7 @@
 #include <type_traits>
 #include "stream_fwd.hpp"
 
-namespace cxxs {
+namespace kstd::streams {
     template<typename S, concepts::Streamable RS, concepts::Function<RS(typename S::value_type&)> M> //
     struct FlatMappingStream final : public Stream<typename RS::value_type, S, FlatMappingStream<S, RS, M>> {
         using self_type = FlatMappingStream<S, RS, M>;

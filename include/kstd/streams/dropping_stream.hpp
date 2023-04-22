@@ -14,7 +14,7 @@
 
 /**
  * @author Alexander Hinze
- * @since 27/03/2023
+ * @since 31/03/2023
  */
 
 #pragma once
@@ -24,31 +24,42 @@
 #include <type_traits>
 #include "stream_fwd.hpp"
 
-namespace cxxs {
-    template<typename R, typename S, concepts::Function<R(typename S::value_type&)> M> //
-    struct MappingStream final : public Stream<R, S, MappingStream<R, S, M>> {
-        using self_type = MappingStream<R, S, M>;
-        using value_type = R;
+namespace kstd::streams {
+    template<typename S, concepts::Function<bool(typename S::value_type&)> P> //
+    struct DroppingStream final : public Stream<typename S::value_type, S, DroppingStream<S, P>> {
+        using self_type = DroppingStream<S, P>;
+        using value_type = typename S::value_type;
 
         private:
 
-        M _mapper;
+        P _predicate;
+        bool _has_dropped;
 
         public:
 
-        constexpr MappingStream(S streamable, M&& mapper) noexcept:
+        constexpr DroppingStream(S streamable, P&& predicate) noexcept:
                 Stream<value_type, S, self_type>(std::move(streamable)),
-                _mapper(std::forward<M>(mapper)) {
+                _predicate(std::forward<P>(predicate)),
+                _has_dropped(false) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
             auto element = this->_streamable.next();
 
+            if (_has_dropped) {
+                return element;
+            }
+
             if (!element) {
                 return std::nullopt;
             }
 
-            return std::make_optional(std::move(_mapper(*element)));
+            while (element && _predicate(*element)) {
+                element = this->_streamable.next();
+            }
+
+            _has_dropped = true;
+            return element;
         }
     };
 }

@@ -19,26 +19,26 @@
 
 #pragma once
 
-#include <functional>
 #include <optional>
+#include <functional>
+#include <type_traits>
 #include "stream_fwd.hpp"
-#include "concepts.hpp"
 
-namespace cxxs {
-    template<typename S, concepts::Function<void(typename S::value_type&)> F> //
-    struct FilteringStream final : public Stream<typename S::value_type, S, FilteringStream<S, F>> {
-        using self_type = FilteringStream<S, F>;
-        using value_type = typename S::value_type;
+namespace kstd::streams {
+    template<typename R, typename S, concepts::Function<R(typename S::value_type&)> M> //
+    struct MappingStream final : public Stream<R, S, MappingStream<R, S, M>> {
+        using self_type = MappingStream<R, S, M>;
+        using value_type = R;
 
         private:
 
-        F _filter;
+        M _mapper;
 
         public:
 
-        constexpr FilteringStream(S streamable, F&& filter) noexcept:
+        constexpr MappingStream(S streamable, M&& mapper) noexcept:
                 Stream<value_type, S, self_type>(std::move(streamable)),
-                _filter(std::forward<F>(filter)) {
+                _mapper(std::forward<M>(mapper)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
@@ -48,11 +48,7 @@ namespace cxxs {
                 return std::nullopt;
             }
 
-            while (element && !_filter(*element)) {
-                element = this->_streamable.next();
-            }
-
-            return element;
+            return std::make_optional(std::move(_mapper(*element)));
         }
     };
 }

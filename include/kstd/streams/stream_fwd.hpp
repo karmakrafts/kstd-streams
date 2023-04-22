@@ -21,7 +21,7 @@
 
 #include "concepts.hpp"
 
-namespace cxxs {
+namespace kstd::streams {
     template<concepts::Iterator I> //
     struct IteratorStreamable;
 

@@ -14,40 +14,38 @@
 
 /**
  * @author Alexander Hinze
- * @since 29/03/2023
+ * @since 27/03/2023
  */
 
 #pragma once
 
 #include <optional>
-#include <functional>
+#include "concepts.hpp"
+#include "stream_fwd.hpp"
 
-namespace cxxs {
-    template<typename T> //
-    struct CountingStreamable final {
-        using value_type = T;
+namespace kstd::streams {
+    template<concepts::Iterator I> //
+    struct IteratorStreamable final {
+        using value_type = typename I::value_type;
 
         private:
 
-        T _value;
-        size_t _max_count;
-        size_t _count;
+        I _current;
+        I _end;
 
         public:
 
-        constexpr CountingStreamable(T value, size_t max_count) noexcept:
-                _value(std::move(value)),
-                _max_count(max_count),
-                _count(0) {
+        constexpr IteratorStreamable(I begin, I end) noexcept:
+                _current(std::move(begin)),
+                _end(std::move(end)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
-            if (_count == _max_count) {
+            if (_current == _end) {
                 return std::nullopt;
             }
 
-            ++_count;
-            return std::make_optional(_value);
+            return std::make_optional(*_current++);
         }
     };
 }

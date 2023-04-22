@@ -14,7 +14,7 @@
 
 /**
  * @author Alexander Hinze
- * @since 31/03/2023
+ * @since 29/03/2023
  */
 
 #pragma once
@@ -23,42 +23,37 @@
 #include <functional>
 #include <type_traits>
 #include "stream_fwd.hpp"
+#include "concepts.hpp"
 
-namespace cxxs {
-    template<typename S, concepts::Function<bool(typename S::value_type&)> P> //
-    struct DroppingStream final : public Stream<typename S::value_type, S, DroppingStream<S, P>> {
-        using self_type = DroppingStream<S, P>;
-        using value_type = typename S::value_type;
+namespace kstd::streams {
+    template<typename S1, typename S2> //
+    requires(std::same_as<typename S1::value_type, typename S2::value_type>)
+    struct ChainingStream final : public Stream<typename S1::value_type, S1, ChainingStream<S1, S2>> {
+        using self_type = ChainingStream<S1, S2>;
+        using value_type = typename S1::value_type;
 
         private:
 
-        P _predicate;
-        bool _has_dropped;
+        S2 _other_streamable;
 
         public:
 
-        constexpr DroppingStream(S streamable, P&& predicate) noexcept:
-                Stream<value_type, S, self_type>(std::move(streamable)),
-                _predicate(std::forward<P>(predicate)),
-                _has_dropped(false) {
+        constexpr ChainingStream(S1 streamable, S2 other_streamable) noexcept:
+                Stream<value_type, S1, self_type>(std::move(streamable)),
+                _other_streamable(std::move(other_streamable)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
             auto element = this->_streamable.next();
 
-            if (_has_dropped) {
-                return element;
-            }
-
             if (!element) {
-                return std::nullopt;
+                element = _other_streamable.next();
+
+                if (!element) {
+                    return std::nullopt;
+                }
             }
 
-            while (element && _predicate(*element)) {
-                element = this->_streamable.next();
-            }
-
-            _has_dropped = true;
             return element;
         }
     };

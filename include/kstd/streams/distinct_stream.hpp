@@ -14,29 +14,40 @@
 
 /**
  * @author Alexander Hinze
- * @since 27/03/2023
+ * @since 29/03/2023
  */
 
 #pragma once
 
 #include <optional>
+#include <type_traits>
+#include <unordered_set>
 #include "stream_fwd.hpp"
-#include "concepts.hpp"
 
-namespace cxxs {
+namespace kstd::streams {
     template<typename S> //
-    struct BasicStream final : public Stream<typename S::value_type, S, BasicStream<S>> {
-        using self_type = BasicStream<S>;
+    struct DistinctStream final : public Stream<typename S::value_type, S, DistinctStream<S>> {
+        using self_type = DistinctStream<S>;
         using value_type = typename S::value_type;
+
+        private:
+
+        std::unordered_set<value_type> _elements;
 
         public:
 
-        explicit constexpr BasicStream(S streamable) noexcept:
+        explicit constexpr DistinctStream(S streamable) noexcept:
                 Stream<value_type, S, self_type>(std::move(streamable)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
-            return this->_streamable.next();
+            auto element = this->_streamable.next();
+
+            while (element && !_elements.insert(*element).second) {
+                element = this->_streamable.next();
+            }
+
+            return element;
         }
     };
 }

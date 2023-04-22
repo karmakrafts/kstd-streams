@@ -18,11 +18,11 @@
  */
 
 #include <gtest/gtest.h>
-#include <cxxs/singlet_streamable.hpp>
+#include "kstd/streams/singlet_streamable.hpp"
 
-TEST(cxxs_SingletStreamable, TestIterate) {
+TEST(kstd_streams_SingletStreamable, TestIterate) {
     float value = 1337.0F;
-    auto streamable = cxxs::SingletStreamable(value);
+    auto streamable = kstd::streams::SingletStreamable(value);
     auto element = streamable.next();
 
     ASSERT_TRUE(element);

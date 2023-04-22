@@ -14,38 +14,41 @@
 
 /**
  * @author Alexander Hinze
- * @since 27/03/2023
+ * @since 31/03/2023
  */
 
 #pragma once
 
 #include <optional>
-#include "concepts.hpp"
+#include <functional>
+#include <type_traits>
 #include "stream_fwd.hpp"
 
-namespace cxxs {
-    template<concepts::Iterator I> //
-    struct IteratorStreamable final {
-        using value_type = typename I::value_type;
+namespace kstd::streams {
+    template<typename S, concepts::Function<bool(typename S::value_type&)> P>
+    struct TakingStream final : public Stream<typename S::value_type, S, TakingStream<S, P>> {
+        using self_type = TakingStream<S, P>;
+        using value_type = typename S::value_type;
 
         private:
 
-        I _current;
-        I _end;
+        P _predicate;
 
         public:
 
-        constexpr IteratorStreamable(I begin, I end) noexcept:
-                _current(std::move(begin)),
-                _end(std::move(end)) {
+        constexpr TakingStream(S streamable, P&& predicate) noexcept:
+                Stream<value_type, S, self_type>(std::move(streamable)),
+                _predicate(std::forward<P>(predicate)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
-            if (_current == _end) {
+            auto element = this->_streamable.next();
+
+            if (!element || !_predicate(*element)) {
                 return std::nullopt;
             }
 
-            return std::make_optional(*_current++);
+            return element;
         }
     };
 }

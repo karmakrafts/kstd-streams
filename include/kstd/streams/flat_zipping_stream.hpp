@@ -25,7 +25,7 @@
 #include "stream_fwd.hpp"
 #include "concepts.hpp"
 
-namespace cxxs {
+namespace kstd::streams {
     template<typename S, typename LS, typename RS, concepts::Function<LS(typename S::value_type&)> LM, concepts::Function<RS(typename S::value_type&)> RM> //
     struct FlatZippingStream final : public Stream<std::pair<typename LS::value_type, typename RS::value_type>, S, FlatZippingStream<S, LS, RS, LM, RM>> {
         using self_type = FlatZippingStream<S, LS, RS, LM, RM>;

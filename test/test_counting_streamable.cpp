@@ -19,11 +19,11 @@
 
 #include <vector>
 #include <gtest/gtest.h>
-#include <cxxs/counting_streamable.hpp>
+#include "kstd/streams/counting_streamable.hpp"
 
-TEST(cxxs_CountingStreamable, TestIterate) {
+TEST(kstd_streams_CountingStreamable, TestIterate) {
     std::vector<float> values({3.0F, 3.0F, 3.0F, 3.0F, 3.0F, 3.0F, 3.0F, 3.0F, 3.0F, 3.0F});
-    auto streamable = cxxs::CountingStreamable(3.0F, values.size());
+    auto streamable = kstd::streams::CountingStreamable(3.0F, values.size());
 
     for (const auto value: values) {
         auto element = streamable.next();

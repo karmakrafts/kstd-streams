@@ -10,7 +10,7 @@
 #include <type_traits>
 #include "stream_fwd.hpp"
 
-namespace cxxs {
+namespace kstd::streams {
     template<concepts::Iterable C> //
     requires(concepts::Erasable<C>)
     struct DrainingStreamable final {

@@ -46,7 +46,7 @@
 #include "taking_stream.hpp"
 #include "sorting_stream.hpp"
 
-namespace cxxs {
+namespace kstd::streams {
     template<typename T, concepts::Streamable S, typename IMPL> //
     class Stream {
         protected:
@@ -93,7 +93,7 @@ namespace cxxs {
 
         template<typename LM, typename L = std::invoke_result_t<LM, T&>, typename RM, typename R = std::invoke_result_t<RM, T&>>
         requires(concepts::Function<LM, L(T&)> && concepts::Function<RM, R(T&)>)
-        [[nodiscard]] constexpr auto zip(LM&& left_mapper, RM&& right_mapper) noexcept -> ZippingStream<IMPL, L, R, LM, RM> {
+        [[nodiscard]] constexpr auto zip(LM&& left_mapper, RM&& right_mapper) noexcept -> ZippingStream <IMPL, L, R, LM, RM> {
             return ZippingStream<IMPL, L, R, LM, RM>(std::move(get_self()), std::forward<LM>(left_mapper), std::forward<RM>(right_mapper));
         }
 
@@ -114,7 +114,7 @@ namespace cxxs {
         }
 
         template<concepts::Function<bool(T&)> P>
-        [[nodiscard]] constexpr auto take_while(P&& predicate) noexcept -> TakingStream<IMPL, P> {
+        [[nodiscard]] constexpr auto take_while(P&& predicate) noexcept -> TakingStream <IMPL, P> {
             return TakingStream<IMPL, P>(std::move(get_self()), std::forward<P>(predicate));
         }
 

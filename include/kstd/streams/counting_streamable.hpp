@@ -14,39 +14,40 @@
 
 /**
  * @author Alexander Hinze
- * @since 27/03/2023
+ * @since 29/03/2023
  */
 
 #pragma once
 
 #include <optional>
-#include <type_traits>
+#include <functional>
 
-namespace cxxs {
+namespace kstd::streams {
     template<typename T> //
-    requires(std::is_move_assignable_v<T>)
-    struct SingletStreamable final {
+    struct CountingStreamable final {
         using value_type = T;
 
         private:
 
-        value_type _element;
-        bool _has_data;
+        T _value;
+        size_t _max_count;
+        size_t _count;
 
         public:
 
-        explicit constexpr SingletStreamable(value_type element) noexcept:
-                _element(std::move(element)),
-                _has_data(true) {
+        constexpr CountingStreamable(T value, size_t max_count) noexcept:
+                _value(std::move(value)),
+                _max_count(max_count),
+                _count(0) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
-            if (!_has_data) {
+            if (_count == _max_count) {
                 return std::nullopt;
             }
 
-            _has_data = false;
-            return std::make_optional(std::move(_element));
+            ++_count;
+            return std::make_optional(_value);
         }
     };
 }

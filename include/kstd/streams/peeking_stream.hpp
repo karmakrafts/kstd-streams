@@ -23,37 +23,32 @@
 #include <functional>
 #include <type_traits>
 #include "stream_fwd.hpp"
-#include "concepts.hpp"
 
-namespace cxxs {
-    template<typename S1, typename S2> //
-    requires(std::same_as<typename S1::value_type, typename S2::value_type>)
-    struct ChainingStream final : public Stream<typename S1::value_type, S1, ChainingStream<S1, S2>> {
-        using self_type = ChainingStream<S1, S2>;
-        using value_type = typename S1::value_type;
+namespace kstd::streams {
+    template<typename S, concepts::Function<void(typename S::value_type&)> F> //
+    struct PeekingStream final : public Stream<typename S::value_type, S, PeekingStream<S, F>> {
+        using self_type = PeekingStream<S, F>;
+        using value_type = typename S::value_type;
 
         private:
 
-        S2 _other_streamable;
+        F _function;
 
         public:
 
-        constexpr ChainingStream(S1 streamable, S2 other_streamable) noexcept:
-                Stream<value_type, S1, self_type>(std::move(streamable)),
-                _other_streamable(std::move(other_streamable)) {
+        constexpr PeekingStream(S streamable, F&& function) noexcept:
+                Stream<value_type, S, self_type>(std::move(streamable)),
+                _function(std::forward<F>(function)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
             auto element = this->_streamable.next();
 
             if (!element) {
-                element = _other_streamable.next();
-
-                if (!element) {
-                    return std::nullopt;
-                }
+                return std::nullopt;
             }
 
+            _function(*element);
             return element;
         }
     };

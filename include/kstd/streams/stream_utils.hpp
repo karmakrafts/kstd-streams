@@ -9,7 +9,7 @@
 #include "stream_fwd.hpp"
 #include "concepts.hpp"
 
-namespace cxxs {
+namespace kstd::streams {
     template<concepts::Streamable S, concepts::Pushable C>
     requires(std::is_same_v<typename S::value_type, typename C::value_type>)
     constexpr auto collect_into(S& streamable, C& container) noexcept -> void {

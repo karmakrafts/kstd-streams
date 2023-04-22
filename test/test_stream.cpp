@@ -24,7 +24,7 @@
 #include <string>
 #include <string_view>
 #include <gtest/gtest.h>
-#include <cxxs/stream.hpp>
+#include "kstd/streams/stream.hpp"
 
 const std::vector<float> test_values({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
 const size_t num_test_values = test_values.size();
@@ -68,7 +68,7 @@ TEST(cxxs_Stream, TestCollectFromMap) {
         ordered_keys[i] = key;
     }
 
-    const auto keys = cxxs::stream(entries).map([](auto& x) {
+    const auto keys = kstd::streams::stream(entries).map([](auto& x) {
         return x.first;
     }).collect<std::vector>();
 
@@ -78,7 +78,7 @@ TEST(cxxs_Stream, TestCollectFromMap) {
         ASSERT_TRUE(std::find(ordered_keys.cbegin(), ordered_keys.cend(), keys[i]) != ordered_keys.cend());
     }
 
-    const auto values = cxxs::stream(entries).map([](auto& x) {
+    const auto values = kstd::streams::stream(entries).map([](auto& x) {
         return x.second;
     }).collect<std::vector>();
 
@@ -91,7 +91,7 @@ TEST(cxxs_Stream, TestCollectFromMap) {
 
 TEST(cxxs_Stream, TestSorted) {
     // @formatter:off
-    const auto result = cxxs::stream(test_values)
+    const auto result = kstd::streams::stream(test_values)
         .sorted([](const auto& a, const auto& b) { return a > b; })
         .collect<std::vector>();
     // @formatter:on
@@ -110,7 +110,7 @@ TEST(cxxs_Stream, TestSorted) {
 
 TEST(cxxs_Stream, TestSortedDefault) {
     // @formatter:off
-    const auto result = cxxs::stream(test_values)
+    const auto result = kstd::streams::stream(test_values)
         .sorted()
         .collect<std::vector>();
     // @formatter:on
@@ -134,7 +134,7 @@ TEST(cxxs_Stream, TestDerefAll) {
         pointers.push_back(&value);
     }
 
-    const auto result = cxxs::stream(pointers).deref_all().collect<std::vector>();
+    const auto result = kstd::streams::stream(pointers).deref_all().collect<std::vector>();
     ASSERT_EQ(result.size(), num_test_values);
 
     for (size_t i = 0; i < num_test_values; i++) {
@@ -150,7 +150,7 @@ TEST(cxxs_Stream, TestDerefNotNull) {
         pointers.push_back(nullptr);
     }
 
-    const auto result = cxxs::stream(pointers).deref_not_null().collect<std::vector>();
+    const auto result = kstd::streams::stream(pointers).deref_not_null().collect<std::vector>();
     ASSERT_EQ(result.size(), num_test_values);
 
     for (size_t i = 0; i < num_test_values; i++) {
@@ -159,38 +159,38 @@ TEST(cxxs_Stream, TestDerefNotNull) {
 }
 
 TEST(cxxs_Stream, TestAnyMatch) {
-    ASSERT_TRUE(cxxs::stream(test_values).any_match([](auto& x) {
+    ASSERT_TRUE(kstd::streams::stream(test_values).any_match([](auto& x) {
         return x > 1.0F;
     }));
 
-    ASSERT_FALSE(cxxs::stream(test_values).any_match([](auto& x) {
+    ASSERT_FALSE(kstd::streams::stream(test_values).any_match([](auto& x) {
         return x < 0.0F;
     }));
 }
 
 TEST(cxxs_Stream, TestAllMatch) {
-    ASSERT_TRUE(cxxs::stream(test_values).all_match([](auto& x) {
+    ASSERT_TRUE(kstd::streams::stream(test_values).all_match([](auto& x) {
         return x > 0.0F;
     }));
 
-    ASSERT_FALSE(cxxs::stream(test_values).all_match([](auto& x) {
+    ASSERT_FALSE(kstd::streams::stream(test_values).all_match([](auto& x) {
         return x > 2.0F;
     }));
 }
 
 TEST(cxxs_Stream, TestNoneMatch) {
-    ASSERT_TRUE(cxxs::stream(test_values).none_match([](auto& x) {
+    ASSERT_TRUE(kstd::streams::stream(test_values).none_match([](auto& x) {
         return x > 5.0F;
     }));
 
-    ASSERT_FALSE(cxxs::stream(test_values).none_match([](auto& x) {
+    ASSERT_FALSE(kstd::streams::stream(test_values).none_match([](auto& x) {
         return x > 0.0F;
     }));
 }
 
 TEST(cxxs_Stream, TestPeek) {
     // @formatter:off
-    const auto result = cxxs::stream(test_values)
+    const auto result = kstd::streams::stream(test_values)
         .peek([](auto& x) { x += 0.5F; })
         .collect<std::vector>();
     // @formatter:on
@@ -205,13 +205,13 @@ TEST(cxxs_Stream, TestPeek) {
 TEST(cxxs_Stream, TestForEach) {
     size_t index = 0;
 
-    cxxs::stream(test_values).for_each([&index](auto& x) {
+    kstd::streams::stream(test_values).for_each([&index](auto& x) {
         ASSERT_EQ(x, test_values[index++]);
     });
 }
 
 TEST(cxxs_Stream, TestForEachIndexed) {
-    cxxs::stream(test_values).for_each_indexed([](auto& x, auto i) {
+    kstd::streams::stream(test_values).for_each_indexed([](auto& x, auto i) {
         ASSERT_EQ(x, test_values[i]);
     });
 }
@@ -224,7 +224,7 @@ TEST(cxxs_Stream, TestZip) {
     // @formatter:on
 
     // @formatter:off
-    const auto result = cxxs::stream(values)
+    const auto result = kstd::streams::stream(values)
         .zip(
             [](auto& x) { return x.i_value; },
             [](auto& x) { return x.f_value; }
@@ -254,10 +254,10 @@ TEST(cxxs_Stream, TestFlatZip) {
     std::vector<std::vector<Foo>> nested_values({values, values, values});
 
     // @formatter:off
-    const auto result = cxxs::stream(nested_values)
+    const auto result = kstd::streams::stream(nested_values)
         .flat_zip(
-            [](auto& x) { return cxxs::owning(x); },
-            [](auto& x) { return cxxs::owning(x); }
+            [](auto& x) { return kstd::streams::owning(x); },
+            [](auto& x) { return kstd::streams::owning(x); }
         )
         .collect<std::vector>();
     // @formatter:on
@@ -287,7 +287,7 @@ TEST(cxxs_Stream, TestFlatZip) {
 
 TEST(cxxs_Stream, TestCollectToMemory) {
     std::vector<float> target(num_test_values);
-    cxxs::stream(test_values).collect_to_memory(target.data(), num_test_values);
+    kstd::streams::stream(test_values).collect_to_memory(target.data(), num_test_values);
 
     ASSERT_EQ(target.size(), num_test_values);
 
@@ -300,7 +300,7 @@ TEST(cxxs_Stream, TestSkip) {
     const auto num_values = num_test_values - 2;
 
     // @formatter:off
-    const auto result = cxxs::stream(test_values)
+    const auto result = kstd::streams::stream(test_values)
         .skip(2)
         .collect<std::vector>();
     // @formatter:on
@@ -316,8 +316,8 @@ TEST(cxxs_Stream, TestDistinct) {
     std::vector<std::vector<float>> nested_values({test_values, test_values, test_values, test_values});
 
     // @formatter:off
-    const auto result = cxxs::stream(nested_values)
-        .flat_map([](auto& x) { return cxxs::owning(x); })
+    const auto result = kstd::streams::stream(nested_values)
+        .flat_map([](auto& x) { return kstd::streams::owning(x); })
         .distinct()
         .collect<std::vector>();
     // @formatter:on
@@ -332,7 +332,7 @@ TEST(cxxs_Stream, TestDistinct) {
 TEST(cxxs_Stream, TestChain) {
     std::vector<float> expected({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F, 1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
     const auto chained_count = expected.size();
-    auto result = (cxxs::stream(test_values) | cxxs::stream(test_values)).collect<std::vector>();
+    auto result = (kstd::streams::stream(test_values) | kstd::streams::stream(test_values)).collect<std::vector>();
 
     ASSERT_EQ(result.size(), chained_count);
 
@@ -340,7 +340,7 @@ TEST(cxxs_Stream, TestChain) {
         ASSERT_EQ(result[i], expected[i]);
     }
 
-    result = (cxxs::stream(test_values) | test_values).collect<std::vector>();
+    result = (kstd::streams::stream(test_values) | test_values).collect<std::vector>();
 
     ASSERT_EQ(result.size(), chained_count);
 
@@ -352,7 +352,7 @@ TEST(cxxs_Stream, TestChain) {
 TEST(cxxs_Stream, TestPreChain) {
     std::vector<float> expected({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F, 1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
     const auto chained_count = expected.size();
-    auto result = (cxxs::stream(test_values) || cxxs::stream(test_values)).collect<std::vector>();
+    auto result = (kstd::streams::stream(test_values) || kstd::streams::stream(test_values)).collect<std::vector>();
 
     ASSERT_EQ(result.size(), chained_count);
 
@@ -360,7 +360,7 @@ TEST(cxxs_Stream, TestPreChain) {
         ASSERT_EQ(result[i], expected[i]);
     }
 
-    result = (cxxs::stream(test_values) || test_values).collect<std::vector>();
+    result = (kstd::streams::stream(test_values) || test_values).collect<std::vector>();
 
     ASSERT_EQ(result.size(), chained_count);
 
@@ -371,7 +371,7 @@ TEST(cxxs_Stream, TestPreChain) {
 
 TEST(cxxs_Stream, TestReduce) {
     // @formatter:off
-    const auto result = cxxs::stream(test_values)
+    const auto result = kstd::streams::stream(test_values)
         .reduce([](auto a, auto b) { return a * b; });
     // @formatter:on
 
@@ -380,18 +380,18 @@ TEST(cxxs_Stream, TestReduce) {
 }
 
 TEST(cxxs_Stream, TestSum) {
-    const auto result = cxxs::stream(test_values).sum();
+    const auto result = kstd::streams::stream(test_values).sum();
     ASSERT_TRUE(result);
     ASSERT_EQ(*result, 22.0F);
 }
 
 TEST(cxxs_Stream, TestFindFirst) {
-    auto result = cxxs::stream(test_values).find_first();
+    auto result = kstd::streams::stream(test_values).find_first();
     ASSERT_TRUE(result);
     ASSERT_EQ(*result, 1.0F);
 
     // @formatter:off
-    result = cxxs::stream(test_values)
+    result = kstd::streams::stream(test_values)
         .filter([](auto& x) { return x == 3.0F; })
         .find_first();
     // @formatter:on
@@ -400,7 +400,7 @@ TEST(cxxs_Stream, TestFindFirst) {
     ASSERT_EQ(*result, 3.0F);
 
     // @formatter:off
-    result = cxxs::stream(test_values)
+    result = kstd::streams::stream(test_values)
         .filter([](auto& x) { return x > 10.0F; })
         .find_first();
     // @formatter:on
@@ -409,12 +409,12 @@ TEST(cxxs_Stream, TestFindFirst) {
 }
 
 TEST(cxxs_Stream, TestFindLast) {
-    auto result = cxxs::stream(test_values).find_last();
+    auto result = kstd::streams::stream(test_values).find_last();
     ASSERT_TRUE(result);
     ASSERT_EQ(*result, 4.5F);
 
     // @formatter:off
-    result = cxxs::stream(test_values)
+    result = kstd::streams::stream(test_values)
         .filter([](auto& x) { return x == 3.0F; })
         .find_last();
     // @formatter:on
@@ -423,7 +423,7 @@ TEST(cxxs_Stream, TestFindLast) {
     ASSERT_EQ(*result, 3.0F);
 
     // @formatter:off
-    result = cxxs::stream(test_values)
+    result = kstd::streams::stream(test_values)
         .filter([](auto& x) { return x > 2.0F && x < 4.0F; })
         .find_last();
     // @formatter:on
@@ -433,7 +433,7 @@ TEST(cxxs_Stream, TestFindLast) {
 }
 
 TEST(cxxs_Stream, TestCollect) {
-    const auto result = cxxs::stream(test_values).collect<std::vector>();
+    const auto result = kstd::streams::stream(test_values).collect<std::vector>();
     ASSERT_EQ(result.size(), num_test_values);
 
     for (size_t i = 0; i < num_test_values; i++) {
@@ -445,7 +445,7 @@ TEST(cxxs_Stream, TestCollectMap) {
     size_t index = 0;
 
     // @formatter:off
-    auto result = cxxs::stream(test_values).collect_map<std::unordered_map>(
+    auto result = kstd::streams::stream(test_values).collect_map<std::unordered_map>(
         [&index](auto& x) { return index++; },
         [](auto& x) { return x; }
     );
@@ -460,7 +460,7 @@ TEST(cxxs_Stream, TestCollectMap) {
 
 TEST(cxxs_Stream, TestCollectToSequence) {
     constexpr size_t extent = 4;
-    const auto result = cxxs::stream(test_values).collect_sequence<extent, std::array>();
+    const auto result = kstd::streams::stream(test_values).collect_sequence<extent, std::array>();
     ASSERT_EQ(result.size(), extent);
 
     for (size_t i = 0; i < extent; i++) {
@@ -469,13 +469,13 @@ TEST(cxxs_Stream, TestCollectToSequence) {
 }
 
 TEST(cxxs_Stream, TestCount) {
-    const auto result = cxxs::stream(test_values).count();
+    const auto result = kstd::streams::stream(test_values).count();
     ASSERT_EQ(result, num_test_values);
 }
 
 TEST(cxxs_Stream, TestFilter) {
     // @formatter:off
-    const auto result = cxxs::stream(test_values)
+    const auto result = kstd::streams::stream(test_values)
         .filter([](auto& x) { return (static_cast<int32_t>(x) & 1) == 0; })
         .collect<std::vector>();
     // @formatter:on
@@ -490,7 +490,7 @@ TEST(cxxs_Stream, TestFilter) {
 
 TEST(cxxs_Stream, TestDropWhile) {
     // @formatter:off
-    const auto result = cxxs::stream(test_values)
+    const auto result = kstd::streams::stream(test_values)
         .drop_while([](auto& x) { return x < 3.0F; })
         .collect<std::vector>();
     // @formatter:on
@@ -505,7 +505,7 @@ TEST(cxxs_Stream, TestDropWhile) {
 
 TEST(cxxs_Stream, TestTakeWhile) {
     // @formatter:off
-    const auto result = cxxs::stream(test_values)
+    const auto result = kstd::streams::stream(test_values)
         .take_while([](auto& x) { return x <= 4.0F; })
         .collect<std::vector>();
     // @formatter:on
@@ -527,7 +527,7 @@ TEST(cxxs_Stream, TestFilterNotNull) {
     }
 
     // @formatter:off
-    const auto result = cxxs::stream(pointers)
+    const auto result = kstd::streams::stream(pointers)
         .filter_not_null()
         .collect<std::vector>();
     // @formatter:on
@@ -541,7 +541,7 @@ TEST(cxxs_Stream, TestFilterNotNull) {
 
 TEST(cxxs_Stream, TestMap) {
     // @formatter:off
-    const auto result1 = cxxs::stream(test_values)
+    const auto result1 = kstd::streams::stream(test_values)
         .map([](auto& x) { return x; })
         .collect<std::vector>();
     // @formatter:on
@@ -553,7 +553,7 @@ TEST(cxxs_Stream, TestMap) {
     }
 
     // @formatter:off
-    const auto result2 = cxxs::stream(test_values)
+    const auto result2 = kstd::streams::stream(test_values)
         .map([](auto& x) { return static_cast<int32_t>(x); })
         .collect<std::vector>();
     // @formatter:on
@@ -575,8 +575,8 @@ TEST(cxxs_Stream, TestFlatMap) {
     std::vector<std::vector<float>> nested_values({test_values, test_values, test_values, test_values});
 
     // @formatter:off
-    const auto result = cxxs::stream(nested_values)
-        .flat_map([](auto& x) { return cxxs::owning(x); })
+    const auto result = kstd::streams::stream(nested_values)
+        .flat_map([](auto& x) { return kstd::streams::owning(x); })
         .collect<std::vector>();
     // @formatter:on
 
@@ -598,13 +598,13 @@ TEST(cxxs_Stream, TestFlatMap) {
 }
 
 TEST(cxxs_Stream, TestMin) {
-    const auto result = cxxs::stream(test_values).min();
+    const auto result = kstd::streams::stream(test_values).min();
     ASSERT_TRUE(result);
     ASSERT_EQ(*result, 1.0F);
 }
 
 TEST(cxxs_Stream, TestMax) {
-    const auto result = cxxs::stream(test_values).max();
+    const auto result = kstd::streams::stream(test_values).max();
     ASSERT_TRUE(result);
     ASSERT_EQ(*result, 4.5F);
 }
@@ -613,7 +613,7 @@ TEST(cxxs_Stream, TestLimit) {
     constexpr std::size_t max_count = 4;
 
     // @formatter:off
-    const auto result = cxxs::stream(test_values)
+    const auto result = kstd::streams::stream(test_values)
         .limit(max_count)
         .collect<std::vector>();
     // @formatter:on

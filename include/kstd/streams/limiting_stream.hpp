@@ -14,42 +14,41 @@
 
 /**
  * @author Alexander Hinze
- * @since 29/03/2023
+ * @since 27/03/2023
  */
 
 #pragma once
 
 #include <optional>
-#include <functional>
-#include <type_traits>
+#include <cstdint>
 #include "stream_fwd.hpp"
 
-namespace cxxs {
-    template<typename S, concepts::Function<void(typename S::value_type&)> F> //
-    struct PeekingStream final : public Stream<typename S::value_type, S, PeekingStream<S, F>> {
-        using self_type = PeekingStream<S, F>;
+namespace kstd::streams {
+    template<typename S> //
+    struct LimitingStream final : public Stream<typename S::value_type, S, LimitingStream<S>> {
+        using self_type = LimitingStream<S>;
         using value_type = typename S::value_type;
 
         private:
 
-        F _function;
+        size_t _max_count;
+        size_t _count;
 
         public:
 
-        constexpr PeekingStream(S streamable, F&& function) noexcept:
+        constexpr LimitingStream(S streamable, size_t max_count) noexcept:
                 Stream<value_type, S, self_type>(std::move(streamable)),
-                _function(std::forward<F>(function)) {
+                _max_count(max_count),
+                _count(0) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
-            auto element = this->_streamable.next();
-
-            if (!element) {
+            if (_count == _max_count) {
                 return std::nullopt;
             }
 
-            _function(*element);
-            return element;
+            ++_count;
+            return this->_streamable.next();
         }
     };
 }
