@@ -1,4 +1,4 @@
-# <img src="https://raw.githubusercontent.com/KitsuneAlex/kstd-streams/master/branding/logo.svg" width="6%"></img> kstd-streams
+# <img src="https://raw.githubusercontent.com/karmakrafts/kstd-streams/master/branding/logo.svg" width="6%"></img> kstd-streams
 
 Are you looking for map, filter, reduce and more on any standard container?  
 Do you want it to be a constexpr-ready zero-cost abstraction?  
