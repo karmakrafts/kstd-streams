@@ -6,7 +6,13 @@ set(KSTD_STREAMS_MODULE ON) # Let other modules know we are present!
 add_compile_definitions(KSTD_STREAMS_MODULE)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake;")
+
+if(${KSTD_STREAMS_EMBEDDED})
+    set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake;")
+else()
+    set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake;")
+endif()
+
 include(CommonLibraries)
 include(Platform)
 
