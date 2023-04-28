@@ -7,7 +7,6 @@
 
 #include <type_traits>
 #include "stream_fwd.hpp"
-#include "concepts.hpp"
 
 namespace kstd::streams {
     template<concepts::Streamable S, concepts::Pushable C>

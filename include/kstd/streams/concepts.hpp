@@ -21,30 +21,8 @@
 
 #include <concepts>
 #include <optional>
-#include <functional>
 
 namespace kstd::streams::concepts {
-    template<typename T, typename S> concept Function = requires {
-        requires std::convertible_to<T, std::function<S>>;
-    };
-
-    template<typename T> concept Addable = requires(T type) {
-        type + type;
-        requires std::convertible_to<decltype(type + type), T>;
-    };
-
-    template<typename T> //
-    concept LessThanComparable = requires(T type) {
-        type < type;
-        requires std::same_as<decltype(type < type), bool>;
-    };
-
-    template<typename T> //
-    concept GreaterThanComparable = requires(T type) {
-        type > type;
-        requires std::same_as<decltype(type > type), bool>;
-    };
-
     template<typename T> //
     concept Pushable = requires(T type, typename T::value_type value) {
         type.push_back(value);
@@ -65,47 +43,5 @@ namespace kstd::streams::concepts {
         typename T::value_type;
         type.next();
         requires std::same_as<decltype(type.next()), std::optional<typename T::value_type>>;
-    };
-
-    template<typename T> //
-    concept Iterator = requires(T type) {
-        typename T::value_type;
-        ++type;
-        type++;
-        *type;
-        type == type;
-        type != type;
-        requires std::convertible_to<decltype(++type), T>;
-        requires std::convertible_to<decltype(type++), T>;
-        requires std::convertible_to<decltype(*type), typename T::value_type>;
-        requires std::same_as<decltype(type == type), bool>;
-        requires std::same_as<decltype(type != type), bool>;
-    };
-
-    template<typename T> //
-    concept ConstIterable = requires(T type) {
-        typename T::const_iterator;
-        type.cbegin();
-        type.cend();
-        requires Iterator<decltype(type.cbegin())>;
-        requires Iterator<decltype(type.cend())>;
-    };
-
-    template<typename T> //
-    concept ConstReverseIterable = requires(T type) {
-        typename T::const_iterator;
-        type.crbegin();
-        type.crend();
-        requires Iterator<decltype(type.crbegin())>;
-        requires Iterator<decltype(type.crend())>;
-    };
-
-    template<typename T> //
-    concept Iterable = requires(T type) {
-        typename T::iterator;
-        type.begin();
-        type.end();
-        requires Iterator<decltype(type.begin())>;
-        requires Iterator<decltype(type.end())>;
     };
 }

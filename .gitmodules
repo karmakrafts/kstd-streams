@@ -1,3 +1,9 @@
 [submodule "cmake"]
 	path = cmake
 	url = https://github.com/karmakrafts/cmake
+[submodule "kstd-types"]
+	path = kstd-types
+	url = https://github.com/karmakrafts/kstd-types
+[submodule "kstd-concepts"]
+	path = kstd-concepts
+	url = https://github.com/karmakrafts/kstd-concepts

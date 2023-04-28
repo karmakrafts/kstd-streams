@@ -20,10 +20,8 @@
 #pragma once
 
 #include <optional>
-#include <functional>
 #include <type_traits>
 #include "stream_fwd.hpp"
-#include "concepts.hpp"
 
 namespace kstd::streams {
     template<typename S1, typename S2> //

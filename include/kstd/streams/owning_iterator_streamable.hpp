@@ -20,10 +20,9 @@
 #pragma once
 
 #include "stream_fwd.hpp"
-#include "concepts.hpp"
 
 namespace kstd::streams {
-    template<concepts::ConstIterable C> //
+    template<kstd::concepts::ConstIterable C> //
     struct OwningIteratorStreamable final {
         using self_type = OwningIteratorStreamable<C>;
         using iterator = typename C::const_iterator;

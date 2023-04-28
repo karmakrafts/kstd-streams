@@ -11,7 +11,7 @@
 #include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<concepts::Iterable C> //
+    template<kstd::concepts::Iterable C> //
     requires(concepts::Erasable<C>)
     struct DrainingStreamable final {
         using self_type = DrainingStreamable<C>;

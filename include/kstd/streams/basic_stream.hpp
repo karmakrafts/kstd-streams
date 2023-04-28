@@ -21,7 +21,6 @@
 
 #include <optional>
 #include "stream_fwd.hpp"
-#include "concepts.hpp"
 
 namespace kstd::streams {
     template<typename S> //

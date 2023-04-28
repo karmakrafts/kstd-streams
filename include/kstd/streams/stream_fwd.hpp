@@ -19,16 +19,17 @@
 
 #pragma once
 
+#include "kstd/concepts.hpp"
 #include "concepts.hpp"
 
 namespace kstd::streams {
-    template<concepts::Iterator I> //
+    template<kstd::concepts::Iterator I> //
     struct IteratorStreamable;
 
-    template<concepts::ConstIterable C> //
+    template<kstd::concepts::ConstIterable C> //
     struct OwningIteratorStreamable;
 
-    template<concepts::Iterable C> //
+    template<kstd::concepts::Iterable C> //
     requires(concepts::Erasable<C>)
     struct DrainingStreamable;
 
@@ -45,16 +46,17 @@ namespace kstd::streams {
     template<typename S> //
     struct BasicStream;
 
-    template<concepts::ConstIterable C>
+    template<kstd::concepts::ConstIterable C>
     [[nodiscard]] constexpr auto stream(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>>;
 
-    template<concepts::ConstIterable C>
-    [[nodiscard]] constexpr auto owning(C container) noexcept -> BasicStream<OwningIteratorStreamable<C>>;
+    template<kstd::concepts::ConstIterable C> [[nodiscard]] constexpr auto owning(C
+    container) noexcept ->
+    BasicStream<OwningIteratorStreamable<C>>;
 
-    template<concepts::ConstReverseIterable C>
+    template<kstd::concepts::ConstReverseIterable C>
     [[nodiscard]] constexpr auto reverse(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>>;
 
-    template<concepts::Iterable C>
+    template<kstd::concepts::Iterable C>
     requires(concepts::Erasable<C>)
     [[nodiscard]] constexpr auto draining(C& container) noexcept -> BasicStream<DrainingStreamable<C>>;
 

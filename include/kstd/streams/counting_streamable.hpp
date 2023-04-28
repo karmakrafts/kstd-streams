@@ -20,7 +20,7 @@
 #pragma once
 
 #include <optional>
-#include <functional>
+#include "kstd/types.hpp"
 
 namespace kstd::streams {
     template<typename T> //
@@ -30,12 +30,12 @@ namespace kstd::streams {
         private:
 
         T _value;
-        size_t _max_count;
-        size_t _count;
+        usize _max_count;
+        usize _count;
 
         public:
 
-        constexpr CountingStreamable(T value, size_t max_count) noexcept:
+        constexpr CountingStreamable(T value, usize max_count) noexcept:
                 _value(std::move(value)),
                 _max_count(max_count),
                 _count(0) {

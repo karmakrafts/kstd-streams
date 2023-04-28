@@ -22,6 +22,7 @@
 #include <optional>
 #include <cstdint>
 #include "stream_fwd.hpp"
+#include "kstd/types.hpp"
 
 namespace kstd::streams {
     template<typename S> //
@@ -31,12 +32,12 @@ namespace kstd::streams {
 
         private:
 
-        size_t _max_count;
-        size_t _count;
+        usize _max_count;
+        usize _count;
 
         public:
 
-        constexpr LimitingStream(S streamable, size_t max_count) noexcept:
+        constexpr LimitingStream(S streamable, usize max_count) noexcept:
                 Stream<value_type, S, self_type>(std::move(streamable)),
                 _max_count(max_count),
                 _count(0) {

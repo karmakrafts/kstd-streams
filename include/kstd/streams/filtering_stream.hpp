@@ -22,10 +22,9 @@
 #include <functional>
 #include <optional>
 #include "stream_fwd.hpp"
-#include "concepts.hpp"
 
 namespace kstd::streams {
-    template<typename S, concepts::Function<void(typename S::value_type&)> F> //
+    template<typename S, kstd::concepts::Function<void(typename S::value_type&)> F> //
     struct FilteringStream final : public Stream<typename S::value_type, S, FilteringStream<S, F>> {
         using self_type = FilteringStream<S, F>;
         using value_type = typename S::value_type;

@@ -26,7 +26,7 @@
 #include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename S, concepts::Streamable RS, concepts::Function<RS(typename S::value_type&)> M> //
+    template<typename S, concepts::Streamable RS, kstd::concepts::Function<RS(typename S::value_type&)> M> //
     struct FlatMappingStream final : public Stream<typename RS::value_type, S, FlatMappingStream<S, RS, M>> {
         using self_type = FlatMappingStream<S, RS, M>;
         using value_type = typename RS::value_type;

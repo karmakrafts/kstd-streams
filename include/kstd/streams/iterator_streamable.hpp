@@ -20,11 +20,10 @@
 #pragma once
 
 #include <optional>
-#include "concepts.hpp"
 #include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<concepts::Iterator I> //
+    template<kstd::concepts::Iterator I> //
     struct IteratorStreamable final {
         using value_type = typename I::value_type;
 

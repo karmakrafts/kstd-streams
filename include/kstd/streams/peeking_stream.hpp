@@ -25,7 +25,7 @@
 #include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename S, concepts::Function<void(typename S::value_type&)> F> //
+    template<typename S, kstd::concepts::Function<void(typename S::value_type&)> F> //
     struct PeekingStream final : public Stream<typename S::value_type, S, PeekingStream<S, F>> {
         using self_type = PeekingStream<S, F>;
         using value_type = typename S::value_type;

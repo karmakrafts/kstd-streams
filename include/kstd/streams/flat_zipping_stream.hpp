@@ -23,10 +23,9 @@
 #include <functional>
 #include <type_traits>
 #include "stream_fwd.hpp"
-#include "concepts.hpp"
 
 namespace kstd::streams {
-    template<typename S, typename LS, typename RS, concepts::Function<LS(typename S::value_type&)> LM, concepts::Function<RS(typename S::value_type&)> RM> //
+    template<typename S, typename LS, typename RS, kstd::concepts::Function<LS(typename S::value_type&)> LM, kstd::concepts::Function<RS(typename S::value_type&)> RM> //
     struct FlatZippingStream final : public Stream<std::pair<typename LS::value_type, typename RS::value_type>, S, FlatZippingStream<S, LS, RS, LM, RM>> {
         using self_type = FlatZippingStream<S, LS, RS, LM, RM>;
         using left_type = typename LS::value_type;

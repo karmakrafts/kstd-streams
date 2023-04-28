@@ -15,7 +15,7 @@
 #include "owning_iterator_streamable.hpp"
 
 namespace kstd::streams {
-    template<typename S, concepts::Function<bool(const typename S::value_type&, const typename S::value_type&)> C> //
+    template<typename S, kstd::concepts::Function<bool(const typename S::value_type&, const typename S::value_type&)> C> //
     struct SortingStream final : public Stream<typename S::value_type, S, SortingStream<S, C>> {
         using self_type = SortingStream<S, C>;
         using value_type = typename S::value_type;
