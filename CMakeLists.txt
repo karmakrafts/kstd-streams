@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.18)
 project(kstd-streams LANGUAGES C CXX)
 
 option(KSTD_STREAMS_BUILD_TESTS "Build unit tests for kstd-streams" ON)
+option(KSTD_STREAMS_EMBEDDED "Look up CMake infra in parent directory instead of the project directory" OFF)
 set(KSTD_STREAMS_MODULE ON) # Let other modules know we are present!
 add_compile_definitions(KSTD_STREAMS_MODULE)
 
