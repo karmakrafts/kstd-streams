@@ -193,7 +193,8 @@ namespace kstd::streams {
             return element;
         }
 
-        template<kstd::concepts::Function<T(T, T)> F>
+        template<typename F>
+        KSTD_REQUIRES((kstd::concepts::Function<F, T(T, T)>))
         [[nodiscard]] constexpr auto reduce(F&& function) noexcept -> std::optional<T> {
             auto& self = get_self();
             auto element = self.next();
