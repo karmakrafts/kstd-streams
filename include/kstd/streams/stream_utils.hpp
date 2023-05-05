@@ -20,7 +20,7 @@ namespace kstd::streams {
         }
     }
 
-    template<concepts::Streamable S, concepts::Pushable C>
+    template<typename S, typename C>
     KSTD_REQUIRES((concepts::Streamable<S> && concepts::Pushable<C> && std::is_same_v<typename S::value_type, typename C::value_type>))
     constexpr auto collect(S& streamable) noexcept -> C {
         C result;
