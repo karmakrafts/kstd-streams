@@ -354,17 +354,7 @@ TEST(kstd_streams_Stream, TestDistinct) {
 TEST(kstd_streams_Stream, TestChain) {
     std::vector<float> expected({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F, 1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
     const auto chained_count = expected.size();
-    auto result = (kstd::streams::stream(test_values) | kstd::streams::stream(test_values)).collect<std::vector>();
-
-    ASSERT_EQ(result.size(), chained_count);
-
-    for (size_t i = 0;
-         i < chained_count;
-         i++) {
-        ASSERT_EQ(result[i], expected[i]);
-    }
-
-    result = (kstd::streams::stream(test_values) | test_values).collect<std::vector>();
+    auto result = (kstd::streams::stream(test_values).chain(kstd::streams::stream(test_values))).collect<std::vector>();
 
     ASSERT_EQ(result.size(), chained_count);
 
@@ -378,17 +368,7 @@ TEST(kstd_streams_Stream, TestChain) {
 TEST(kstd_streams_Stream, TestPreChain) {
     std::vector<float> expected({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F, 1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
     const auto chained_count = expected.size();
-    auto result = (kstd::streams::stream(test_values) || kstd::streams::stream(test_values)).collect<std::vector>();
-
-    ASSERT_EQ(result.size(), chained_count);
-
-    for (size_t i = 0;
-         i < chained_count;
-         i++) {
-        ASSERT_EQ(result[i], expected[i]);
-    }
-
-    result = (kstd::streams::stream(test_values) || test_values).collect<std::vector>();
+    auto result = (kstd::streams::stream(test_values).pre_chain(kstd::streams::stream(test_values))).collect<std::vector>();
 
     ASSERT_EQ(result.size(), chained_count);
 

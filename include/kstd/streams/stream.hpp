@@ -444,54 +444,8 @@ namespace kstd::streams {
             }
         }
 
-        [[nodiscard]] constexpr auto evaluate() noexcept -> decltype(auto) {
+        [[nodiscard]] constexpr auto evaluate() noexcept -> OwningIteratorStreamable<std::vector<T>> {
             return owning(collect<std::vector>());
-        }
-
-        // Chain operators (append)
-
-        template<typename OTHER>
-        KSTD_REQUIRES(concepts::Streamable<OTHER>)
-        [[nodiscard]] constexpr auto operator |(OTHER other) noexcept -> decltype(auto) {
-            return chain(std::move(other));
-        }
-
-        template<typename OTHER>
-        KSTD_REQUIRES(kstd::concepts::ConstIterable<OTHER>)
-        [[nodiscard]] constexpr auto operator |(const OTHER& container) noexcept -> decltype(auto) {
-            return chain(stream(container));
-        }
-
-        template<typename OTHER>
-        KSTD_REQUIRES(kstd::concepts::ConstIterable<OTHER>)
-        [[nodiscard]] constexpr auto operator |(OTHER&& container) noexcept -> decltype(auto) {
-            return chain(owning(std::forward(container)));
-        }
-
-        // Pre-chain operators (prepend)
-
-        template<typename OTHER>
-        KSTD_REQUIRES(concepts::Streamable<OTHER>)
-        [[nodiscard]] constexpr auto operator ||(OTHER other) noexcept -> decltype(auto) {
-            return pre_chain(std::move(other));
-        }
-
-        template<typename OTHER>
-        KSTD_REQUIRES(kstd::concepts::ConstIterable<OTHER>)
-        [[nodiscard]] constexpr auto operator ||(const OTHER& container) noexcept -> decltype(auto) {
-            return pre_chain(stream(container));
-        }
-
-        template<typename OTHER>
-        KSTD_REQUIRES(kstd::concepts::ConstIterable<OTHER>)
-        [[nodiscard]] constexpr auto operator ||(OTHER&& container) noexcept -> decltype(auto) {
-            return pre_chain(owning(std::forward(container)));
-        }
-
-        // Deref operator (find first)
-
-        [[nodiscard]] constexpr auto operator *() noexcept -> std::optional<T> {
-            return find_first();
         }
     };
 
