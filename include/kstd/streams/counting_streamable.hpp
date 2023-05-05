@@ -36,10 +36,7 @@ namespace kstd::streams {
 
     public:
 
-        KSTD_STREAM_CONSTRUCTOR CountingStreamable(T value, usize max_count) noexcept :
-                _value(std::move(value)),
-                _max_count(max_count),
-                _count(0) {
+        KSTD_STREAM_CONSTRUCTOR CountingStreamable(T value, usize max_count) noexcept : _value(std::move(value)), _max_count(max_count), _count(0) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

@@ -37,9 +37,7 @@ namespace kstd::streams {
 
     public:
 
-        KSTD_STREAM_CONSTRUCTOR PeekingStream(S streamable, F&& function) noexcept :
-                Stream<value_type, S, self_type>(std::move(streamable)),
-                _function(std::forward<F>(function)) {
+        KSTD_STREAM_CONSTRUCTOR PeekingStream(S streamable, F&& function) noexcept : Stream<value_type, S, self_type>(std::move(streamable)), _function(std::forward<F>(function)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

@@ -36,9 +36,7 @@ namespace kstd::streams {
 
     public:
 
-        KSTD_STREAM_CONSTRUCTOR ChainingStream(S1 streamable, S2 other_streamable) noexcept :
-                Stream<value_type, S1, self_type>(std::move(streamable)),
-                _other_streamable(std::move(other_streamable)) {
+        KSTD_STREAM_CONSTRUCTOR ChainingStream(S1 streamable, S2 other_streamable) noexcept : Stream<value_type, S1, self_type>(std::move(streamable)), _other_streamable(std::move(other_streamable)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

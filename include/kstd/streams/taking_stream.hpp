@@ -37,9 +37,7 @@ namespace kstd::streams {
 
     public:
 
-        KSTD_STREAM_CONSTRUCTOR TakingStream(S streamable, P&& predicate) noexcept :
-                Stream<value_type, S, self_type>(std::move(streamable)),
-                _predicate(std::forward<P>(predicate)) {
+        KSTD_STREAM_CONSTRUCTOR TakingStream(S streamable, P&& predicate) noexcept : Stream<value_type, S, self_type>(std::move(streamable)), _predicate(std::forward<P>(predicate)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

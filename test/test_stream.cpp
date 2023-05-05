@@ -352,8 +352,7 @@ TEST(kstd_streams_Stream, TestDistinct) {
 }
 
 TEST(kstd_streams_Stream, TestChain) {
-    std::vector<float> expected(
-            {1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F, 1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
+    std::vector<float> expected({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F, 1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
     const auto chained_count = expected.size();
     auto result = (kstd::streams::stream(test_values) | kstd::streams::stream(test_values)).collect<std::vector>();
 
@@ -377,8 +376,7 @@ TEST(kstd_streams_Stream, TestChain) {
 }
 
 TEST(kstd_streams_Stream, TestPreChain) {
-    std::vector<float> expected(
-            {1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F, 1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
+    std::vector<float> expected({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F, 1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
     const auto chained_count = expected.size();
     auto result = (kstd::streams::stream(test_values) || kstd::streams::stream(test_values)).collect<std::vector>();
 

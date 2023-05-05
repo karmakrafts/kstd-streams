@@ -35,9 +35,7 @@ namespace kstd::streams {
 
     public:
 
-        explicit KSTD_STREAM_CONSTRUCTOR SingletStreamable(value_type element) noexcept :
-                _element(std::move(element)),
-                _has_data(true) {
+        explicit KSTD_STREAM_CONSTRUCTOR SingletStreamable(value_type element) noexcept : _element(std::move(element)), _has_data(true) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

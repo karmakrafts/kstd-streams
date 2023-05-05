@@ -49,28 +49,27 @@ namespace kstd::streams {
     template<typename S> //
     struct BasicStream;
 
-    template<kstd::concepts::ConstIterable C>
-    [[nodiscard]] constexpr auto
-    stream(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>>;
+    template<typename C>
+    KSTD_REQUIRES(kstd::concepts::ConstIterable<C>)
+    [[nodiscard]] constexpr auto stream(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>>;
 
-    template<kstd::concepts::ConstIterable C>
-    [[nodiscard]] constexpr auto owning(C
-                                        container) noexcept ->
-    BasicStream<OwningIteratorStreamable<C>>;
+    template<typename C>
+    KSTD_REQUIRES(kstd::concepts::ConstIterable<C>)
+    [[nodiscard]] constexpr auto owning(C container) noexcept -> BasicStream<OwningIteratorStreamable<C>>;
 
-    template<kstd::concepts::ConstReverseIterable C>
-    [[nodiscard]] constexpr auto
-    reverse(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>>;
+    template<typename C>
+    KSTD_REQUIRES(kstd::concepts::ConstReverseIterable<C>)
+    [[nodiscard]] constexpr auto reverse(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>>;
 
-    template<kstd::concepts::Iterable C>
-    requires(concepts::Erasable<C>)
+    template<typename C>
+    KSTD_REQUIRES((kstd::concepts::Iterable<C> && concepts::Erasable<C>))
     [[nodiscard]] constexpr auto draining(C& container) noexcept -> BasicStream<DrainingStreamable<C>>;
 
     template<typename T>
-    requires(std::is_copy_assignable_v<T>)
+    KSTD_REQUIRES(std::is_copy_assignable_v<T>)
     [[nodiscard]] constexpr auto singlet(T value) noexcept -> BasicStream<SingletStreamable<T>>;
 
     template<typename T>
-    requires(std::is_copy_assignable_v<T>)
+    KSTD_REQUIRES(std::is_copy_assignable_v<T>)
     [[nodiscard]] constexpr auto counting(T value, size_t max_count) noexcept -> BasicStream<CountingStreamable<T>>;
 }

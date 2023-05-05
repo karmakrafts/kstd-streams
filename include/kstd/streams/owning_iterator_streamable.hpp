@@ -37,28 +37,16 @@ namespace kstd::streams {
 
     public:
 
-        explicit KSTD_STREAM_CONSTRUCTOR OwningIteratorStreamable(C container) noexcept :
-                _container(std::move(container)),
-                _current(_container.cbegin()),
-                _end(_container.cend()) {
+        explicit KSTD_STREAM_CONSTRUCTOR OwningIteratorStreamable(C container) noexcept : _container(std::move(container)), _current(_container.cbegin()), _end(_container.cend()) {
         }
 
-        KSTD_STREAM_CONSTRUCTOR OwningIteratorStreamable() noexcept :
-                _container(),
-                _current(_container.cbegin()),
-                _end(_container.cend()) {
+        KSTD_STREAM_CONSTRUCTOR OwningIteratorStreamable() noexcept : _container(), _current(_container.cbegin()), _end(_container.cend()) {
         }
 
-        KSTD_STREAM_CONSTRUCTOR OwningIteratorStreamable(const self_type& other) noexcept :
-                _container(other._container),
-                _current(_container.cbegin()),
-                _end(_container.cend()) {
+        KSTD_STREAM_CONSTRUCTOR OwningIteratorStreamable(const self_type& other) noexcept : _container(other._container), _current(_container.cbegin()), _end(_container.cend()) {
         }
 
-        KSTD_STREAM_CONSTRUCTOR OwningIteratorStreamable(self_type&& other) noexcept :
-                _container(std::move(other._container)),
-                _current(_container.cbegin()),
-                _end(_container.cend()) {
+        KSTD_STREAM_CONSTRUCTOR OwningIteratorStreamable(self_type&& other) noexcept : _container(std::move(other._container)), _current(_container.cbegin()), _end(_container.cend()) {
         }
 
         constexpr auto operator =(const self_type& other) noexcept -> self_type& {

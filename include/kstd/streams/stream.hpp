@@ -61,8 +61,7 @@ namespace kstd::streams {
 
     public:
 
-        explicit KSTD_STREAM_CONSTRUCTOR Stream(S streamable) noexcept :
-                _streamable(std::move(streamable)) {
+        explicit KSTD_STREAM_CONSTRUCTOR Stream(S streamable) noexcept : _streamable(std::move(streamable)) {
         }
 
         template<concepts::Streamable S2>
@@ -94,18 +93,14 @@ namespace kstd::streams {
 
         template<typename LM, typename L = std::invoke_result_t<LM, T&>, typename RM, typename R = std::invoke_result_t<RM, T&>>
         requires(kstd::concepts::Function<LM, L(T&)> && kstd::concepts::Function<RM, R(T&)>)
-        [[nodiscard]] constexpr auto
-        zip(LM&& left_mapper, RM&& right_mapper) noexcept -> ZippingStream<IMPL, L, R, LM, RM> {
-            return ZippingStream<IMPL, L, R, LM, RM>(std::move(get_self()), std::forward<LM>(left_mapper),
-                                                     std::forward<RM>(right_mapper));
+        [[nodiscard]] constexpr auto zip(LM&& left_mapper, RM&& right_mapper) noexcept -> ZippingStream<IMPL, L, R, LM, RM> {
+            return ZippingStream<IMPL, L, R, LM, RM>(std::move(get_self()), std::forward<LM>(left_mapper), std::forward<RM>(right_mapper));
         }
 
         template<typename LM, typename LS = std::invoke_result_t<LM, T&>, typename RM, typename RS = std::invoke_result_t<RM, T&>>
         requires(kstd::concepts::Function<LM, LS(T&)> && kstd::concepts::Function<RM, RS(T&)>)
-        [[nodiscard]] constexpr auto
-        flat_zip(LM&& left_mapper, RM&& right_mapper) noexcept -> FlatZippingStream<IMPL, LS, RS, LM, RM> {
-            return FlatZippingStream<IMPL, LS, RS, LM, RM>(std::move(get_self()), std::forward<LM>(left_mapper),
-                                                           std::forward<RM>(right_mapper));
+        [[nodiscard]] constexpr auto flat_zip(LM&& left_mapper, RM&& right_mapper) noexcept -> FlatZippingStream<IMPL, LS, RS, LM, RM> {
+            return FlatZippingStream<IMPL, LS, RS, LM, RM>(std::move(get_self()), std::forward<LM>(left_mapper), std::forward<RM>(right_mapper));
         }
 
         template<kstd::concepts::Function<void(T&)> F>
@@ -137,8 +132,7 @@ namespace kstd::streams {
         }
 
         [[nodiscard]] constexpr auto sorted() noexcept -> decltype(auto) {
-            static_assert(kstd::concepts::LessThanComparable<T> || kstd::concepts::GreaterThanComparable<T>,
-                          "Stream value type doesn't implement operator< or operator>");
+            static_assert(kstd::concepts::LessThanComparable<T> || kstd::concepts::GreaterThanComparable<T>, "Stream value type doesn't implement operator< or operator>");
 
             return sorted([](const auto& a, const auto& b) {
                 if constexpr (kstd::concepts::LessThanComparable<T>) {
@@ -222,8 +216,7 @@ namespace kstd::streams {
         }
 
         [[nodiscard]] constexpr auto min() noexcept -> std::optional<T> {
-            static_assert(kstd::concepts::LessThanComparable<T> || kstd::concepts::GreaterThanComparable<T>,
-                          "Stream value type doesn't implement operator< or operator>");
+            static_assert(kstd::concepts::LessThanComparable<T> || kstd::concepts::GreaterThanComparable<T>, "Stream value type doesn't implement operator< or operator>");
 
             auto& self = get_self();
             auto element = self.next();
@@ -256,8 +249,7 @@ namespace kstd::streams {
         }
 
         [[nodiscard]] constexpr auto max() noexcept -> std::optional<T> {
-            static_assert(kstd::concepts::LessThanComparable<T> || kstd::concepts::LessThanComparable<T>,
-                          "Stream value type doesn't implement operator< or operator>");
+            static_assert(kstd::concepts::LessThanComparable<T> || kstd::concepts::LessThanComparable<T>, "Stream value type doesn't implement operator< or operator>");
 
             auto& self = get_self();
             auto element = self.next();
@@ -405,8 +397,7 @@ namespace kstd::streams {
         }
 
         template<template<typename, typename, typename...> typename M, typename KM, typename K = std::invoke_result_t<KM, T&>, typename VM, typename V = std::invoke_result_t<VM, T&>>
-        requires(kstd::concepts::Function<KM, K(T&)> && kstd::concepts::Function<VM, V(T&)> &&
-                 std::is_default_constructible_v<M<K, V>> && concepts::Indexable<K, V, M>)
+        requires(kstd::concepts::Function<KM, K(T&)> && kstd::concepts::Function<VM, V(T&)> && std::is_default_constructible_v<M<K, V>> && concepts::Indexable<K, V, M>)
         [[nodiscard]] constexpr auto collect_map(KM&& key_mapper, VM&& value_mapper) noexcept -> M <K, V> {
             M<K, V> result;
             auto& self = get_self();
@@ -459,13 +450,11 @@ namespace kstd::streams {
             return chain(std::move(other));
         }
 
-        [[nodiscard]] constexpr auto
-        operator |(const kstd::concepts::ConstIterable auto& container) noexcept -> decltype(auto) {
+        [[nodiscard]] constexpr auto operator |(const kstd::concepts::ConstIterable auto& container) noexcept -> decltype(auto) {
             return chain(stream(container));
         }
 
-        [[nodiscard]] constexpr auto
-        operator |(kstd::concepts::ConstIterable auto&& container) noexcept -> decltype(auto) {
+        [[nodiscard]] constexpr auto operator |(kstd::concepts::ConstIterable auto&& container) noexcept -> decltype(auto) {
             return chain(owning(std::forward(container)));
         }
 
@@ -475,13 +464,11 @@ namespace kstd::streams {
             return pre_chain(std::move(other));
         }
 
-        [[nodiscard]] constexpr auto
-        operator ||(const kstd::concepts::ConstIterable auto& container) noexcept -> decltype(auto) {
+        [[nodiscard]] constexpr auto operator ||(const kstd::concepts::ConstIterable auto& container) noexcept -> decltype(auto) {
             return pre_chain(stream(container));
         }
 
-        [[nodiscard]] constexpr auto
-        operator ||(kstd::concepts::ConstIterable auto&& container) noexcept -> decltype(auto) {
+        [[nodiscard]] constexpr auto operator ||(kstd::concepts::ConstIterable auto&& container) noexcept -> decltype(auto) {
             return pre_chain(owning(std::forward(container)));
         }
 
@@ -492,37 +479,38 @@ namespace kstd::streams {
         }
     };
 
-    template<kstd::concepts::ConstIterable C>
-    [[nodiscard]] constexpr auto
-    stream(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>> {
+    template<typename C>
+    KSTD_REQUIRES(kstd::concepts::ConstIterable<C>)
+    [[nodiscard]] constexpr auto stream(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>> {
         return BasicStream(IteratorStreamable(container.cbegin(), container.cend()));
     }
 
-    template<kstd::concepts::ConstIterable C>
+    template<typename C>
+    KSTD_REQUIRES(kstd::concepts::ConstIterable<C>)
     [[nodiscard]] constexpr auto owning(C container) noexcept -> BasicStream<OwningIteratorStreamable<C>> {
         return BasicStream(OwningIteratorStreamable(std::move(container)));
     }
 
-    template<kstd::concepts::ConstReverseIterable C>
-    [[nodiscard]] constexpr auto
-    reverse(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>> {
+    template<typename C>
+    KSTD_REQUIRES(kstd::concepts::ConstReverseIterable<C>)
+    [[nodiscard]] constexpr auto reverse(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>> {
         return BasicStream(IteratorStreamable(container.crbegin(), container.crend()));
     }
 
-    template<kstd::concepts::Iterable C>
-    requires(concepts::Erasable<C>)
+    template<typename C>
+    KSTD_REQUIRES((kstd::concepts::Iterable<C> && concepts::Erasable<C>))
     [[nodiscard]] constexpr auto draining(C& container) noexcept -> BasicStream<DrainingStreamable<C>> {
         return BasicStream(DrainingStreamable(container));
     }
 
     template<typename T>
-    requires(std::is_copy_assignable_v<T>)
+    KSTD_REQUIRES(std::is_copy_assignable_v<T>)
     [[nodiscard]] constexpr auto singlet(T value) noexcept -> BasicStream<SingletStreamable<T>> {
         return BasicStream(SingletStreamable(std::move(value)));
     }
 
     template<typename T>
-    requires(std::is_copy_assignable_v<T>)
+    KSTD_REQUIRES(std::is_copy_assignable_v<T>)
     [[nodiscard]] constexpr auto counting(T value, size_t max_count) noexcept -> BasicStream<CountingStreamable<T>> {
         return BasicStream(CountingStreamable(std::move(value), max_count));
     }

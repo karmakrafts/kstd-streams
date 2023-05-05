@@ -12,7 +12,7 @@
 
 namespace kstd::streams {
     template<typename C> //
-    KSTD_REQUIRES(kstd::concepts::Iterable<C>&& concepts::Erasable<C>)
+    KSTD_REQUIRES(kstd::concepts::Iterable<C> && concepts::Erasable<C>)
     struct DrainingStreamable final {
         using self_type = DrainingStreamable<C>;
         using value_type = typename C::iterator::value_type;
@@ -23,8 +23,7 @@ namespace kstd::streams {
 
     public:
 
-        explicit KSTD_STREAM_CONSTRUCTOR DrainingStreamable(C& container) noexcept :
-                _container(container) {
+        explicit KSTD_STREAM_CONSTRUCTOR DrainingStreamable(C& container) noexcept : _container(container) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

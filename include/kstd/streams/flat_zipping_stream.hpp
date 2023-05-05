@@ -26,10 +26,8 @@
 
 namespace kstd::streams {
     template<typename S, typename LS, typename RS, typename LM, typename RM> //
-    KSTD_REQUIRES((kstd::concepts::Function<LM, LS(typename S::value_type & )> &&
-                   kstd::concepts::Function<RM, RS(typename S::value_type & )>))
-    struct FlatZippingStream final
-            : public Stream<std::pair<typename LS::value_type, typename RS::value_type>, S, FlatZippingStream<S, LS, RS, LM, RM>> {
+    KSTD_REQUIRES((kstd::concepts::Function<LM, LS(typename S::value_type & )> && kstd::concepts::Function<RM, RS(typename S::value_type & )>))
+    struct FlatZippingStream final : public Stream<std::pair<typename LS::value_type, typename RS::value_type>, S, FlatZippingStream<S, LS, RS, LM, RM>> {
         using self_type = FlatZippingStream<S, LS, RS, LM, RM>;
         using left_type = typename LS::value_type;
         using right_type = typename RS::value_type;
@@ -43,11 +41,9 @@ namespace kstd::streams {
 
     public:
 
-        KSTD_STREAM_CONSTRUCTOR FlatZippingStream(S streamable, LM&& left_mapper, RM&& right_mapper) noexcept :
-                Stream<value_type, S, self_type>(std::move(streamable)),
-                _left_mapper(std::forward<LM>(left_mapper)),
-                _right_mapper(std::forward<RM>(right_mapper)),
-                _current(std::nullopt) {
+        KSTD_STREAM_CONSTRUCTOR FlatZippingStream(S streamable, LM&& left_mapper, RM&& right_mapper) noexcept : Stream<value_type, S, self_type>(std::move(streamable)),
+                                                                                                                _left_mapper(std::forward<LM>(left_mapper)),
+                                                                                                                _right_mapper(std::forward<RM>(right_mapper)), _current(std::nullopt) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
@@ -72,8 +68,7 @@ namespace kstd::streams {
                     }
 
                     auto& value = *element;
-                    _current = std::make_optional(
-                            std::make_pair(std::move(_left_mapper(value)), std::move(_right_mapper(value))));
+                    _current = std::make_optional(std::make_pair(std::move(_left_mapper(value)), std::move(_right_mapper(value))));
                     continue;
                 }
             }

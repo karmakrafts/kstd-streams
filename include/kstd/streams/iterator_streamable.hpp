@@ -35,9 +35,7 @@ namespace kstd::streams {
 
     public:
 
-        KSTD_STREAM_CONSTRUCTOR IteratorStreamable(I begin, I end) noexcept :
-                _current(std::move(begin)),
-                _end(std::move(end)) {
+        KSTD_STREAM_CONSTRUCTOR IteratorStreamable(I begin, I end) noexcept : _current(std::move(begin)), _end(std::move(end)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

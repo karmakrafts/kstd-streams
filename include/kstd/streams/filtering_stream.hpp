@@ -36,9 +36,7 @@ namespace kstd::streams {
 
     public:
 
-        KSTD_STREAM_CONSTRUCTOR FilteringStream(S streamable, F&& filter) noexcept :
-                Stream<value_type, S, self_type>(std::move(streamable)),
-                _filter(std::forward<F>(filter)) {
+        KSTD_STREAM_CONSTRUCTOR FilteringStream(S streamable, F&& filter) noexcept : Stream<value_type, S, self_type>(std::move(streamable)), _filter(std::forward<F>(filter)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
