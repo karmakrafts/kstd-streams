@@ -26,19 +26,21 @@
 #include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename S, typename L, typename R, kstd::concepts::Function<L(typename S::value_type&)> LM, kstd::concepts::Function<R(typename S::value_type&)> RM> //
+    template<typename S, typename L, typename R, typename LM, typename RM> //
+    KSTD_REQUIRES((kstd::concepts::Function<LM, L(typename S::value_type & )> &&
+                   kstd::concepts::Function<RM, R(typename S::value_type & )>))
     struct ZippingStream final : public Stream<std::pair<L, R>, S, ZippingStream<S, L, R, LM, RM>> {
         using self_type = ZippingStream<S, L, R, LM, RM>;
         using value_type = std::pair<L, R>;
 
-        private:
+    private:
 
         LM _left_mapper;
         RM _right_mapper;
 
-        public:
+    public:
 
-        constexpr ZippingStream(S streamable, LM&& left_mapper, RM&& right_mapper) noexcept:
+        KSTD_STREAM_CONSTRUCTOR ZippingStream(S streamable, LM&& left_mapper, RM&& right_mapper) noexcept :
                 Stream<value_type, S, self_type>(std::move(streamable)),
                 _left_mapper(std::forward<LM>(left_mapper)),
                 _right_mapper(std::forward<RM>(right_mapper)) {

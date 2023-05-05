@@ -24,18 +24,19 @@
 #include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename S, kstd::concepts::Function<void(typename S::value_type&)> F> //
+    template<typename S, typename F> //
+    KSTD_REQUIRES((kstd::concepts::Function<F, void(typename S::value_type&)>))
     struct FilteringStream final : public Stream<typename S::value_type, S, FilteringStream<S, F>> {
         using self_type = FilteringStream<S, F>;
         using value_type = typename S::value_type;
 
-        private:
+    private:
 
         F _filter;
 
-        public:
+    public:
 
-        constexpr FilteringStream(S streamable, F&& filter) noexcept:
+        KSTD_STREAM_CONSTRUCTOR FilteringStream(S streamable, F&& filter) noexcept :
                 Stream<value_type, S, self_type>(std::move(streamable)),
                 _filter(std::forward<F>(filter)) {
         }

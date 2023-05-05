@@ -21,21 +21,22 @@
 
 #include <optional>
 #include "kstd/types.hpp"
+#include "stream_macros.hpp"
 
 namespace kstd::streams {
     template<typename T> //
     struct CountingStreamable final {
         using value_type = T;
 
-        private:
+    private:
 
         T _value;
         usize _max_count;
         usize _count;
 
-        public:
+    public:
 
-        constexpr CountingStreamable(T value, usize max_count) noexcept:
+        KSTD_STREAM_CONSTRUCTOR CountingStreamable(T value, usize max_count) noexcept :
                 _value(std::move(value)),
                 _max_count(max_count),
                 _count(0) {

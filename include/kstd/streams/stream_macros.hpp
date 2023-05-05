@@ -14,28 +14,13 @@
 
 /**
  * @author Alexander Hinze
- * @since 27/03/2023
+ * @since 05/05/2023
  */
 
 #pragma once
 
-#include <optional>
-#include "stream_fwd.hpp"
-
-namespace kstd::streams {
-    template<typename S> //
-    struct BasicStream final : public Stream<typename S::value_type, S, BasicStream<S>> {
-        using self_type = BasicStream<S>;
-        using value_type = typename S::value_type;
-
-    public:
-
-        explicit KSTD_STREAM_CONSTRUCTOR BasicStream(S streamable) noexcept :
-                Stream<value_type, S, self_type>(std::move(streamable)) {
-        }
-
-        [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
-            return this->_streamable.next();
-        }
-    };
-}
+#if __cplusplus >= 202002L
+#define KSTD_STREAM_CONSTRUCTOR constexpr
+#else
+#define KSTD_STREAM_CONSTRUCTOR inline
+#endif

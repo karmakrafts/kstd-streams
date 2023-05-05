@@ -23,18 +23,19 @@
 #include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<kstd::concepts::Iterator I> //
+    template<typename I> //
+    KSTD_REQUIRES(kstd::concepts::Iterator<I>)
     struct IteratorStreamable final {
         using value_type = typename I::value_type;
 
-        private:
+    private:
 
         I _current;
         I _end;
 
-        public:
+    public:
 
-        constexpr IteratorStreamable(I begin, I end) noexcept:
+        KSTD_STREAM_CONSTRUCTOR IteratorStreamable(I begin, I end) noexcept :
                 _current(std::move(begin)),
                 _end(std::move(end)) {
         }

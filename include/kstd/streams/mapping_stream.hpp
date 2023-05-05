@@ -25,18 +25,19 @@
 #include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename R, typename S, kstd::concepts::Function<R(typename S::value_type&)> M> //
+    template<typename R, typename S, typename M> //
+    KSTD_REQUIRES((kstd::concepts::Function<M, R(typename S::value_type & )>))
     struct MappingStream final : public Stream<R, S, MappingStream<R, S, M>> {
         using self_type = MappingStream<R, S, M>;
         using value_type = R;
 
-        private:
+    private:
 
         M _mapper;
 
-        public:
+    public:
 
-        constexpr MappingStream(S streamable, M&& mapper) noexcept:
+        KSTD_STREAM_CONSTRUCTOR MappingStream(S streamable, M&& mapper) noexcept :
                 Stream<value_type, S, self_type>(std::move(streamable)),
                 _mapper(std::forward<M>(mapper)) {
         }

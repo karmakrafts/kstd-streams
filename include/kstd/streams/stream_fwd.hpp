@@ -21,40 +21,46 @@
 
 #include "kstd/concepts.hpp"
 #include "concepts.hpp"
+#include "stream_macros.hpp"
 
 namespace kstd::streams {
-    template<kstd::concepts::Iterator I> //
+    template<typename I> //
+    KSTD_REQUIRES(kstd::concepts::Iterator<I>)
     struct IteratorStreamable;
 
-    template<kstd::concepts::ConstIterable C> //
+    template<typename C> //
+    KSTD_REQUIRES(kstd::concepts::ConstIterable<C>)
     struct OwningIteratorStreamable;
 
-    template<kstd::concepts::Iterable C> //
-    requires(concepts::Erasable<C>)
+    template<typename C> //
+    KSTD_REQUIRES(kstd::concepts::Iterable<C> && concepts::Erasable<C>)
     struct DrainingStreamable;
 
     template<typename T> //
-    requires(std::is_move_assignable_v<T>)
     struct SingletStreamable;
 
     template<typename T> //
     struct CountingStreamable;
 
-    template<typename T, concepts::Streamable S, typename IMPL> //
+    template<typename T, typename S, typename IMPL> //
+    KSTD_REQUIRES(concepts::Streamable<S>)
     class Stream;
 
     template<typename S> //
     struct BasicStream;
 
     template<kstd::concepts::ConstIterable C>
-    [[nodiscard]] constexpr auto stream(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>>;
+    [[nodiscard]] constexpr auto
+    stream(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>>;
 
-    template<kstd::concepts::ConstIterable C> [[nodiscard]] constexpr auto owning(C
-    container) noexcept ->
+    template<kstd::concepts::ConstIterable C>
+    [[nodiscard]] constexpr auto owning(C
+                                        container) noexcept ->
     BasicStream<OwningIteratorStreamable<C>>;
 
     template<kstd::concepts::ConstReverseIterable C>
-    [[nodiscard]] constexpr auto reverse(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>>;
+    [[nodiscard]] constexpr auto
+    reverse(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>>;
 
     template<kstd::concepts::Iterable C>
     requires(concepts::Erasable<C>)

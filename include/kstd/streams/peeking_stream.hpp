@@ -25,18 +25,19 @@
 #include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename S, kstd::concepts::Function<void(typename S::value_type&)> F> //
+    template<typename S, typename F> //
+    KSTD_REQUIRES((kstd::concepts::Function<F, void(typename S::value_type&)>))
     struct PeekingStream final : public Stream<typename S::value_type, S, PeekingStream<S, F>> {
         using self_type = PeekingStream<S, F>;
         using value_type = typename S::value_type;
 
-        private:
+    private:
 
         F _function;
 
-        public:
+    public:
 
-        constexpr PeekingStream(S streamable, F&& function) noexcept:
+        KSTD_STREAM_CONSTRUCTOR PeekingStream(S streamable, F&& function) noexcept :
                 Stream<value_type, S, self_type>(std::move(streamable)),
                 _function(std::forward<F>(function)) {
         }

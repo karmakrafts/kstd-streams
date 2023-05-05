@@ -26,19 +26,20 @@
 #include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename S, concepts::Streamable RS, kstd::concepts::Function<RS(typename S::value_type&)> M> //
+    template<typename S, typename RS, typename M> //
+    KSTD_REQUIRES((concepts::Streamable<RS> && kstd::concepts::Function<M, RS(typename S::value_type & )>))
     struct FlatMappingStream final : public Stream<typename RS::value_type, S, FlatMappingStream<S, RS, M>> {
         using self_type = FlatMappingStream<S, RS, M>;
         using value_type = typename RS::value_type;
 
-        private:
+    private:
 
         M _mapper;
         std::optional<RS> _current;
 
-        public:
+    public:
 
-        constexpr FlatMappingStream(S streamable, M&& mapper) noexcept:
+        KSTD_STREAM_CONSTRUCTOR FlatMappingStream(S streamable, M&& mapper) noexcept :
                 Stream<value_type, S, self_type>(std::move(streamable)),
                 _mapper(std::forward<M>(mapper)),
                 _current(std::nullopt) {

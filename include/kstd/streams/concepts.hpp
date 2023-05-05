@@ -19,10 +19,12 @@
 
 #pragma once
 
-#include <concepts>
 #include <optional>
+#include "kstd/concepts.hpp"
 
 namespace kstd::streams::concepts {
+    #ifdef KSTD_CONCEPTS_AVAILABLE
+
     template<typename T> //
     concept Pushable = requires(T type, typename T::value_type value) {
         type.push_back(value);
@@ -44,4 +46,6 @@ namespace kstd::streams::concepts {
         type.next();
         requires std::same_as<decltype(type.next()), std::optional<typename T::value_type>>;
     };
+
+    #endif // KSTD_CONCEPTS_AVAILABLE
 }

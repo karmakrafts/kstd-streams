@@ -25,18 +25,18 @@
 
 namespace kstd::streams {
     template<typename S1, typename S2> //
-    requires(std::same_as<typename S1::value_type, typename S2::value_type>)
+    KSTD_REQUIRES((std::same_as<typename S1::value_type, typename S2::value_type>))
     struct ChainingStream final : public Stream<typename S1::value_type, S1, ChainingStream<S1, S2>> {
         using self_type = ChainingStream<S1, S2>;
         using value_type = typename S1::value_type;
 
-        private:
+    private:
 
         S2 _other_streamable;
 
-        public:
+    public:
 
-        constexpr ChainingStream(S1 streamable, S2 other_streamable) noexcept:
+        KSTD_STREAM_CONSTRUCTOR ChainingStream(S1 streamable, S2 other_streamable) noexcept :
                 Stream<value_type, S1, self_type>(std::move(streamable)),
                 _other_streamable(std::move(other_streamable)) {
         }

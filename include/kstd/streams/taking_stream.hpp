@@ -25,18 +25,19 @@
 #include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename S, kstd::concepts::Function<bool(typename S::value_type&)> P>
+    template<typename S, typename P> //
+    KSTD_REQUIRES((kstd::concepts::Function<P, bool(typename S::value_type&)>))
     struct TakingStream final : public Stream<typename S::value_type, S, TakingStream<S, P>> {
         using self_type = TakingStream<S, P>;
         using value_type = typename S::value_type;
 
-        private:
+    private:
 
         P _predicate;
 
-        public:
+    public:
 
-        constexpr TakingStream(S streamable, P&& predicate) noexcept:
+        KSTD_STREAM_CONSTRUCTOR TakingStream(S streamable, P&& predicate) noexcept :
                 Stream<value_type, S, self_type>(std::move(streamable)),
                 _predicate(std::forward<P>(predicate)) {
         }

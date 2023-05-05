@@ -21,21 +21,21 @@
 
 #include <optional>
 #include <type_traits>
+#include "stream_macros.hpp"
 
 namespace kstd::streams {
     template<typename T> //
-    requires(std::is_move_assignable_v<T>)
     struct SingletStreamable final {
         using value_type = T;
 
-        private:
+    private:
 
         value_type _element;
         bool _has_data;
 
-        public:
+    public:
 
-        explicit constexpr SingletStreamable(value_type element) noexcept:
+        explicit KSTD_STREAM_CONSTRUCTOR SingletStreamable(value_type element) noexcept :
                 _element(std::move(element)),
                 _has_data(true) {
         }

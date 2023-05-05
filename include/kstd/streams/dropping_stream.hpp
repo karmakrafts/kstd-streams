@@ -25,19 +25,20 @@
 #include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename S, kstd::concepts::Function<bool(typename S::value_type&)> P> //
+    template<typename S, typename P> //
+    KSTD_REQUIRES((kstd::concepts::Function<P, bool(typename S::value_type&)>))
     struct DroppingStream final : public Stream<typename S::value_type, S, DroppingStream<S, P>> {
         using self_type = DroppingStream<S, P>;
         using value_type = typename S::value_type;
 
-        private:
+    private:
 
         P _predicate;
         bool _has_dropped;
 
-        public:
+    public:
 
-        constexpr DroppingStream(S streamable, P&& predicate) noexcept:
+        KSTD_STREAM_CONSTRUCTOR DroppingStream(S streamable, P&& predicate) noexcept :
                 Stream<value_type, S, self_type>(std::move(streamable)),
                 _predicate(std::forward<P>(predicate)),
                 _has_dropped(false) {

@@ -30,13 +30,13 @@ namespace kstd::streams {
         using self_type = DistinctStream<S>;
         using value_type = typename S::value_type;
 
-        private:
+    private:
 
         std::unordered_set<value_type> _elements;
 
-        public:
+    public:
 
-        explicit constexpr DistinctStream(S streamable) noexcept:
+        explicit KSTD_STREAM_CONSTRUCTOR DistinctStream(S streamable) noexcept :
                 Stream<value_type, S, self_type>(std::move(streamable)) {
         }
 

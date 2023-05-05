@@ -50,7 +50,9 @@ struct Foo final {
     std::string result;
     result.resize(length);
 
-    for (size_t i = 0; i < length; i++) {
+    for (size_t i = 0;
+         i < length;
+         i++) {
         result[i] = allowed_chars[dist(generator)];
     }
 
@@ -62,7 +64,9 @@ TEST(kstd_streams_Stream, TestCollectFromMap) {
     std::unordered_map<std::string, float> entries;
     std::vector<std::string> ordered_keys(num_entries);
 
-    for (size_t i = 0; i < num_entries; ++i) {
+    for (size_t i = 0;
+         i < num_entries;
+         ++i) {
         const auto key = generate_string();
         entries[key] = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX); // NOLINT
         ordered_keys[i] = key;
@@ -74,7 +78,9 @@ TEST(kstd_streams_Stream, TestCollectFromMap) {
 
     ASSERT_EQ(keys.size(), ordered_keys.size());
 
-    for (size_t i = 0; i < num_entries; ++i) {
+    for (size_t i = 0;
+         i < num_entries;
+         ++i) {
         ASSERT_TRUE(std::find(ordered_keys.cbegin(), ordered_keys.cend(), keys[i]) != ordered_keys.cend());
     }
 
@@ -137,7 +143,9 @@ TEST(kstd_streams_Stream, TestDerefAll) {
     const auto result = kstd::streams::stream(pointers).deref_all().collect<std::vector>();
     ASSERT_EQ(result.size(), num_test_values);
 
-    for (size_t i = 0; i < num_test_values; i++) {
+    for (size_t i = 0;
+         i < num_test_values;
+         i++) {
         ASSERT_EQ(result[i], test_values[i]);
     }
 }
@@ -153,7 +161,9 @@ TEST(kstd_streams_Stream, TestDerefNotNull) {
     const auto result = kstd::streams::stream(pointers).deref_not_null().collect<std::vector>();
     ASSERT_EQ(result.size(), num_test_values);
 
-    for (size_t i = 0; i < num_test_values; i++) {
+    for (size_t i = 0;
+         i < num_test_values;
+         i++) {
         ASSERT_EQ(result[i], test_values[i]);
     }
 }
@@ -197,7 +207,9 @@ TEST(kstd_streams_Stream, TestPeek) {
 
     ASSERT_EQ(result.size(), num_test_values);
 
-    for (size_t i = 0; i < num_test_values; i++) {
+    for (size_t i = 0;
+         i < num_test_values;
+         i++) {
         ASSERT_EQ(result[i], test_values[i] + 0.5F);
     }
 }
@@ -235,7 +247,9 @@ TEST(kstd_streams_Stream, TestZip) {
     const auto num_values = values.size();
     ASSERT_EQ(result.size(), num_values);
 
-    for (size_t i = 0; i < num_values; i++) {
+    for (size_t i = 0;
+         i < num_values;
+         i++) {
         auto& [expected_int, expected_float] = values[i];
         auto& [actual_int, actual_float] = result[i];
         ASSERT_EQ(actual_int, expected_int);
@@ -266,7 +280,9 @@ TEST(kstd_streams_Stream, TestFlatZip) {
     ASSERT_EQ(result.size(), flat_count);
     size_t sub_index = 0;
 
-    for (size_t i = 0; i < flat_count; i++) {
+    for (size_t i = 0;
+         i < flat_count;
+         i++) {
         auto& [expected_int, expected_float] = values[sub_index];
         auto& [left_foo, right_foo] = result[i];
 
@@ -291,7 +307,9 @@ TEST(kstd_streams_Stream, TestCollectToMemory) {
 
     ASSERT_EQ(target.size(), num_test_values);
 
-    for (size_t i = 0; i < num_test_values; i++) {
+    for (size_t i = 0;
+         i < num_test_values;
+         i++) {
         ASSERT_EQ(target[i], test_values[i]);
     }
 }
@@ -307,7 +325,9 @@ TEST(kstd_streams_Stream, TestSkip) {
 
     ASSERT_EQ(result.size(), num_values);
 
-    for (size_t i = 0; i < num_values; i++) {
+    for (size_t i = 0;
+         i < num_values;
+         i++) {
         ASSERT_EQ(result[i], test_values[i + 2]);
     }
 }
@@ -324,19 +344,24 @@ TEST(kstd_streams_Stream, TestDistinct) {
 
     ASSERT_EQ(result.size(), num_test_values);
 
-    for (size_t i = 0; i < num_test_values; i++) {
+    for (size_t i = 0;
+         i < num_test_values;
+         i++) {
         ASSERT_EQ(result[i], test_values[i]);
     }
 }
 
 TEST(kstd_streams_Stream, TestChain) {
-    std::vector<float> expected({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F, 1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
+    std::vector<float> expected(
+            {1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F, 1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
     const auto chained_count = expected.size();
     auto result = (kstd::streams::stream(test_values) | kstd::streams::stream(test_values)).collect<std::vector>();
 
     ASSERT_EQ(result.size(), chained_count);
 
-    for (size_t i = 0; i < chained_count; i++) {
+    for (size_t i = 0;
+         i < chained_count;
+         i++) {
         ASSERT_EQ(result[i], expected[i]);
     }
 
@@ -344,19 +369,24 @@ TEST(kstd_streams_Stream, TestChain) {
 
     ASSERT_EQ(result.size(), chained_count);
 
-    for (size_t i = 0; i < chained_count; i++) {
+    for (size_t i = 0;
+         i < chained_count;
+         i++) {
         ASSERT_EQ(result[i], expected[i]);
     }
 }
 
 TEST(kstd_streams_Stream, TestPreChain) {
-    std::vector<float> expected({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F, 1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
+    std::vector<float> expected(
+            {1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F, 1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
     const auto chained_count = expected.size();
     auto result = (kstd::streams::stream(test_values) || kstd::streams::stream(test_values)).collect<std::vector>();
 
     ASSERT_EQ(result.size(), chained_count);
 
-    for (size_t i = 0; i < chained_count; i++) {
+    for (size_t i = 0;
+         i < chained_count;
+         i++) {
         ASSERT_EQ(result[i], expected[i]);
     }
 
@@ -364,7 +394,9 @@ TEST(kstd_streams_Stream, TestPreChain) {
 
     ASSERT_EQ(result.size(), chained_count);
 
-    for (size_t i = 0; i < chained_count; i++) {
+    for (size_t i = 0;
+         i < chained_count;
+         i++) {
         ASSERT_EQ(result[i], expected[i]);
     }
 }
@@ -436,7 +468,9 @@ TEST(kstd_streams_Stream, TestCollect) {
     const auto result = kstd::streams::stream(test_values).collect<std::vector>();
     ASSERT_EQ(result.size(), num_test_values);
 
-    for (size_t i = 0; i < num_test_values; i++) {
+    for (size_t i = 0;
+         i < num_test_values;
+         i++) {
         ASSERT_EQ(result[i], test_values[i]);
     }
 }
@@ -453,7 +487,9 @@ TEST(kstd_streams_Stream, TestCollectMap) {
 
     ASSERT_EQ(result.size(), num_test_values);
 
-    for (size_t i = 0; i < num_test_values; i++) {
+    for (size_t i = 0;
+         i < num_test_values;
+         i++) {
         ASSERT_EQ(result[i], test_values[i]);
     }
 }
@@ -463,7 +499,9 @@ TEST(kstd_streams_Stream, TestCollectToSequence) {
     const auto result = kstd::streams::stream(test_values).collect_sequence<extent, std::array>();
     ASSERT_EQ(result.size(), extent);
 
-    for (size_t i = 0; i < extent; i++) {
+    for (size_t i = 0;
+         i < extent;
+         i++) {
         ASSERT_EQ(result[i], test_values[i]);
     }
 }
@@ -498,7 +536,9 @@ TEST(kstd_streams_Stream, TestDropWhile) {
     const auto num_remaining = test_values.size() - 2;
     ASSERT_EQ(result.size(), num_remaining);
 
-    for (size_t i = 0; i < num_remaining; i++) {
+    for (size_t i = 0;
+         i < num_remaining;
+         i++) {
         ASSERT_EQ(result[i], test_values[i + 2]);
     }
 }
@@ -513,7 +553,9 @@ TEST(kstd_streams_Stream, TestTakeWhile) {
     const auto num_taken = test_values.size() - 1;
     ASSERT_EQ(result.size(), num_taken);
 
-    for (size_t i = 0; i < num_taken; i++) {
+    for (size_t i = 0;
+         i < num_taken;
+         i++) {
         ASSERT_EQ(result[i], test_values[i]);
     }
 }
@@ -534,7 +576,9 @@ TEST(kstd_streams_Stream, TestFilterNotNull) {
 
     ASSERT_EQ(result.size(), num_test_values);
 
-    for (size_t i = 0; i < num_test_values; i++) {
+    for (size_t i = 0;
+         i < num_test_values;
+         i++) {
         ASSERT_EQ(*result[i], test_values[i]);
     }
 }
@@ -548,7 +592,9 @@ TEST(kstd_streams_Stream, TestMap) {
 
     ASSERT_EQ(result1.size(), num_test_values);
 
-    for (size_t i = 0; i < num_test_values; i++) {
+    for (size_t i = 0;
+         i < num_test_values;
+         i++) {
         ASSERT_EQ(result1[i], test_values[i]);
     }
 
@@ -585,7 +631,9 @@ TEST(kstd_streams_Stream, TestFlatMap) {
 
     size_t sub_index = 0;
 
-    for (size_t i = 0; i < flat_count; i++) {
+    for (size_t i = 0;
+         i < flat_count;
+         i++) {
         ASSERT_EQ(result[i], test_values[sub_index]);
 
         if (sub_index < num_test_values - 1) {
@@ -620,7 +668,9 @@ TEST(kstd_streams_Stream, TestLimit) {
 
     ASSERT_EQ(result.size(), max_count);
 
-    for (size_t i = 0; i < max_count; i++) {
+    for (size_t i = 0;
+         i < max_count;
+         i++) {
         ASSERT_EQ(result[i], test_values[i]);
     }
 }

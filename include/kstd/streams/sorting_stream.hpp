@@ -15,18 +15,19 @@
 #include "owning_iterator_streamable.hpp"
 
 namespace kstd::streams {
-    template<typename S, kstd::concepts::Function<bool(const typename S::value_type&, const typename S::value_type&)> C> //
+    template<typename S, typename C> //
+    KSTD_REQUIRES((kstd::concepts::Function<C, bool(const typename S::value_type&, const typename S::value_type&)>))
     struct SortingStream final : public Stream<typename S::value_type, S, SortingStream<S, C>> {
         using self_type = SortingStream<S, C>;
         using value_type = typename S::value_type;
 
-        private:
+    private:
 
         OwningIteratorStreamable<std::vector<value_type>> _sorted_streamable;
 
-        public:
+    public:
 
-        constexpr SortingStream(S streamable, C&& comparator) noexcept:
+        KSTD_STREAM_CONSTRUCTOR SortingStream(S streamable, C&& comparator) noexcept :
                 Stream<value_type, S, self_type>(std::move(streamable)) {
             std::vector<value_type> elements;
             collect_into<S, std::vector<value_type>>(this->_streamable, elements);
