@@ -30,13 +30,15 @@ namespace kstd::streams {
         using self_type = ChainingStream<S1, S2>;
         using value_type = typename S1::value_type;
 
-    private:
+        private:
 
         S2 _other_streamable;
 
-    public:
+        public:
 
-        KSTD_STREAM_CONSTRUCTOR ChainingStream(S1 streamable, S2 other_streamable) noexcept : Stream<value_type, S1, self_type>(std::move(streamable)), _other_streamable(std::move(other_streamable)) {
+        KSTD_STREAM_CONSTRUCTOR ChainingStream(S1 streamable, S2 other_streamable) noexcept :
+                Stream<value_type, S1, self_type>(std::move(streamable)),
+                _other_streamable(std::move(other_streamable)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

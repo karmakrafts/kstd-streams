@@ -31,13 +31,15 @@ namespace kstd::streams {
         using self_type = MappingStream<R, S, M>;
         using value_type = R;
 
-    private:
+        private:
 
         M _mapper;
 
-    public:
+        public:
 
-        KSTD_STREAM_CONSTRUCTOR MappingStream(S streamable, M&& mapper) noexcept : Stream<value_type, S, self_type>(std::move(streamable)), _mapper(std::forward<M>(mapper)) {
+        KSTD_STREAM_CONSTRUCTOR MappingStream(S streamable, M&& mapper) noexcept :
+                Stream<value_type, S, self_type>(std::move(streamable)),
+                _mapper(std::forward<M>(mapper)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

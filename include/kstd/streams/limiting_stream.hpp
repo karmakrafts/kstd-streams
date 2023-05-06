@@ -30,14 +30,17 @@ namespace kstd::streams {
         using self_type = LimitingStream<S>;
         using value_type = typename S::value_type;
 
-    private:
+        private:
 
         usize _max_count;
         usize _count;
 
-    public:
+        public:
 
-        KSTD_STREAM_CONSTRUCTOR LimitingStream(S streamable, usize max_count) noexcept : Stream<value_type, S, self_type>(std::move(streamable)), _max_count(max_count), _count(0) {
+        KSTD_STREAM_CONSTRUCTOR LimitingStream(S streamable, usize max_count) noexcept :
+                Stream<value_type, S, self_type>(std::move(streamable)),
+                _max_count(max_count),
+                _count(0) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

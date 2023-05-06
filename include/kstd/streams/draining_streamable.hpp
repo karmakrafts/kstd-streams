@@ -17,13 +17,14 @@ namespace kstd::streams {
         using self_type = DrainingStreamable<C>;
         using value_type = typename C::iterator::value_type;
 
-    private:
+        private:
 
         C& _container;
 
-    public:
+        public:
 
-        explicit KSTD_STREAM_CONSTRUCTOR DrainingStreamable(C& container) noexcept : _container(container) {
+        explicit KSTD_STREAM_CONSTRUCTOR DrainingStreamable(C& container) noexcept :
+                _container(container) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

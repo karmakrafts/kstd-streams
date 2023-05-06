@@ -28,14 +28,16 @@ namespace kstd::streams {
     struct SingletStreamable final {
         using value_type = T;
 
-    private:
+        private:
 
         value_type _element;
         bool _has_data;
 
-    public:
+        public:
 
-        explicit KSTD_STREAM_CONSTRUCTOR SingletStreamable(value_type element) noexcept : _element(std::move(element)), _has_data(true) {
+        explicit KSTD_STREAM_CONSTRUCTOR SingletStreamable(value_type element) noexcept :
+                _element(std::move(element)),
+                _has_data(true) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

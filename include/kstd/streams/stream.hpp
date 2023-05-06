@@ -50,7 +50,7 @@ namespace kstd::streams {
     template<typename T, typename S, typename IMPL> //
     KSTD_REQUIRES(concepts::Streamable<S>)
     class Stream {
-    protected:
+        protected:
 
         [[maybe_unused]] S _streamable;
 
@@ -61,9 +61,10 @@ namespace kstd::streams {
             return static_cast<IMPL&>(*this);
         }
 
-    public:
+        public:
 
-        explicit KSTD_STREAM_CONSTRUCTOR Stream(S streamable) noexcept : _streamable(std::move(streamable)) {
+        explicit KSTD_STREAM_CONSTRUCTOR Stream(S streamable) noexcept :
+                _streamable(std::move(streamable)) {
         }
 
         template<typename S2>
@@ -132,7 +133,7 @@ namespace kstd::streams {
             return SortingStream<IMPL, C>(std::move(get_self()), std::forward<C>(comparator));
         }
 
-        [[nodiscard]] constexpr auto limit(size_t max_count) noexcept -> LimitingStream<IMPL> {
+        [[nodiscard]] constexpr auto limit(usize max_count) noexcept -> LimitingStream<IMPL> {
             return LimitingStream<IMPL>(std::move(get_self()), max_count);
         }
 
@@ -158,10 +159,10 @@ namespace kstd::streams {
             });
         }
 
-        [[nodiscard]] constexpr auto skip(size_t count) noexcept -> IMPL& {
+        [[nodiscard]] constexpr auto skip(usize count) noexcept -> IMPL& {
             auto& self = get_self();
 
-            for (size_t i = 0;
+            for (usize i = 0;
                  i < count;
                  i++) {
                 if (!self.next()) {
@@ -280,8 +281,8 @@ namespace kstd::streams {
             return std::make_optional(result);
         }
 
-        [[nodiscard]] constexpr auto count() noexcept -> size_t {
-            size_t result = 0;
+        [[nodiscard]] constexpr auto count() noexcept -> usize {
+            usize result = 0;
             auto& self = get_self();
             auto element = self.next();
 
@@ -306,11 +307,11 @@ namespace kstd::streams {
         }
 
         template<typename F>
-        KSTD_REQUIRES((kstd::concepts::Function<F, void(T&, size_t)>))
+        KSTD_REQUIRES((kstd::concepts::Function<F, void(T&, usize)>))
         constexpr auto for_each_indexed(F&& function) noexcept -> void {
             auto& self = get_self();
             auto element = self.next();
-            size_t index = 0;
+            usize index = 0;
 
             while (element) {
                 function(*element, index++);
@@ -416,13 +417,13 @@ namespace kstd::streams {
             return result;
         }
 
-        template<size_t EXTENT, template<typename, size_t, typename...> typename SEQ>
-        requires(EXTENT > 0)
+        template<usize EXTENT, template<typename, usize, typename...> typename SEQ>
+        KSTD_REQUIRES(EXTENT > 0)
         [[nodiscard]] constexpr auto collect_sequence() noexcept -> SEQ <T, EXTENT> {
             SEQ<T, EXTENT> result;
             auto& self = get_self();
             auto element = self.next();
-            size_t index = 0;
+            usize index = 0;
 
             while (element && index < EXTENT) {
                 result[index++] = std::move(*element);
@@ -432,10 +433,10 @@ namespace kstd::streams {
             return result;
         }
 
-        constexpr auto collect_to_memory(T* elements, size_t max_count) noexcept -> void {
+        constexpr auto collect_to_memory(T* elements, usize max_count) noexcept -> void {
             auto& self = get_self();
             auto element = self.next();
-            size_t index = 0;
+            usize index = 0;
 
             while (element && index < max_count) {
                 *(elements + index) = std::move(*element);
@@ -486,7 +487,7 @@ namespace kstd::streams {
 
     template<typename T>
     KSTD_REQUIRES(std::is_copy_assignable_v<T>)
-    [[nodiscard]] constexpr auto counting(T value, size_t max_count) noexcept -> BasicStream<CountingStreamable<T>> {
+    [[nodiscard]] constexpr auto counting(T value, usize max_count) noexcept -> BasicStream<CountingStreamable<T>> {
         using streamable = CountingStreamable<T>;
         return BasicStream<streamable>(streamable(std::move(value), max_count));
     }

@@ -28,14 +28,16 @@ namespace kstd::streams {
     struct IteratorStreamable final {
         using value_type = typename I::value_type;
 
-    private:
+        private:
 
         I _current;
         I _end;
 
-    public:
+        public:
 
-        KSTD_STREAM_CONSTRUCTOR IteratorStreamable(I begin, I end) noexcept : _current(std::move(begin)), _end(std::move(end)) {
+        KSTD_STREAM_CONSTRUCTOR IteratorStreamable(I begin, I end) noexcept :
+                _current(std::move(begin)),
+                _end(std::move(end)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

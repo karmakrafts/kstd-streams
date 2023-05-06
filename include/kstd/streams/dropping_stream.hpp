@@ -31,15 +31,17 @@ namespace kstd::streams {
         using self_type = DroppingStream<S, P>;
         using value_type = typename S::value_type;
 
-    private:
+        private:
 
         P _predicate;
         bool _has_dropped;
 
-    public:
+        public:
 
-        KSTD_STREAM_CONSTRUCTOR DroppingStream(S streamable, P&& predicate) noexcept : Stream<value_type, S, self_type>(std::move(streamable)), _predicate(std::forward<P>(predicate)),
-                                                                                       _has_dropped(false) {
+        KSTD_STREAM_CONSTRUCTOR DroppingStream(S streamable, P&& predicate) noexcept :
+                Stream<value_type, S, self_type>(std::move(streamable)),
+                _predicate(std::forward<P>(predicate)),
+                _has_dropped(false) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

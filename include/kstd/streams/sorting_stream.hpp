@@ -21,13 +21,14 @@ namespace kstd::streams {
         using self_type = SortingStream<S, C>;
         using value_type = typename S::value_type;
 
-    private:
+        private:
 
         OwningIteratorStreamable<std::vector<value_type>> _sorted_streamable;
 
-    public:
+        public:
 
-        KSTD_STREAM_CONSTRUCTOR SortingStream(S streamable, C&& comparator) noexcept : Stream<value_type, S, self_type>(std::move(streamable)) {
+        KSTD_STREAM_CONSTRUCTOR SortingStream(S streamable, C&& comparator) noexcept :
+                Stream<value_type, S, self_type>(std::move(streamable)) {
             std::vector<value_type> elements;
             collect_into<S, std::vector<value_type>>(this->_streamable, elements);
             std::sort(elements.begin(), elements.end(), std::forward<C>(comparator));

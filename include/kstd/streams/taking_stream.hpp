@@ -31,13 +31,15 @@ namespace kstd::streams {
         using self_type = TakingStream<S, P>;
         using value_type = typename S::value_type;
 
-    private:
+        private:
 
         P _predicate;
 
-    public:
+        public:
 
-        KSTD_STREAM_CONSTRUCTOR TakingStream(S streamable, P&& predicate) noexcept : Stream<value_type, S, self_type>(std::move(streamable)), _predicate(std::forward<P>(predicate)) {
+        KSTD_STREAM_CONSTRUCTOR TakingStream(S streamable, P&& predicate) noexcept :
+                Stream<value_type, S, self_type>(std::move(streamable)),
+                _predicate(std::forward<P>(predicate)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

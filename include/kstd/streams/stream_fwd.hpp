@@ -20,6 +20,7 @@
 #pragma once
 
 #include "kstd/concepts.hpp"
+#include "kstd/types.hpp"
 #include "concepts.hpp"
 #include "stream_macros.hpp"
 
@@ -71,5 +72,5 @@ namespace kstd::streams {
 
     template<typename T>
     KSTD_REQUIRES(std::is_copy_assignable_v<T>)
-    [[nodiscard]] constexpr auto counting(T value, size_t max_count) noexcept -> BasicStream<CountingStreamable<T>>;
+    [[nodiscard]] constexpr auto counting(T value, usize max_count) noexcept -> BasicStream<CountingStreamable<T>>;
 }

@@ -32,15 +32,17 @@ namespace kstd::streams {
         using self_type = FlatMappingStream<S, RS, M>;
         using value_type = typename RS::value_type;
 
-    private:
+        private:
 
         M _mapper;
         std::optional<RS> _current;
 
-    public:
+        public:
 
-        KSTD_STREAM_CONSTRUCTOR FlatMappingStream(S streamable, M&& mapper) noexcept : Stream<value_type, S, self_type>(std::move(streamable)), _mapper(std::forward<M>(mapper)),
-                                                                                       _current(std::nullopt) {
+        KSTD_STREAM_CONSTRUCTOR FlatMappingStream(S streamable, M&& mapper) noexcept :
+                Stream<value_type, S, self_type>(std::move(streamable)),
+                _mapper(std::forward<M>(mapper)),
+                _current(std::nullopt) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

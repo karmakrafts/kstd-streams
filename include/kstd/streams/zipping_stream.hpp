@@ -32,15 +32,17 @@ namespace kstd::streams {
         using self_type = ZippingStream<S, L, R, LM, RM>;
         using value_type = std::pair<L, R>;
 
-    private:
+        private:
 
         LM _left_mapper;
         RM _right_mapper;
 
-    public:
+        public:
 
-        KSTD_STREAM_CONSTRUCTOR ZippingStream(S streamable, LM&& left_mapper, RM&& right_mapper) noexcept : Stream<value_type, S, self_type>(std::move(streamable)),
-                                                                                                            _left_mapper(std::forward<LM>(left_mapper)), _right_mapper(std::forward<RM>(right_mapper)) {
+        KSTD_STREAM_CONSTRUCTOR ZippingStream(S streamable, LM&& left_mapper, RM&& right_mapper) noexcept :
+                Stream<value_type, S, self_type>(std::move(streamable)),
+                _left_mapper(std::forward<LM>(left_mapper)),
+                _right_mapper(std::forward<RM>(right_mapper)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

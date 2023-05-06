@@ -28,9 +28,10 @@ namespace kstd::streams {
         using self_type = BasicStream<S>;
         using value_type = typename S::value_type;
 
-    public:
+        public:
 
-        explicit KSTD_STREAM_CONSTRUCTOR BasicStream(S streamable) noexcept : Stream<value_type, S, self_type>(std::move(streamable)) {
+        explicit KSTD_STREAM_CONSTRUCTOR BasicStream(S streamable) noexcept :
+                Stream<value_type, S, self_type>(std::move(streamable)) {
         }
 
         [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {

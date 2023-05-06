@@ -20,7 +20,7 @@
 #pragma once
 
 #if __cplusplus >= 202002L
-#define KSTD_STREAM_CONSTRUCTOR constexpr
+    #define KSTD_STREAM_CONSTRUCTOR constexpr
 #else
-#define KSTD_STREAM_CONSTRUCTOR inline
+    #define KSTD_STREAM_CONSTRUCTOR inline
 #endif
