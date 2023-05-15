@@ -19,10 +19,10 @@
 
 #pragma once
 
-#include <optional>
 #include <type_traits>
 #include <unordered_set>
 #include "stream_fwd.hpp"
+#include "kstd/option.hpp"
 
 namespace kstd::streams {
     template<typename S> //
@@ -36,14 +36,14 @@ namespace kstd::streams {
 
         public:
 
-        explicit KSTD_STREAM_CONSTRUCTOR DistinctStream(S streamable) noexcept :
+        explicit constexpr DistinctStream(S streamable) noexcept :
                 Stream<value_type, S, self_type>(std::move(streamable)) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
             auto element = this->_streamable.next();
 
-            while (element && !_elements.insert(*element).second) {
+            while (element && !_elements.insert(element.borrow_value()).second) {
                 element = this->_streamable.next();
             }
 

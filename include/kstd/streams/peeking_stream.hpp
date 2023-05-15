@@ -19,14 +19,13 @@
 
 #pragma once
 
-#include <optional>
 #include <functional>
 #include <type_traits>
 #include "stream_fwd.hpp"
+#include "kstd/option.hpp"
 
 namespace kstd::streams {
-    template<typename S, typename F> //
-    KSTD_REQUIRES((kstd::concepts::Function<F, void(typename S::value_type&)>))
+    template<typename S, kstd::concepts::Function<void(typename S::value_type&)> F> //
     struct PeekingStream final : public Stream<typename S::value_type, S, PeekingStream<S, F>> {
         using self_type = PeekingStream<S, F>;
         using value_type = typename S::value_type;
@@ -37,16 +36,16 @@ namespace kstd::streams {
 
         public:
 
-        KSTD_STREAM_CONSTRUCTOR PeekingStream(S streamable, F&& function) noexcept :
+        constexpr PeekingStream(S streamable, F&& function) noexcept :
                 Stream<value_type, S, self_type>(std::move(streamable)),
                 _function(std::forward<F>(function)) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
             auto element = this->_streamable.next();
 
             if (!element) {
-                return std::nullopt;
+                return make_empty<value_type>();
             }
 
             _function(*element);

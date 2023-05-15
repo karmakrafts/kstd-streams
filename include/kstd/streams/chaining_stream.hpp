@@ -19,13 +19,13 @@
 
 #pragma once
 
-#include <optional>
 #include <type_traits>
 #include "stream_fwd.hpp"
+#include "kstd/option.hpp"
 
 namespace kstd::streams {
     template<typename S1, typename S2> //
-    KSTD_REQUIRES((std::same_as<typename S1::value_type, typename S2::value_type>))
+    requires(std::same_as<typename S1::value_type, typename S2::value_type>)
     struct ChainingStream final : public Stream<typename S1::value_type, S1, ChainingStream<S1, S2>> {
         using self_type = ChainingStream<S1, S2>;
         using value_type = typename S1::value_type;
@@ -36,19 +36,19 @@ namespace kstd::streams {
 
         public:
 
-        KSTD_STREAM_CONSTRUCTOR ChainingStream(S1 streamable, S2 other_streamable) noexcept :
+        constexpr ChainingStream(S1 streamable, S2 other_streamable) noexcept :
                 Stream<value_type, S1, self_type>(std::move(streamable)),
                 _other_streamable(std::move(other_streamable)) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
             auto element = this->_streamable.next();
 
             if (!element) {
                 element = _other_streamable.next();
 
                 if (!element) {
-                    return std::nullopt;
+                    return make_empty<value_type>();
                 }
             }
 

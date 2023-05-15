@@ -26,7 +26,7 @@ TEST(kstd_streams_SingletStreamable, TestIterate) {
     auto element = streamable.next();
 
     ASSERT_TRUE(element);
-    ASSERT_EQ(*element, value);
+    ASSERT_EQ(element.borrow_value(), value);
 
     element = streamable.next();
 

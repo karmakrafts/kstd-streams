@@ -19,15 +19,14 @@
 
 #pragma once
 
-#include <optional>
 #include <functional>
 #include <type_traits>
 #include <tuple>
 #include "stream_fwd.hpp"
+#include "kstd/option.hpp"
 
 namespace kstd::streams {
-    template<typename S, typename L, typename R, typename LM, typename RM> //
-    KSTD_REQUIRES((kstd::concepts::Function<LM, L(typename S::value_type & )> && kstd::concepts::Function<RM, R(typename S::value_type & )>))
+    template<typename S, typename L, typename R, kstd::concepts::Function<L(typename S::value_type&)> LM, kstd::concepts::Function<R(typename S::value_type&)> RM> //
     struct ZippingStream final : public Stream<std::pair<L, R>, S, ZippingStream<S, L, R, LM, RM>> {
         using self_type = ZippingStream<S, L, R, LM, RM>;
         using value_type = std::pair<L, R>;
@@ -39,21 +38,21 @@ namespace kstd::streams {
 
         public:
 
-        KSTD_STREAM_CONSTRUCTOR ZippingStream(S streamable, LM&& left_mapper, RM&& right_mapper) noexcept :
+        constexpr ZippingStream(S streamable, LM&& left_mapper, RM&& right_mapper) noexcept :
                 Stream<value_type, S, self_type>(std::move(streamable)),
                 _left_mapper(std::forward<LM>(left_mapper)),
                 _right_mapper(std::forward<RM>(right_mapper)) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
             auto element = this->_streamable.next();
 
             if (!element) {
-                return std::nullopt;
+                return {};
             }
 
-            auto& value = *element;
-            return std::make_optional(std::make_pair(std::move(_left_mapper(value)), std::move(_right_mapper(value))));
+            auto& value = element.borrow_value();
+            return std::make_pair(std::move(_left_mapper(value)), std::move(_right_mapper(value)));
         }
     };
 }

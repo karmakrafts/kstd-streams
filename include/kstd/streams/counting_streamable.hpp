@@ -19,9 +19,8 @@
 
 #pragma once
 
-#include <optional>
 #include "kstd/types.hpp"
-#include "stream_macros.hpp"
+#include "kstd/option.hpp"
 
 namespace kstd::streams {
     template<typename T> //
@@ -36,19 +35,19 @@ namespace kstd::streams {
 
         public:
 
-        KSTD_STREAM_CONSTRUCTOR CountingStreamable(T value, usize max_count) noexcept :
+        constexpr CountingStreamable(T value, usize max_count) noexcept :
                 _value(std::move(value)),
                 _max_count(max_count),
                 _count(0) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
             if (_count == _max_count) {
-                return std::nullopt;
+                return make_empty<value_type>();
             }
 
             ++_count;
-            return std::make_optional(_value);
+            return make_value<value_type>(_value);
         }
     };
 }

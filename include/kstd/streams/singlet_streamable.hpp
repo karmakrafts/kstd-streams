@@ -19,9 +19,8 @@
 
 #pragma once
 
-#include <optional>
 #include <type_traits>
-#include "stream_macros.hpp"
+#include "kstd/option.hpp"
 
 namespace kstd::streams {
     template<typename T> //
@@ -35,18 +34,18 @@ namespace kstd::streams {
 
         public:
 
-        explicit KSTD_STREAM_CONSTRUCTOR SingletStreamable(value_type element) noexcept :
+        explicit constexpr SingletStreamable(value_type element) noexcept :
                 _element(std::move(element)),
                 _has_data(true) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
             if (!_has_data) {
-                return std::nullopt;
+                return make_empty<value_type>();
             }
 
             _has_data = false;
-            return std::make_optional(std::move(_element));
+            return make_value<value_type>(std::move(_element));
         }
     };
 }

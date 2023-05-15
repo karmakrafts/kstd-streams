@@ -19,14 +19,13 @@
 
 #pragma once
 
-#include <optional>
 #include <functional>
 #include <type_traits>
 #include "stream_fwd.hpp"
+#include "kstd/option.hpp"
 
 namespace kstd::streams {
-    template<typename S, typename LS, typename RS, typename LM, typename RM> //
-    KSTD_REQUIRES((kstd::concepts::Function<LM, LS(typename S::value_type & )> && kstd::concepts::Function<RM, RS(typename S::value_type & )>))
+    template<typename S, typename LS, typename RS, kstd::concepts::Function<LS(typename S::value_type&)> LM, kstd::concepts::Function<RS(typename S::value_type&)> RM> //
     struct FlatZippingStream final : public Stream<std::pair<typename LS::value_type, typename RS::value_type>, S, FlatZippingStream<S, LS, RS, LM, RM>> {
         using self_type = FlatZippingStream<S, LS, RS, LM, RM>;
         using left_type = typename LS::value_type;
@@ -37,40 +36,40 @@ namespace kstd::streams {
 
         LM _left_mapper;
         RM _right_mapper;
-        std::optional<std::pair<LS, RS>> _current;
+        Option<std::pair<LS, RS>> _current;
 
         public:
 
-        KSTD_STREAM_CONSTRUCTOR FlatZippingStream(S streamable, LM&& left_mapper, RM&& right_mapper) noexcept :
+        constexpr FlatZippingStream(S streamable, LM&& left_mapper, RM&& right_mapper) noexcept :
                 Stream<value_type, S, self_type>(std::move(streamable)),
                 _left_mapper(std::forward<LM>(left_mapper)),
                 _right_mapper(std::forward<RM>(right_mapper)),
-                _current(std::nullopt) {
+                _current() {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
             while (true) {
                 if (_current) {
-                    auto& [left_stream, right_stream] = *_current;
+                    auto& [left_stream, right_stream] = _current.borrow_value();
                     auto left_element = left_stream.next();
                     auto right_element = right_stream.next();
 
                     if (!left_element || !right_element) {
-                        _current.reset();
+                        _current = {};
                         continue;
                     }
 
-                    return std::make_optional(std::make_pair(std::move(*left_element), std::move(*right_element)));
+                    return std::make_pair(std::move(*left_element), std::move(*right_element));
                 }
                 else {
                     auto element = this->_streamable.next();
 
                     if (!element) {
-                        return std::nullopt;
+                        return {};
                     }
 
-                    auto& value = *element;
-                    _current = std::make_optional(std::make_pair(std::move(_left_mapper(value)), std::move(_right_mapper(value))));
+                    auto& value = element.borrow_value();
+                    _current = std::make_pair(std::move(_left_mapper(value)), std::move(_right_mapper(value)));
                     continue;
                 }
             }

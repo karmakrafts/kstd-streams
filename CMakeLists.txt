@@ -6,10 +6,7 @@ option(KSTD_STREAMS_EMBEDDED "Look up CMake infra in parent directory instead of
 set(KSTD_STREAMS_MODULE ON) # Let other modules know we are present!
 add_compile_definitions(KSTD_STREAMS_MODULE)
 
-if(NOT DEFINED CMAKE_CXX_STANDARD)
-    message(STATUS "No C++ version specified, defaulting to C++20")
-    set(CMAKE_CXX_STANDARD 20)
-endif()
+set(CMAKE_CXX_STANDARD 20)
 
 if(${KSTD_STREAMS_EMBEDDED})
     set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake;")

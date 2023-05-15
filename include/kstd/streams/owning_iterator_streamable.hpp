@@ -20,10 +20,10 @@
 #pragma once
 
 #include "stream_fwd.hpp"
+#include "kstd/option.hpp"
 
 namespace kstd::streams {
-    template<typename C> //
-    KSTD_REQUIRES(kstd::concepts::ConstIterable<C>)
+    template<kstd::concepts::ConstIterable C> //
     struct OwningIteratorStreamable final {
         using self_type = OwningIteratorStreamable<C>;
         using iterator = typename C::const_iterator;
@@ -37,25 +37,25 @@ namespace kstd::streams {
 
         public:
 
-        explicit KSTD_STREAM_CONSTRUCTOR OwningIteratorStreamable(C container) noexcept :
+        explicit constexpr OwningIteratorStreamable(C container) noexcept :
                 _container(std::move(container)),
                 _current(_container.cbegin()),
                 _end(_container.cend()) {
         }
 
-        KSTD_STREAM_CONSTRUCTOR OwningIteratorStreamable() noexcept :
+        constexpr OwningIteratorStreamable() noexcept :
                 _container(),
                 _current(_container.cbegin()),
                 _end(_container.cend()) {
         }
 
-        KSTD_STREAM_CONSTRUCTOR OwningIteratorStreamable(const self_type& other) noexcept :
+        constexpr OwningIteratorStreamable(const self_type& other) noexcept :
                 _container(other._container),
                 _current(_container.cbegin()),
                 _end(_container.cend()) {
         }
 
-        KSTD_STREAM_CONSTRUCTOR OwningIteratorStreamable(self_type&& other) noexcept :
+        constexpr OwningIteratorStreamable(self_type&& other) noexcept :
                 _container(std::move(other._container)),
                 _current(_container.cbegin()),
                 _end(_container.cend()) {
@@ -75,12 +75,12 @@ namespace kstd::streams {
             return *this;
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
             if (_current == _end) {
-                return std::nullopt;
+                return make_empty<value_type>();
             }
 
-            return std::make_optional(*_current++);
+            return make_value<value_type>(*_current++);
         }
     };
 }

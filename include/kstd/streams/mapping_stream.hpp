@@ -19,14 +19,14 @@
 
 #pragma once
 
-#include <optional>
 #include <functional>
 #include <type_traits>
+#include <utility>
 #include "stream_fwd.hpp"
+#include "kstd/option.hpp"
 
 namespace kstd::streams {
-    template<typename R, typename S, typename M> //
-    KSTD_REQUIRES((kstd::concepts::Function<M, R(typename S::value_type & )>))
+    template<typename R, typename S, kstd::concepts::Function<R(typename S::value_type&)> M> //
     struct MappingStream final : public Stream<R, S, MappingStream<R, S, M>> {
         using self_type = MappingStream<R, S, M>;
         using value_type = R;
@@ -37,19 +37,19 @@ namespace kstd::streams {
 
         public:
 
-        KSTD_STREAM_CONSTRUCTOR MappingStream(S streamable, M&& mapper) noexcept :
+        constexpr MappingStream(S streamable, M&& mapper) noexcept :
                 Stream<value_type, S, self_type>(std::move(streamable)),
                 _mapper(std::forward<M>(mapper)) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
             auto element = this->_streamable.next();
 
             if (!element) {
-                return std::nullopt;
+                return make_empty<value_type>();
             }
 
-            return std::make_optional(std::move(_mapper(*element)));
+            return make_value<value_type>(std::move(_mapper(element.borrow_value())));
         }
     };
 }

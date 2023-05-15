@@ -20,12 +20,11 @@
 #pragma once
 
 #include <functional>
-#include <optional>
 #include "stream_fwd.hpp"
+#include "kstd/option.hpp"
 
 namespace kstd::streams {
-    template<typename S, typename F> //
-    KSTD_REQUIRES((kstd::concepts::Function<F, void(typename S::value_type&)>))
+    template<typename S, kstd::concepts::Function<void(typename S::value_type&)> F> //
     struct FilteringStream final : public Stream<typename S::value_type, S, FilteringStream<S, F>> {
         using self_type = FilteringStream<S, F>;
         using value_type = typename S::value_type;
@@ -36,19 +35,19 @@ namespace kstd::streams {
 
         public:
 
-        KSTD_STREAM_CONSTRUCTOR FilteringStream(S streamable, F&& filter) noexcept :
+        constexpr FilteringStream(S streamable, F&& filter) noexcept :
                 Stream<value_type, S, self_type>(std::move(streamable)),
                 _filter(std::forward<F>(filter)) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
             auto element = this->_streamable.next();
 
             if (!element) {
-                return std::nullopt;
+                return make_empty<value_type>();
             }
 
-            while (element && !_filter(*element)) {
+            while (element && !_filter(element.borrow_value())) {
                 element = this->_streamable.next();
             }
 

@@ -19,15 +19,13 @@
 
 #pragma once
 
-#include <memory>
-#include <optional>
 #include <functional>
 #include <type_traits>
 #include "stream_fwd.hpp"
+#include "kstd/option.hpp"
 
 namespace kstd::streams {
-    template<typename S, typename RS, typename M> //
-    KSTD_REQUIRES((concepts::Streamable<RS> && kstd::concepts::Function<M, RS(typename S::value_type & )>))
+    template<typename S, concepts::Streamable RS, kstd::concepts::Function<RS(typename S::value_type&)> M> //
     struct FlatMappingStream final : public Stream<typename RS::value_type, S, FlatMappingStream<S, RS, M>> {
         using self_type = FlatMappingStream<S, RS, M>;
         using value_type = typename RS::value_type;
@@ -35,23 +33,23 @@ namespace kstd::streams {
         private:
 
         M _mapper;
-        std::optional<RS> _current;
+        Option<RS> _current;
 
         public:
 
-        KSTD_STREAM_CONSTRUCTOR FlatMappingStream(S streamable, M&& mapper) noexcept :
+        constexpr FlatMappingStream(S streamable, M&& mapper) noexcept :
                 Stream<value_type, S, self_type>(std::move(streamable)),
                 _mapper(std::forward<M>(mapper)),
-                _current(std::nullopt) {
+                _current() {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
             while (true) {
                 if (_current) {
                     auto element = _current->next();
 
                     if (!element) {
-                        _current.reset();
+                        _current = make_empty<RS>();
                         continue;
                     }
 
@@ -61,10 +59,10 @@ namespace kstd::streams {
                     auto element = this->_streamable.next();
 
                     if (!element) {
-                        return std::nullopt;
+                        return make_empty<value_type>();
                     }
 
-                    _current = std::make_optional<RS>(std::move(_mapper(*element)));
+                    _current = make_value<RS>(_mapper(element.get_value()));
                     continue;
                 }
             }

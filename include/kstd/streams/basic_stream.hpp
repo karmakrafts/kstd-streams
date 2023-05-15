@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <optional>
 #include "stream_fwd.hpp"
+#include "kstd/option.hpp"
 
 namespace kstd::streams {
     template<typename S> //
@@ -30,11 +30,11 @@ namespace kstd::streams {
 
         public:
 
-        explicit KSTD_STREAM_CONSTRUCTOR BasicStream(S streamable) noexcept :
+        explicit constexpr BasicStream(S streamable) noexcept :
                 Stream<value_type, S, self_type>(std::move(streamable)) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
             return this->_streamable.next();
         }
     };

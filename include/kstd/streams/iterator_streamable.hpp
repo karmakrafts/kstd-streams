@@ -19,12 +19,11 @@
 
 #pragma once
 
-#include <optional>
 #include "stream_fwd.hpp"
+#include "kstd/option.hpp"
 
 namespace kstd::streams {
-    template<typename I> //
-    KSTD_REQUIRES(kstd::concepts::Iterator<I>)
+    template<kstd::concepts::Iterator I> //
     struct IteratorStreamable final {
         using value_type = typename I::value_type;
 
@@ -35,17 +34,17 @@ namespace kstd::streams {
 
         public:
 
-        KSTD_STREAM_CONSTRUCTOR IteratorStreamable(I begin, I end) noexcept :
+        constexpr IteratorStreamable(I begin, I end) noexcept :
                 _current(std::move(begin)),
                 _end(std::move(end)) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> std::optional<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
             if (_current == _end) {
-                return std::nullopt;
+                return make_empty<value_type>();
             }
 
-            return std::make_optional(*_current++);
+            return make_value<value_type>(*_current++);
         }
     };
 }

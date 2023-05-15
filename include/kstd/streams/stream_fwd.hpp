@@ -22,19 +22,16 @@
 #include "kstd/concepts.hpp"
 #include "kstd/types.hpp"
 #include "concepts.hpp"
-#include "stream_macros.hpp"
 
 namespace kstd::streams {
-    template<typename I> //
-    KSTD_REQUIRES(kstd::concepts::Iterator<I>)
+    template<kstd::concepts::Iterator I> //
     struct IteratorStreamable;
 
-    template<typename C> //
-    KSTD_REQUIRES(kstd::concepts::ConstIterable<C>)
+    template<kstd::concepts::ConstIterable C> //
     struct OwningIteratorStreamable;
 
-    template<typename C> //
-    KSTD_REQUIRES(kstd::concepts::Iterable<C> && concepts::Erasable<C>)
+    template<kstd::concepts::Iterable C> //
+    requires(concepts::Erasable<C>)
     struct DrainingStreamable;
 
     template<typename T> //
@@ -43,34 +40,30 @@ namespace kstd::streams {
     template<typename T> //
     struct CountingStreamable;
 
-    template<typename T, typename S, typename IMPL> //
-    KSTD_REQUIRES(concepts::Streamable<S>)
+    template<typename T, concepts::Streamable S, typename IMPL> //
     class Stream;
 
     template<typename S> //
     struct BasicStream;
 
-    template<typename C>
-    KSTD_REQUIRES(kstd::concepts::ConstIterable<C>)
+    template<kstd::concepts::ConstIterable C>
     [[nodiscard]] constexpr auto stream(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>>;
 
-    template<typename C>
-    KSTD_REQUIRES(kstd::concepts::ConstIterable<C>)
+    template<kstd::concepts::ConstIterable C>
     [[nodiscard]] constexpr auto owning(C container) noexcept -> BasicStream<OwningIteratorStreamable<C>>;
 
-    template<typename C>
-    KSTD_REQUIRES(kstd::concepts::ConstReverseIterable<C>)
+    template<kstd::concepts::ConstReverseIterable C>
     [[nodiscard]] constexpr auto reverse(const C& container) noexcept -> BasicStream<IteratorStreamable<typename C::const_iterator>>;
 
-    template<typename C>
-    KSTD_REQUIRES((kstd::concepts::Iterable<C> && concepts::Erasable<C>))
+    template<kstd::concepts::Iterable C>
+    requires(concepts::Erasable<C>)
     [[nodiscard]] constexpr auto draining(C& container) noexcept -> BasicStream<DrainingStreamable<C>>;
 
     template<typename T>
-    KSTD_REQUIRES(std::is_copy_assignable_v<T>)
+    requires(std::is_copy_assignable_v<T>)
     [[nodiscard]] constexpr auto singlet(T value) noexcept -> BasicStream<SingletStreamable<T>>;
 
     template<typename T>
-    KSTD_REQUIRES(std::is_copy_assignable_v<T>)
+    requires(std::is_copy_assignable_v<T>)
     [[nodiscard]] constexpr auto counting(T value, usize max_count) noexcept -> BasicStream<CountingStreamable<T>>;
 }
