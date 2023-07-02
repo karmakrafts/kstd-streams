@@ -19,37 +19,34 @@
 
 #pragma once
 
-#include <functional>
-#include <type_traits>
-#include <utility>
-#include "stream_fwd.hpp"
 #include "kstd/option.hpp"
+#include "kstd/utils.hpp"
+
+#include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename R, typename S, kstd::concepts::Function<R(typename S::value_type&)> M> //
+    template<typename R, typename S, typename M>//
     struct MappingStream final : public Stream<R, S, MappingStream<R, S, M>> {
-        using self_type = MappingStream<R, S, M>;
-        using value_type = R;
+        using Self = MappingStream<R, S, M>;
+        using ValueType = R;
 
         private:
-
         M _mapper;
 
         public:
-
         constexpr MappingStream(S streamable, M&& mapper) noexcept :
-                Stream<value_type, S, self_type>(std::move(streamable)),
-                _mapper(std::forward<M>(mapper)) {
+                Stream<ValueType, S, Self>(utils::move(streamable)),
+                _mapper(utils::forward<M>(mapper)) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<ValueType> {
             auto element = this->_streamable.next();
 
-            if (!element) {
-                return make_empty<value_type>();
+            if(!element) {
+                return make_empty<ValueType>();
             }
 
-            return make_value<value_type>(std::move(_mapper(element.borrow_value())));
+            return make_value<ValueType>(utils::move(_mapper(element.borrow())));
         }
     };
-}
+}// namespace kstd::streams

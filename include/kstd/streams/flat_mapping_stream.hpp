@@ -19,53 +19,49 @@
 
 #pragma once
 
-#include <functional>
-#include <type_traits>
-#include "stream_fwd.hpp"
 #include "kstd/option.hpp"
+#include "kstd/utils.hpp"
+
+#include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename S, concepts::Streamable RS, kstd::concepts::Function<RS(typename S::value_type&)> M> //
-    struct FlatMappingStream final : public Stream<typename RS::value_type, S, FlatMappingStream<S, RS, M>> {
-        using self_type = FlatMappingStream<S, RS, M>;
-        using value_type = typename RS::value_type;
+    template<typename S, typename RS, typename M>//
+    struct FlatMappingStream final : public Stream<typename RS::ValueType, S, FlatMappingStream<S, RS, M>> {
+        using Self = FlatMappingStream<S, RS, M>;
+        using ValueType = typename RS::ValueType;
 
         private:
-
         M _mapper;
         Option<RS> _current;
 
         public:
-
         constexpr FlatMappingStream(S streamable, M&& mapper) noexcept :
-                Stream<value_type, S, self_type>(std::move(streamable)),
-                _mapper(std::forward<M>(mapper)),
+                Stream<ValueType, S, Self>(utils::move(streamable)),
+                _mapper(utils::forward<M>(mapper)),
                 _current() {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
-            while (true) {
-                if (_current) {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<ValueType> {
+            while(true) {
+                if(_current) {
                     auto element = _current->next();
 
-                    if (!element) {
+                    if(!element) {
                         _current = make_empty<RS>();
                         continue;
                     }
 
                     return element;
                 }
-                else {
-                    auto element = this->_streamable.next();
 
-                    if (!element) {
-                        return make_empty<value_type>();
-                    }
+                auto element = this->_streamable.next();
 
-                    _current = make_value<RS>(_mapper(element.get_value()));
-                    continue;
+                if(!element) {
+                    return make_empty<ValueType>();
                 }
+
+                _current = make_value<RS>(_mapper(element.get()));
             }
         }
     };
-}
+}// namespace kstd::streams

@@ -17,18 +17,18 @@
  * @since 27/03/2023
  */
 
-#include <vector>
-#include <gtest/gtest.h>
 #include "kstd/streams/iterator_streamable.hpp"
+#include <gtest/gtest.h>
+#include <vector>
 
 TEST(kstd_streams_IteratorStreamable, TestIterate) {
     std::vector<float> values({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
     auto streamable = kstd::streams::IteratorStreamable(values.cbegin(), values.cend());
 
-    for (const auto value: values) {
+    for(const auto value : values) {
         auto element = streamable.next();
         ASSERT_TRUE(element);
-        ASSERT_EQ(element.borrow_value(), value);
+        ASSERT_EQ(element.borrow(), value);
     }
 
     auto element = streamable.next();

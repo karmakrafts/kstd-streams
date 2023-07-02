@@ -19,39 +19,38 @@
 
 #pragma once
 
-#include <functional>
-#include "stream_fwd.hpp"
 #include "kstd/option.hpp"
+#include "kstd/utils.hpp"
+
+#include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename S, kstd::concepts::Function<void(typename S::value_type&)> F> //
-    struct FilteringStream final : public Stream<typename S::value_type, S, FilteringStream<S, F>> {
-        using self_type = FilteringStream<S, F>;
-        using value_type = typename S::value_type;
+    template<typename S, typename F>//
+    struct FilteringStream final : public Stream<typename S::ValueType, S, FilteringStream<S, F>> {
+        using Self = FilteringStream<S, F>;
+        using ValueType = typename S::ValueType;
 
         private:
-
         F _filter;
 
         public:
-
         constexpr FilteringStream(S streamable, F&& filter) noexcept :
-                Stream<value_type, S, self_type>(std::move(streamable)),
-                _filter(std::forward<F>(filter)) {
+                Stream<ValueType, S, Self>(utils::move(streamable)),
+                _filter(utils::forward<F>(filter)) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<ValueType> {
             auto element = this->_streamable.next();
 
-            if (!element) {
-                return make_empty<value_type>();
+            if(!element) {
+                return make_empty<ValueType>();
             }
 
-            while (element && !_filter(element.borrow_value())) {
+            while(element && !_filter(element.borrow())) {
                 element = this->_streamable.next();
             }
 
             return element;
         }
     };
-}
+}// namespace kstd::streams

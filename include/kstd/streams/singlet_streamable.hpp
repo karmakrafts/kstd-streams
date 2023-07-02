@@ -19,33 +19,31 @@
 
 #pragma once
 
-#include <type_traits>
 #include "kstd/option.hpp"
+#include "kstd/utils.hpp"
 
 namespace kstd::streams {
-    template<typename T> //
+    template<typename T>//
     struct SingletStreamable final {
-        using value_type = T;
+        using ValueType = T;
 
         private:
-
-        value_type _element;
+        ValueType _element;
         bool _has_data;
 
         public:
-
-        explicit constexpr SingletStreamable(value_type element) noexcept :
-                _element(std::move(element)),
+        explicit constexpr SingletStreamable(ValueType element) noexcept :
+                _element(utils::move(element)),
                 _has_data(true) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
-            if (!_has_data) {
-                return make_empty<value_type>();
+        [[nodiscard]] constexpr auto next() noexcept -> Option<ValueType> {
+            if(!_has_data) {
+                return make_empty<ValueType>();
             }
 
             _has_data = false;
-            return make_value<value_type>(std::move(_element));
+            return make_value<ValueType>(utils::move(_element));
         }
     };
-}
+}// namespace kstd::streams

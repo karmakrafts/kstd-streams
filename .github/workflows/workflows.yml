@@ -1,0 +1,160 @@
+name: Build & Test
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+jobs:
+  # Linux
+  ubuntu-20-04-cpp17-gcc:
+    uses: karmakrafts/workflows/.github/workflows/gcc.yml@master
+    with:
+      platform_name: ubuntu-20
+      image_name: ubuntu-20.04
+      std_version: 17
+      version: 11
+  ubuntu-20-04-cpp20-gcc:
+    uses: karmakrafts/workflows/.github/workflows/gcc.yml@master
+    with:
+      platform_name: ubuntu-20
+      image_name: ubuntu-20.04
+      std_version: 20
+      version: 11
+  ubuntu-20-04-cpp17-clang:
+    uses: karmakrafts/workflows/.github/workflows/clang.yml@master
+    with:
+      platform_name: ubuntu-20
+      image_name: ubuntu-20.04
+      std_version: 17
+      version: 15
+  ubuntu-20-04-cpp20-clang:
+    uses: karmakrafts/workflows/.github/workflows/clang.yml@master
+    with:
+      platform_name: ubuntu-20
+      image_name: ubuntu-20.04
+      std_version: 20
+      version: 15
+
+  ubuntu-22-04-cpp17-gcc:
+    uses: karmakrafts/workflows/.github/workflows/gcc.yml@master
+    with:
+      platform_name: ubuntu-22
+      image_name: ubuntu-22.04
+      std_version: 17
+      version: 12
+  ubuntu-22-04-cpp20-gcc:
+    uses: karmakrafts/workflows/.github/workflows/gcc.yml@master
+    with:
+      platform_name: ubuntu-22
+      image_name: ubuntu-22.04
+      std_version: 20
+      version: 12
+  ubuntu-22-04-cpp17-clang:
+    uses: karmakrafts/workflows/.github/workflows/clang.yml@master
+    with:
+      platform_name: ubuntu-22
+      image_name: ubuntu-22.04
+      std_version: 17
+      version: 15
+  ubuntu-22-04-cpp20-clang:
+    uses: karmakrafts/workflows/.github/workflows/clang.yml@master
+    with:
+      platform_name: ubuntu-22
+      image_name: ubuntu-22.04
+      std_version: 20
+      version: 15
+
+  # MacOS
+  macos-11-cpp17:
+    uses: karmakrafts/workflows/.github/workflows/default.yml@master
+    with:
+      platform_name: macos-11
+      image_name: macos-11
+      std_version: 17
+  macos-11-cpp20:
+    uses: karmakrafts/workflows/.github/workflows/default.yml@master
+    with:
+      platform_name: macos-11
+      image_name: macos-11
+      std_version: 20
+
+  macos-12-cpp17:
+    uses: karmakrafts/workflows/.github/workflows/default.yml@master
+    with:
+      platform_name: macos-12
+      image_name: macos-12
+      std_version: 17
+  macos-12-cpp20:
+    uses: karmakrafts/workflows/.github/workflows/default.yml@master
+    with:
+      platform_name: macos-12
+      image_name: macos-12
+      std_version: 20
+
+  macos-13-cpp17:
+    uses: karmakrafts/workflows/.github/workflows/default.yml@master
+    with:
+      platform_name: macos-13
+      image_name: macos-13
+      std_version: 17
+  macos-13-cpp20:
+    uses: karmakrafts/workflows/.github/workflows/default.yml@master
+    with:
+      platform_name: macos-13
+      image_name: macos-13
+      std_version: 20
+
+  # Windows
+  windows-2019-cpp17-msvc:
+    uses: karmakrafts/workflows/.github/workflows/default.yml@master
+    with:
+      platform_name: windows-2019
+      image_name: windows-2019
+      std_version: 17
+  windows-2019-cpp20-msvc:
+    uses: karmakrafts/workflows/.github/workflows/default.yml@master
+    with:
+      platform_name: windows-2019
+      image_name: windows-2019
+      std_version: 20
+  windows-2019-cpp17-clang:
+    uses: karmakrafts/workflows/.github/workflows/clang-windows.yml@master
+    with:
+      platform_name: windows-2019
+      image_name: windows-2019
+      std_version: 17
+      version: 15
+  windows-2019-cpp20-clang:
+    uses: karmakrafts/workflows/.github/workflows/clang-windows.yml@master
+    with:
+      platform_name: windows-2019
+      image_name: windows-2019
+      std_version: 20
+      version: 15
+
+  windows-2022-cpp17-msvc:
+    uses: karmakrafts/workflows/.github/workflows/default.yml@master
+    with:
+      platform_name: windows-2022
+      image_name: windows-2022
+      std_version: 17
+  windows-2022-cpp20-msvc:
+    uses: karmakrafts/workflows/.github/workflows/default.yml@master
+    with:
+      platform_name: windows-2022
+      image_name: windows-2022
+      std_version: 20
+  windows-2022-cpp17-clang:
+    uses: karmakrafts/workflows/.github/workflows/clang-windows.yml@master
+    with:
+      platform_name: windows-2022
+      image_name: windows-2022
+      std_version: 17
+      version: 15
+  windows-2022-cpp20-clang:
+    uses: karmakrafts/workflows/.github/workflows/clang-windows.yml@master
+    with:
+      platform_name: windows-2022
+      image_name: windows-2022
+      std_version: 20
+      version: 15

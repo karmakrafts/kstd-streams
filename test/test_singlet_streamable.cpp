@@ -17,8 +17,8 @@
  * @since 27/03/2023
  */
 
-#include <gtest/gtest.h>
 #include "kstd/streams/singlet_streamable.hpp"
+#include <gtest/gtest.h>
 
 TEST(kstd_streams_SingletStreamable, TestIterate) {
     float value = 1337.0F;
@@ -26,7 +26,7 @@ TEST(kstd_streams_SingletStreamable, TestIterate) {
     auto element = streamable.next();
 
     ASSERT_TRUE(element);
-    ASSERT_EQ(element.borrow_value(), value);
+    ASSERT_EQ(element.borrow(), value);
 
     element = streamable.next();
 

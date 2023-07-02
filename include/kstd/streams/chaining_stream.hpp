@@ -19,40 +19,39 @@
 
 #pragma once
 
-#include <type_traits>
-#include "stream_fwd.hpp"
 #include "kstd/option.hpp"
+#include "kstd/utils.hpp"
+
+#include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename S1, typename S2> //
-    requires(std::same_as<typename S1::value_type, typename S2::value_type>)
-    struct ChainingStream final : public Stream<typename S1::value_type, S1, ChainingStream<S1, S2>> {
-        using self_type = ChainingStream<S1, S2>;
-        using value_type = typename S1::value_type;
+    template<typename S1, typename S2>//
+        requires(std::same_as<typename S1::ValueType, typename S2::ValueType>)
+    struct ChainingStream final : public Stream<typename S1::ValueType, S1, ChainingStream<S1, S2>> {
+        using Self = ChainingStream<S1, S2>;
+        using ValueType = typename S1::ValueType;
 
         private:
-
         S2 _other_streamable;
 
         public:
-
         constexpr ChainingStream(S1 streamable, S2 other_streamable) noexcept :
-                Stream<value_type, S1, self_type>(std::move(streamable)),
-                _other_streamable(std::move(other_streamable)) {
+                Stream<ValueType, S1, Self>(utils::move(streamable)),
+                _other_streamable(utils::move(other_streamable)) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<ValueType> {
             auto element = this->_streamable.next();
 
-            if (!element) {
+            if(!element) {
                 element = _other_streamable.next();
 
-                if (!element) {
-                    return make_empty<value_type>();
+                if(!element) {
+                    return make_empty<ValueType>();
                 }
             }
 
             return element;
         }
     };
-}
+}// namespace kstd::streams

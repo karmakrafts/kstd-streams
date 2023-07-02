@@ -19,40 +19,40 @@
 
 #pragma once
 
-#include <functional>
-#include <type_traits>
-#include <tuple>
-#include "stream_fwd.hpp"
 #include "kstd/option.hpp"
+#include "kstd/tuple.hpp"
+#include "kstd/utils.hpp"
+
+#include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename S, typename L, typename R, kstd::concepts::Function<L(typename S::value_type&)> LM, kstd::concepts::Function<R(typename S::value_type&)> RM> //
-    struct ZippingStream final : public Stream<std::pair<L, R>, S, ZippingStream<S, L, R, LM, RM>> {
-        using self_type = ZippingStream<S, L, R, LM, RM>;
-        using value_type = std::pair<L, R>;
+    template<typename S, typename L, typename R, typename LM, typename RM>//
+    struct ZippingStream final : public Stream<Pair<L, R>, S, ZippingStream<S, L, R, LM, RM>> {
+        using Self = ZippingStream<S, L, R, LM, RM>;
+        using LeftType = L;
+        using RightType = R;
+        using ValueType = Pair<LeftType, RightType>;
 
         private:
-
         LM _left_mapper;
         RM _right_mapper;
 
         public:
-
         constexpr ZippingStream(S streamable, LM&& left_mapper, RM&& right_mapper) noexcept :
-                Stream<value_type, S, self_type>(std::move(streamable)),
-                _left_mapper(std::forward<LM>(left_mapper)),
-                _right_mapper(std::forward<RM>(right_mapper)) {
+                Stream<ValueType, S, Self>(utils::move(streamable)),
+                _left_mapper(utils::forward<LM>(left_mapper)),
+                _right_mapper(utils::forward<RM>(right_mapper)) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<ValueType> {
             auto element = this->_streamable.next();
 
-            if (!element) {
+            if(!element) {
                 return {};
             }
 
-            auto& value = element.borrow_value();
-            return std::make_pair(std::move(_left_mapper(value)), std::move(_right_mapper(value)));
+            auto& value = element.borrow();
+            return ValueType(utils::move(_left_mapper(value)), utils::move(_right_mapper(value)));
         }
     };
-}
+}// namespace kstd::streams

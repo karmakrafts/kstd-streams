@@ -19,23 +19,24 @@
 
 #pragma once
 
-#include "stream_fwd.hpp"
 #include "kstd/option.hpp"
+#include "kstd/utils.hpp"
+
+#include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename S> //
-    struct BasicStream final : public Stream<typename S::value_type, S, BasicStream<S>> {
-        using self_type = BasicStream<S>;
-        using value_type = typename S::value_type;
+    template<typename S>//
+    struct BasicStream final : public Stream<typename S::ValueType, S, BasicStream<S>> {
+        using Self = BasicStream<S>;
+        using ValueType = typename S::ValueType;
 
         public:
-
         explicit constexpr BasicStream(S streamable) noexcept :
-                Stream<value_type, S, self_type>(std::move(streamable)) {
+                Stream<ValueType, S, Self>(utils::move(streamable)) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<ValueType> {
             return this->_streamable.next();
         }
     };
-}
+}// namespace kstd::streams

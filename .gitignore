@@ -2,10 +2,8 @@ out
 *.ipr
 *.iws
 *.iml
-.idea/
-cmake-build-*/
+/cmake-build-*/
 build/
-out/
-.idea/
 .DS_Store
 **/.DS_Store
+.clangd

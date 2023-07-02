@@ -19,26 +19,26 @@
 
 #pragma once
 
-#include "stream_fwd.hpp"
 #include "kstd/option.hpp"
+#include "kstd/utils.hpp"
+
+#include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<kstd::concepts::ConstIterable C> //
+    template<typename C>//
     struct OwningIteratorStreamable final {
-        using self_type = OwningIteratorStreamable<C>;
-        using iterator = typename C::const_iterator;
-        using value_type = typename iterator::value_type;
+        using Self = OwningIteratorStreamable<C>;
+        using Iterator = typename C::const_iterator;
+        using ValueType = typename Iterator::value_type;
 
         private:
-
         C _container;
-        iterator _current;
-        iterator _end;
+        Iterator _current;
+        Iterator _end;
 
         public:
-
         explicit constexpr OwningIteratorStreamable(C container) noexcept :
-                _container(std::move(container)),
+                _container(utils::move(container)),
                 _current(_container.cbegin()),
                 _end(_container.cend()) {
         }
@@ -49,38 +49,40 @@ namespace kstd::streams {
                 _end(_container.cend()) {
         }
 
-        constexpr OwningIteratorStreamable(const self_type& other) noexcept :
+        constexpr OwningIteratorStreamable(const Self& other) noexcept :
                 _container(other._container),
                 _current(_container.cbegin()),
                 _end(_container.cend()) {
         }
 
-        constexpr OwningIteratorStreamable(self_type&& other) noexcept :
-                _container(std::move(other._container)),
+        constexpr OwningIteratorStreamable(Self&& other) noexcept :
+                _container(utils::move(other._container)),
                 _current(_container.cbegin()),
                 _end(_container.cend()) {
         }
 
-        constexpr auto operator =(const self_type& other) noexcept -> self_type& {
+        ~OwningIteratorStreamable() noexcept = default;
+
+        constexpr auto operator=(const Self& other) noexcept -> Self& {
             _container = other._container;
             _current = _container.cbegin();
             _end = _container.cend();
             return *this;
         }
 
-        constexpr auto operator =(self_type&& other) noexcept -> self_type& {
-            _container = std::move(other._container);
+        constexpr auto operator=(Self&& other) noexcept -> Self& {
+            _container = utils::move(other._container);
             _current = _container.cbegin();
             _end = _container.cend();
             return *this;
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
-            if (_current == _end) {
-                return make_empty<value_type>();
+        [[nodiscard]] constexpr auto next() noexcept -> Option<ValueType> {
+            if(_current == _end) {
+                return make_empty<ValueType>();
             }
 
-            return make_value<value_type>(*_current++);
+            return make_value<ValueType>(*_current++);
         }
     };
-}
+}// namespace kstd::streams

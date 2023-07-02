@@ -19,36 +19,34 @@
 
 #pragma once
 
-#include <functional>
-#include <type_traits>
-#include "stream_fwd.hpp"
 #include "kstd/option.hpp"
+#include "kstd/utils.hpp"
+
+#include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename S, kstd::concepts::Function<bool(typename S::value_type&)> P> //
-    struct TakingStream final : public Stream<typename S::value_type, S, TakingStream<S, P>> {
-        using self_type = TakingStream<S, P>;
-        using value_type = typename S::value_type;
+    template<typename S, typename P>//
+    struct TakingStream final : public Stream<typename S::ValueType, S, TakingStream<S, P>> {
+        using Self = TakingStream<S, P>;
+        using ValueType = typename S::ValueType;
 
         private:
-
         P _predicate;
 
         public:
-
         constexpr TakingStream(S streamable, P&& predicate) noexcept :
-                Stream<value_type, S, self_type>(std::move(streamable)),
-                _predicate(std::forward<P>(predicate)) {
+                Stream<ValueType, S, Self>(utils::move(streamable)),
+                _predicate(utils::forward<P>(predicate)) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<ValueType> {
             auto element = this->_streamable.next();
 
-            if (!element || !_predicate(element.borrow_value())) {
+            if(!element || !_predicate(element.borrow())) {
                 return {};
             }
 
             return element;
         }
     };
-}
+}// namespace kstd::streams

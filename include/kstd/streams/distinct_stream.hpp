@@ -19,35 +19,35 @@
 
 #pragma once
 
-#include <type_traits>
 #include <unordered_set>
-#include "stream_fwd.hpp"
+
 #include "kstd/option.hpp"
+#include "kstd/utils.hpp"
+
+#include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename S> //
-    struct DistinctStream final : public Stream<typename S::value_type, S, DistinctStream<S>> {
-        using self_type = DistinctStream<S>;
-        using value_type = typename S::value_type;
+    template<typename S>//
+    struct DistinctStream final : public Stream<typename S::ValueType, S, DistinctStream<S>> {
+        using Self = DistinctStream<S>;
+        using ValueType = typename S::ValueType;
 
         private:
-
-        std::unordered_set<value_type> _elements;
+        std::unordered_set<ValueType> _elements;
 
         public:
-
         explicit constexpr DistinctStream(S streamable) noexcept :
-                Stream<value_type, S, self_type>(std::move(streamable)) {
+                Stream<ValueType, S, Self>(utils::move(streamable)) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> Option<value_type> {
+        [[nodiscard]] constexpr auto next() noexcept -> Option<ValueType> {
             auto element = this->_streamable.next();
 
-            while (element && !_elements.insert(element.borrow_value()).second) {
+            while(element && !_elements.insert(element.borrow()).second) {
                 element = this->_streamable.next();
             }
 
             return element;
         }
     };
-}
+}// namespace kstd::streams

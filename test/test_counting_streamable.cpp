@@ -17,18 +17,18 @@
  * @since 29/03/2023
  */
 
-#include <vector>
-#include <gtest/gtest.h>
 #include "kstd/streams/counting_streamable.hpp"
+#include <gtest/gtest.h>
+#include <vector>
 
 TEST(kstd_streams_CountingStreamable, TestIterate) {
     std::vector<float> values({3.0F, 3.0F, 3.0F, 3.0F, 3.0F, 3.0F, 3.0F, 3.0F, 3.0F, 3.0F});
     auto streamable = kstd::streams::CountingStreamable(3.0F, values.size());
 
-    for (const auto value: values) {
+    for(const auto value : values) {
         auto element = streamable.next();
         ASSERT_TRUE(element);
-        ASSERT_EQ(element.borrow_value(), value);
+        ASSERT_EQ(element.borrow(), value);
     }
 
     auto element = streamable.next();
