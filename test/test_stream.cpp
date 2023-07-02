@@ -250,47 +250,48 @@ TEST(kstd_streams_Stream, TestZip) {
     }
 }
 
-//TEST(kstd_streams_Stream, TestFlatZip) {
-//    // @formatter:off
-//    std::vector<Foo> values({{10, 12.0F},
-//        {12, 14.0F},
-//        {14, 16.0F}});
-//    // @formatter:on
-//    const auto num_values = values.size();
-//
-//    std::vector<std::vector<Foo>> nested_values({values, values, values});
-//
-//    // @formatter:off
-//    const auto result = kstd::streams::stream(nested_values)
-//        .flat_zip(
-//            [](auto x) { return kstd::streams::owning(x); },
-//            [](auto x) { return kstd::streams::owning(x); }
-//        )
-//        .collect<std::vector>();
-//    // @formatter:on
-//
-//    const auto flat_count = 9;
-//    ASSERT_EQ(result.size(), flat_count);
-//    size_t sub_index = 0;
-//
-//    for (size_t i = 0; i < flat_count; i++) {
-//        auto& [expected_int, expected_float] = values[sub_index];
-//        auto& [left_foo, right_foo] = result[i];
-//
-//        ASSERT_EQ(left_foo.i_value, expected_int);
-//        ASSERT_EQ(left_foo.f_value, expected_float);
-//
-//        ASSERT_EQ(right_foo.i_value, expected_int);
-//        ASSERT_EQ(right_foo.f_value, expected_float);
-//
-//        if (sub_index < num_values - 1) {
-//            sub_index++;
-//        }
-//        else {
-//            sub_index = 0;
-//        }
-//    }
-//}
+TEST(kstd_streams_Stream, TestFlatZip) {
+    // @formatter:off
+    std::vector<Foo> values({{10, 12.0F}, {12, 14.0F}, {14, 16.0F}});
+    // @formatter:on
+    const auto num_values = values.size();
+
+    std::vector<std::vector<Foo>> nested_values({values, values, values});
+
+    // @formatter:off
+    const auto result = kstd::streams::stream(nested_values)
+                                .flat_zip(
+                                        [](auto& x) {
+                                            return kstd::streams::owning(x);
+                                        },
+                                        [](auto& x) {
+                                            return kstd::streams::owning(x);
+                                        })
+                                .collect<std::vector>();
+    // @formatter:on
+
+    const auto flat_count = 9;
+    ASSERT_EQ(result.size(), flat_count);
+    size_t sub_index = 0;
+
+    for(size_t i = 0; i < flat_count; i++) {
+        auto& [expected_int, expected_float] = values[sub_index];
+        auto& [left_foo, right_foo] = result[i];
+
+        ASSERT_EQ(left_foo.i_value, expected_int);
+        ASSERT_EQ(left_foo.f_value, expected_float);
+
+        ASSERT_EQ(right_foo.i_value, expected_int);
+        ASSERT_EQ(right_foo.f_value, expected_float);
+
+        if(sub_index < num_values - 1) {
+            sub_index++;
+        }
+        else {
+            sub_index = 0;
+        }
+    }
+}
 
 TEST(kstd_streams_Stream, TestCollectToMemory) {
     std::vector<float> target(num_test_values);
@@ -317,22 +318,24 @@ TEST(kstd_streams_Stream, TestSkip) {
     }
 }
 
-//TEST(kstd_streams_Stream, TestDistinct) {
-//    std::vector<std::vector<float>> nested_values({test_values, test_values, test_values, test_values});
-//
-//    // @formatter:off
-//    const auto result = kstd::streams::stream(nested_values)
-//        .flat_map([](auto x) { return kstd::streams::owning(x); })
-//        .distinct()
-//        .collect<std::vector>();
-//    // @formatter:on
-//
-//    ASSERT_EQ(result.size(), num_test_values);
-//
-//    for (size_t i = 0; i < num_test_values; i++) {
-//        ASSERT_EQ(result[i], test_values[i]);
-//    }
-//}
+TEST(kstd_streams_Stream, TestDistinct) {
+    std::vector<std::vector<float>> nested_values({test_values, test_values, test_values, test_values});
+
+    // @formatter:off
+    const auto result = kstd::streams::stream(nested_values)
+                                .flat_map([](auto x) {
+                                    return kstd::streams::owning(x);
+                                })
+                                .distinct()
+                                .collect<std::vector>();
+    // @formatter:on
+
+    ASSERT_EQ(result.size(), num_test_values);
+
+    for(size_t i = 0; i < num_test_values; i++) {
+        ASSERT_EQ(result[i], test_values[i]);
+    }
+}
 
 TEST(kstd_streams_Stream, TestChain) {
     std::vector<float> expected(
@@ -584,31 +587,33 @@ TEST(kstd_streams_Stream, TestMap) {
     ASSERT_EQ(result2[7], 4);
 }
 
-//TEST(kstd_streams_Stream, TestFlatMap) {
-//    std::vector<std::vector<float>> nested_values({test_values, test_values, test_values, test_values});
-//
-//    // @formatter:off
-//    const auto result = kstd::streams::stream(nested_values)
-//        .flat_map([](auto x) { return kstd::streams::owning(x); })
-//        .collect<std::vector>();
-//    // @formatter:on
-//
-//    const auto flat_count = test_values.size() << 2;
-//    ASSERT_EQ(result.size(), flat_count);
-//
-//    size_t sub_index = 0;
-//
-//    for (size_t i = 0; i < flat_count; i++) {
-//        ASSERT_EQ(result[i], test_values[sub_index]);
-//
-//        if (sub_index < num_test_values - 1) {
-//            sub_index++;
-//        }
-//        else {
-//            sub_index = 0;
-//        }
-//    }
-//}
+TEST(kstd_streams_Stream, TestFlatMap) {
+    std::vector<std::vector<float>> nested_values({test_values, test_values, test_values, test_values});
+
+    // @formatter:off
+    const auto result = kstd::streams::stream(nested_values)
+                                .flat_map([](auto x) {
+                                    return kstd::streams::owning(x);
+                                })
+                                .collect<std::vector>();
+    // @formatter:on
+
+    const auto flat_count = test_values.size() << 2;
+    ASSERT_EQ(result.size(), flat_count);
+
+    size_t sub_index = 0;
+
+    for(size_t i = 0; i < flat_count; i++) {
+        ASSERT_EQ(result[i], test_values[sub_index]);
+
+        if(sub_index < num_test_values - 1) {
+            sub_index++;
+        }
+        else {
+            sub_index = 0;
+        }
+    }
+}
 
 TEST(kstd_streams_Stream, TestMin) {
     auto result = kstd::streams::stream(test_values).min();
