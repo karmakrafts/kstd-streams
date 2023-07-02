@@ -11,8 +11,9 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
 endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake;")
-include(CommonLibraries)
 include(Platform)
+include(CommonLibraries)
+include_scripts()
 
 if(${KSTD_STREAMS_BUILD_TESTS})
     file(GLOB_RECURSE KSTD_TEST_SOURCE_FILES "${CMAKE_SOURCE_DIR}/test/*.cpp")
