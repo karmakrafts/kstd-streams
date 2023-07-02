@@ -17,8 +17,8 @@
  * @since 27/03/2023
  */
 
-#include "kstd/streams/iterator_streamable.hpp"
 #include <gtest/gtest.h>
+#include <kstd/streams/iterator_streamable.hpp>
 #include <vector>
 
 TEST(kstd_streams_IteratorStreamable, TestIterate) {

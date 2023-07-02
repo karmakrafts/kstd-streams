@@ -17,8 +17,8 @@
  * @since 27/03/2023
  */
 
-#include "kstd/streams/singlet_streamable.hpp"
 #include <gtest/gtest.h>
+#include <kstd/streams/singlet_streamable.hpp>
 
 TEST(kstd_streams_SingletStreamable, TestIterate) {
     float value = 1337.0F;

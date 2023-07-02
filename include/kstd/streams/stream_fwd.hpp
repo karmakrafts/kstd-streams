@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "kstd/types.hpp"
+#include <kstd/types.hpp>
 
 namespace kstd::streams {
     template<typename I>//

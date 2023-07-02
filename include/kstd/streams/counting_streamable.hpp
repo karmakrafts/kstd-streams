@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include "kstd/option.hpp"
-#include "kstd/types.hpp"
-#include "kstd/utils.hpp"
+#include <kstd/option.hpp>
+#include <kstd/types.hpp>
+#include <kstd/utils.hpp>
 
 namespace kstd::streams {
     template<typename T>//

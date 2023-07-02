@@ -17,9 +17,9 @@
  * @since 27/03/2023
  */
 
-#include "kstd/streams/stream.hpp"
 #include <array>
 #include <gtest/gtest.h>
+#include <kstd/streams/stream.hpp>
 #include <random>
 #include <string>
 #include <string_view>

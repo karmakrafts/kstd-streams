@@ -5,13 +5,14 @@
 
 #pragma once
 
-#include "kstd/option.hpp"
-#include "kstd/utils.hpp"
+#include <algorithm>
+#include <kstd/option.hpp>
+#include <kstd/utils.hpp>
+#include <vector>
+
 #include "owning_iterator_streamable.hpp"
 #include "stream_fwd.hpp"
 #include "stream_utils.hpp"
-#include <algorithm>
-#include <vector>
 
 namespace kstd::streams {
     template<typename S, typename C>//

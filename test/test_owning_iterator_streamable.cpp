@@ -17,8 +17,8 @@
  * @since 29/03/2023
  */
 
-#include "kstd/streams/owning_iterator_streamable.hpp"
 #include <gtest/gtest.h>
+#include <kstd/streams/owning_iterator_streamable.hpp>
 #include <vector>
 
 TEST(kstd_streams_OwningIteratorStreamable, TestIterate) {

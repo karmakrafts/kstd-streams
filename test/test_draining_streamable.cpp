@@ -3,8 +3,8 @@
  * @since 03/04/2023
  */
 
-#include "kstd/streams/stream.hpp"
 #include <gtest/gtest.h>
+#include <kstd/streams/stream.hpp>
 
 TEST(kstd_streams_DrainingStreamable, TestIterate) {
     std::vector<float> values({1.0F, 2.0F, 3.0F, 4.0F, 1.5F, 2.5F, 3.5F, 4.5F});
