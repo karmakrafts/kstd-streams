@@ -26,7 +26,6 @@
 
 namespace kstd::streams {
     template<typename S1, typename S2>//
-        requires(std::same_as<typename S1::ValueType, typename S2::ValueType>)
     struct ChainingStream final : public Stream<typename S1::ValueType, S1, ChainingStream<S1, S2>> {
         using Self = ChainingStream<S1, S2>;
         using ValueType = typename S1::ValueType;

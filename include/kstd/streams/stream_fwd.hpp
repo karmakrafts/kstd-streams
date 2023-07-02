@@ -58,10 +58,8 @@ namespace kstd::streams {
     [[nodiscard]] constexpr auto draining(C& container) noexcept -> BasicStream<DrainingStreamable<C>>;
 
     template<typename T>
-        requires(std::is_copy_assignable_v<T>)
     [[nodiscard]] constexpr auto singlet(T value) noexcept -> BasicStream<SingletStreamable<T>>;
 
     template<typename T>
-        requires(std::is_copy_assignable_v<T>)
     [[nodiscard]] constexpr auto counting(T value, usize max_count) noexcept -> BasicStream<CountingStreamable<T>>;
 }// namespace kstd::streams

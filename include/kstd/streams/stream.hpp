@@ -398,7 +398,6 @@ namespace kstd::streams {
         }
 
         template<usize EXTENT, template<typename, usize, typename...> typename SEQ>
-            requires(EXTENT > 0)
         [[nodiscard]] constexpr auto collect_sequence() noexcept -> SEQ<T, EXTENT> {
             SEQ<T, EXTENT> result;
             auto& self = get_self();
