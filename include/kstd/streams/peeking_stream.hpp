@@ -46,7 +46,7 @@ namespace kstd::streams {
                 return make_empty<ValueType>();
             }
 
-            _function(*element);
+            _function(element.borrow());
             return element;
         }
     };
