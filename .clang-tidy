@@ -52,7 +52,7 @@ CheckOptions: # @formatter:off
   - key:    readability-identifier-naming.LocalConstantCase
     value:  lower_case
   - key:    readability-identifier-naming.TypedefCase
-    value:  CamelCase
+    value:  lower_case
   - key:    readability-identifier-naming.TypeAliasCase
-    value:  CamelCase
+    value:  lower_case
     # @formatter:on

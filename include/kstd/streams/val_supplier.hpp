@@ -14,37 +14,43 @@
 
 /**
  * @author Alexander Hinze
- * @since 27/03/2023
+ * @since 12/07/2023
  */
 
 #pragma once
 
+#include <kstd/defaults.hpp>
 #include <kstd/option.hpp>
-#include <kstd/utils.hpp>
-
-#include "stream_fwd.hpp"
 
 namespace kstd::streams {
-    template<typename I>//
-    struct IteratorStreamable final {
-        using ValueType = typename I::value_type;
+    template<typename I>
+    struct ValSupplier final {
+        // clang-format off
+        using iterator      = I;
+        using self          = ValSupplier<iterator>;
+        using value_type    = typename iterator::value_type;
+        using out_type      = value_type;
+        // clang-format on
 
         private:
-        I _current;
-        I _end;
+        iterator _current;
+        iterator _end;
 
         public:
-        constexpr IteratorStreamable(I begin, I end) noexcept :
-                _current(utils::move(begin)),
-                _end(utils::move(end)) {
+        KSTD_DEFAULT_MOVE_COPY(ValSupplier, self, constexpr)
+
+        constexpr ValSupplier(iterator begin, iterator end) noexcept :
+                _current(begin),
+                _end(end) {
         }
 
-        [[nodiscard]] constexpr auto next() noexcept -> Option<ValueType> {
-            if(_current == _end) {
-                return make_empty<ValueType>();
-            }
+        ~ValSupplier() noexcept = default;
 
-            return make_value<ValueType>(*_current++);
+        [[nodiscard]] constexpr auto get_next() noexcept -> Option<out_type> {
+            if(_current == _end) {
+                return {};
+            }
+            return *(_current++);
         }
     };
 }// namespace kstd::streams
