@@ -43,6 +43,7 @@ namespace kstd::streams {
         public:
         // clang-format on
         using out_type = std::decay_t<decltype(_sleeve(std::declval<supplier_type&>()))>;
+        using value_type = out_type;
         // clang-format off
 
         KSTD_DEFAULT_MOVE_COPY(Pipe, self, constexpr)

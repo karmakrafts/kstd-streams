@@ -27,13 +27,17 @@
 
 namespace kstd::streams {
     template<typename C>
-    [[nodiscard]] constexpr auto stream(C& container) noexcept -> decltype(auto) {
+    [[nodiscard]] constexpr auto stream(C& container) noexcept
+            -> IdentityPipe<ReferenceSupplier<typename C::iterator>,
+                            BasicPipe<ReferenceSupplier<typename C::iterator>>> {
         using supplier = ReferenceSupplier<typename C::iterator>;
         return IdentityPipe<supplier, BasicPipe<supplier>>(supplier(container.begin(), container.end()));
     }
 
     template<typename C>
-    [[nodiscard]] constexpr auto stream(const C& container) noexcept -> decltype(auto) {
+    [[nodiscard]] constexpr auto stream(const C& container) noexcept
+            -> IdentityPipe<ReferenceSupplier<typename C::const_iterator, true>,
+                            BasicPipe<ReferenceSupplier<typename C::const_iterator, true>>> {
         using supplier = ReferenceSupplier<typename C::const_iterator, true>;
         return IdentityPipe<supplier, BasicPipe<supplier>>(supplier(container.cbegin(), container.cend()));
     }

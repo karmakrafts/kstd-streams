@@ -29,6 +29,7 @@ namespace kstd::streams {
         using supplier_type = S;
         using in_type       = typename supplier_type::in_type;
         using out_type      = typename supplier_type::out_type;
+        using value_type    = out_type;
         using self          = BasicPipe<supplier_type>;
         // clang-format on
 
