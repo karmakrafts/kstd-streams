@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <functional>
 #include <kstd/defaults.hpp>
 #include <kstd/option.hpp>
 #include <type_traits>
@@ -41,10 +42,13 @@ namespace kstd::streams {
         sleeve_type _sleeve;
 
         public:
-        // clang-format on
+        // clang-format off
         using out_type = std::decay_t<decltype(_sleeve(std::declval<supplier_type&>()))>;
         using value_type = out_type;
-        // clang-format off
+        // clang-format on
+
+        static_assert(std::is_convertible_v<sleeve_type, std::function<Option<out_type>(supplier_type&)>>,
+                      "Sleeve signature doesn't match");
 
         KSTD_DEFAULT_MOVE_COPY(Pipe, self, constexpr)
 

@@ -25,17 +25,17 @@
 TEST(kstd_streams_IdentityPipe, TestGetNext) {
     std::vector<std::string> values({"Hello", "World", "OwO"});
     auto stream = kstd::streams::stream(values);
-    ASSERT_EQ(*stream.get_next(), "Hello");
-    ASSERT_EQ(*stream.get_next(), "World");
-    ASSERT_EQ(*stream.get_next(), "OwO");
-    ASSERT_FALSE(stream.get_next());
+    ASSERT_EQ(**stream, "Hello");
+    ASSERT_EQ(**stream, "World");
+    ASSERT_EQ(**stream, "OwO");
+    ASSERT_FALSE(*stream);
 }
 
 TEST(kstd_streams_IdentityPipe, TestGetNextConst) {
     const std::vector<std::string> values({"Hello", "World", "OwO"});
     auto stream = kstd::streams::stream(values);
-    ASSERT_EQ(*stream.get_next(), "Hello");
-    ASSERT_EQ(*stream.get_next(), "World");
-    ASSERT_EQ(*stream.get_next(), "OwO");
-    ASSERT_FALSE(stream.get_next());
+    ASSERT_EQ(**stream, "Hello");
+    ASSERT_EQ(**stream, "World");
+    ASSERT_EQ(**stream, "OwO");
+    ASSERT_FALSE(*stream);
 }
