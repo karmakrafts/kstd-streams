@@ -19,13 +19,13 @@
  */
 
 #include <gtest/gtest.h>
-#include <kstd/streams/val_supplier.hpp>
+#include <kstd/streams/value_supplier.hpp>
 
-TEST(kstd_streams_ValSupplier, TestGetNext) {
+TEST(kstd_streams_ValueSupplier, TestGetNext) {
     using namespace std::string_view_literals;
 
     std::vector<std::string> values({"Hello", "World", "!"});
-    kstd::streams::ValSupplier supplier(values.begin(), values.end());
+    kstd::streams::ValueSupplier supplier(values.begin(), values.end());
     kstd::usize index = 0;
 
     auto element = supplier.get_next();
@@ -39,7 +39,7 @@ TEST(kstd_streams_ValSupplier, TestGetNext) {
     }
 }
 
-TEST(kstd_streams_ValSupplier, TestGetNextPointer) {
+TEST(kstd_streams_ValueSupplier, TestGetNextPointer) {
     using namespace std::string_view_literals;
 
     std::vector<std::string> values({"Hello", "World", "!"});
@@ -50,7 +50,7 @@ TEST(kstd_streams_ValSupplier, TestGetNextPointer) {
         addresses[index] = &values[index];
     }
 
-    kstd::streams::ValSupplier supplier(addresses.begin(), addresses.end());
+    kstd::streams::ValueSupplier supplier(addresses.begin(), addresses.end());
     kstd::usize index = 0;
 
     auto element = supplier.get_next();

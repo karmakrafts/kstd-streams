@@ -19,17 +19,20 @@
 
 #pragma once
 
-#include <kstd/defaults.hpp>
-#include <kstd/option.hpp>
+#include "kstd/defaults.hpp"
+#include "kstd/option.hpp"
+#include <type_traits>
 
 namespace kstd::streams {
-    template<typename I>
-    struct ValSupplier final {
+    template<typename I, bool IS_CONST = false>
+    struct ReferenceSupplier final {
         // clang-format off
         using iterator      = I;
-        using self          = ValSupplier<iterator>;
         using value_type    = typename iterator::value_type;
-        using out_type      = value_type;
+        using in_type       = value_type;
+        using out_type      = std::conditional_t<std::is_reference_v<value_type>, value_type,
+                                std::conditional_t<IS_CONST, const value_type&, value_type&>>;
+        using self          = ReferenceSupplier<iterator, IS_CONST>;
         // clang-format on
 
         private:
@@ -37,14 +40,14 @@ namespace kstd::streams {
         iterator _end;
 
         public:
-        KSTD_DEFAULT_MOVE_COPY(ValSupplier, self, constexpr)
+        KSTD_DEFAULT_MOVE_COPY(ReferenceSupplier, self, constexpr)
 
-        constexpr ValSupplier(iterator begin, iterator end) noexcept :
+        explicit constexpr ReferenceSupplier(iterator begin, iterator end) noexcept :
                 _current(begin),
                 _end(end) {
         }
 
-        ~ValSupplier() noexcept = default;
+        ~ReferenceSupplier() noexcept = default;
 
         [[nodiscard]] constexpr auto get_next() noexcept -> Option<out_type> {
             if(_current == _end) {

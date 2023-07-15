@@ -14,44 +14,38 @@
 
 /**
  * @author Alexander Hinze
- * @since 12/07/2023
+ * @since 15/07/2023
  */
 
 #pragma once
 
-#include "kstd/defaults.hpp"
-#include "kstd/option.hpp"
-#include <type_traits>
+#include <kstd/defaults.hpp>
+#include <kstd/option.hpp>
 
 namespace kstd::streams {
-    template<typename I>
-    struct RefSupplier final {
+    template<typename S>
+    struct BasicPipe {
         // clang-format off
-        using iterator      = I;
-        using value_type    = typename iterator::value_type;
-        using out_type      = std::conditional_t<std::is_reference_v<value_type>, value_type, value_type&>;
-        using self          = RefSupplier<iterator>;
+        using supplier_type = S;
+        using in_type       = typename supplier_type::in_type;
+        using out_type      = typename supplier_type::out_type;
+        using self          = BasicPipe<supplier_type>;
         // clang-format on
 
-        private:
-        iterator _current;
-        iterator _end;
+        protected:
+        supplier_type _supplier;// NOLINT
 
         public:
-        KSTD_DEFAULT_MOVE_COPY(RefSupplier, self, constexpr)
+        KSTD_DEFAULT_MOVE_COPY(BasicPipe, self, constexpr);
 
-        RefSupplier(iterator begin, iterator end) noexcept :
-                _current(begin),
-                _end(end) {
+        BasicPipe(supplier_type supplier) noexcept :
+                _supplier(std::move(supplier)) {
         }
 
-        ~RefSupplier() noexcept = default;
+        ~BasicPipe() noexcept = default;
 
         [[nodiscard]] constexpr auto get_next() noexcept -> Option<out_type> {
-            if(_current == _end) {
-                return {};
-            }
-            return *(_current++);
+            return _supplier.get_next();
         }
     };
 }// namespace kstd::streams
