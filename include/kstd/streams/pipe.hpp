@@ -14,7 +14,7 @@
 
 /**
  * @author Alexander Hinze
- * @since 14/07/2023
+ * @since 17/07/2023
  */
 
 #pragma once
@@ -23,47 +23,38 @@
 #include <kstd/defaults.hpp>
 #include <kstd/option.hpp>
 #include <type_traits>
-#include <utility>
 
 namespace kstd::streams {
-    template<typename S, typename IMPL>
-    struct IdentityPipe;
-
-    template<typename S, typename T>
-    struct Pipe final : public IdentityPipe<S, Pipe<S, T>> {
+    template<typename PIPE, typename SLEEVE>
+    struct Pipe final {
         // clang-format off
-        using supplier_type     = S;
-        using sleeve_type       = T;
-        using in_type           = typename supplier_type::out_type;
-        using self              = Pipe<supplier_type, sleeve_type>;
+        using pipe_type     = PIPE;
+        using sleeve_type   = SLEEVE;
+        using self          = Pipe<pipe_type, sleeve_type>;
+        using value_type    = typename decltype(std::declval<sleeve_type&&>()(std::declval<pipe_type&>()))::value_type;
         // clang-format on
 
         private:
+        pipe_type _pipe;
         sleeve_type _sleeve;
 
         public:
-        // clang-format off
-        using out_type = std::decay_t<decltype(_sleeve(std::declval<supplier_type&>()))>;
-        using value_type = out_type;
-        // clang-format on
-
-        static_assert(std::is_convertible_v<sleeve_type, std::function<Option<out_type>(supplier_type&)>>,
-                      "Sleeve signature doesn't match");
-
         KSTD_DEFAULT_MOVE_COPY(Pipe, self, constexpr)
 
-        constexpr Pipe(supplier_type supplier, sleeve_type&& sleeve) noexcept :
-                IdentityPipe<supplier_type, self>(std::move(supplier)),
-                _sleeve(std::forward<sleeve_type>(sleeve)) {
+        constexpr Pipe() noexcept :
+                _pipe {},
+                _sleeve {} {
+        }
+
+        constexpr Pipe(pipe_type pipe, sleeve_type&& sleeve) noexcept :
+                _pipe {std::move(pipe)},
+                _sleeve {std::forward<sleeve_type>(sleeve)} {
         }
 
         ~Pipe() noexcept = default;
 
-        [[nodiscard]] constexpr auto get_next() noexcept -> Option<out_type> {
-            return _sleeve(this->_supplier);
+        [[nodiscard]] constexpr auto get_next() noexcept -> Option<value_type> {
+            return _sleeve(_pipe);
         }
     };
-
-    template<typename S, typename T>
-    Pipe(S, T&&) -> Pipe<S, T>;
 }// namespace kstd::streams

@@ -14,39 +14,42 @@
 
 /**
  * @author Alexander Hinze
- * @since 15/07/2023
+ * @since 17/07/2023
  */
 
 #pragma once
 
 #include <kstd/defaults.hpp>
 #include <kstd/option.hpp>
+#include <type_traits>
 
 namespace kstd::streams {
-    template<typename S>
-    struct BasicPipe {
+    template<typename SUPPLIER>
+    struct SupplierPipe final {
         // clang-format off
-        using supplier_type = S;
-        using in_type       = typename supplier_type::in_type;
-        using out_type      = typename supplier_type::out_type;
-        using value_type    = out_type;
-        using self          = BasicPipe<supplier_type>;
+        using supplier_type = SUPPLIER;
+        using self          = SupplierPipe<supplier_type>;
+        using value_type    = typename decltype(std::declval<supplier_type&&>()())::value_type;
         // clang-format on
 
-        protected:
-        supplier_type _supplier;// NOLINT
+        private:
+        supplier_type _supplier;
 
         public:
-        KSTD_DEFAULT_MOVE_COPY(BasicPipe, self, constexpr);
+        KSTD_DEFAULT_MOVE_COPY(SupplierPipe, self, constexpr)
 
-        BasicPipe(supplier_type supplier) noexcept :
-                _supplier(std::move(supplier)) {
+        constexpr SupplierPipe() noexcept :
+                _supplier {} {
         }
 
-        ~BasicPipe() noexcept = default;
+        explicit constexpr SupplierPipe(supplier_type&& supplier) noexcept :
+                _supplier(std::forward<supplier_type>(supplier)) {
+        }
 
-        [[nodiscard]] constexpr auto get_next() noexcept -> Option<out_type> {
-            return _supplier.get_next();
+        ~SupplierPipe() noexcept = default;
+
+        [[nodiscard]] constexpr auto get_next() noexcept -> Option<value_type> {
+            return _supplier();
         }
     };
 }// namespace kstd::streams
