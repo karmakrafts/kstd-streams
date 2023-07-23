@@ -74,22 +74,28 @@ namespace kstd::streams {
         }
     };
 
-    // clang-format off
-    static_assert(std::is_same_v<
-            typename BufferedPipe<IteratorPipe<typename std::vector<std::string>::iterator>,
-            decltype([](auto&) {})>::ValueType,
-            std::string&>);
-    static_assert(std::is_same_v<
-            typename BufferedPipe<IteratorPipe<typename std::vector<std::string>::const_iterator>,
-            decltype([](auto&) {})>::ValueType,
-            std::string&>);
-    static_assert(std::is_same_v<
-            typename BufferedPipe<IteratorPipe<typename std::vector<std::string*>::iterator>,
-            decltype([](auto&) {})>::ValueType,
+    namespace {
+        constexpr auto dummy_function = [](auto&) {};
+        // clang-format off
+        static_assert(std::is_same_v<
+                typename BufferedPipe<IteratorPipe<typename std::vector<std::string>::iterator>,
+                decltype(dummy_function)>::ValueType,
+                std::string&>);
+
+        static_assert(std::is_same_v<
+                typename BufferedPipe<IteratorPipe<typename std::vector<std::string>::const_iterator>,
+                decltype(dummy_function)>::ValueType,
+                std::string&>);
+
+        static_assert(std::is_same_v<
+                typename BufferedPipe<IteratorPipe<typename std::vector<std::string*>::iterator>,
+                decltype(dummy_function)>::ValueType,
+                std::string*>);
+
+        static_assert(std::is_same_v<
+                typename BufferedPipe<IteratorPipe<typename std::vector<std::string*>::const_iterator>,
+                decltype(dummy_function)>::ValueType,
             std::string*>);
-    static_assert(std::is_same_v<
-            typename BufferedPipe<IteratorPipe<typename std::vector<std::string*>::const_iterator>,
-            decltype([](auto&) {})>::ValueType,
-            std::string*>);
-    // clang-format on
+        // clang-format on
+    }// namespace
 }// namespace kstd::streams
