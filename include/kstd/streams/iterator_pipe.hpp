@@ -28,42 +28,42 @@ namespace kstd::streams {
         static constexpr bool is_const = std::is_const_v<std::remove_pointer_t<typename I::iterator_type>>;
 
         // clang-format off
-        using iterator      = I;
-        using self          = IteratorPipe<iterator>;
-        using value_type    = std::conditional_t<
-                                std::is_pointer_v<typename iterator::value_type>,
-                                typename iterator::value_type,
+        using Iterator      = I;
+        using Self          = IteratorPipe<Iterator>;
+        using ValueType     = std::conditional_t<
+                                std::is_pointer_v<typename Iterator::value_type>,
+                                typename Iterator::value_type,
                                 std::conditional_t<
                                     is_const,
-                                    const std::remove_cv_t<std::remove_reference_t<typename iterator::value_type>>&,
-                                    std::remove_cv_t<std::remove_reference_t<typename iterator::value_type>>&>>;
+                                    const std::remove_cv_t<std::remove_reference_t<typename Iterator::value_type>>&,
+                                    std::remove_cv_t<std::remove_reference_t<typename Iterator::value_type>>&>>;
         // clang-format on
 
         private:
-        iterator _current;
-        iterator _end;
+        Iterator _current;
+        Iterator _end;
 
         public:
-        KSTD_DEFAULT_MOVE_COPY(IteratorPipe, self, constexpr)
+        KSTD_DEFAULT_MOVE_COPY(IteratorPipe, Self, constexpr)
 
         constexpr IteratorPipe() noexcept :
                 _current {},
                 _end {} {
         }
 
-        constexpr IteratorPipe(iterator begin, iterator end) noexcept :
+        constexpr IteratorPipe(Iterator begin, Iterator end) noexcept :
                 _current {begin},
                 _end {end} {
         }
 
         ~IteratorPipe() noexcept = default;
 
-        [[nodiscard]] constexpr auto get_next() noexcept -> Option<value_type> {
+        [[nodiscard]] constexpr auto get_next() noexcept -> Option<ValueType> {
             if(_current == _end) {
                 return {};
             }
             if constexpr(is_const) {
-                value_type result = *_current;
+                ValueType result = *_current;
                 _current = std::next(_current);
                 return result;
             }
@@ -73,16 +73,16 @@ namespace kstd::streams {
         }
     };
 
-    static_assert(std::is_same_v<typename IteratorPipe<typename std::vector<std::string>::iterator>::value_type,
+    static_assert(std::is_same_v<typename IteratorPipe<typename std::vector<std::string>::iterator>::ValueType,
                                  std::string&>);
     static_assert(!IteratorPipe<typename std::vector<std::string>::iterator>::is_const);
-    static_assert(std::is_same_v<typename IteratorPipe<typename std::vector<std::string>::const_iterator>::value_type,
+    static_assert(std::is_same_v<typename IteratorPipe<typename std::vector<std::string>::const_iterator>::ValueType,
                                  const std::string&>);
     static_assert(IteratorPipe<typename std::vector<std::string>::const_iterator>::is_const);
-    static_assert(std::is_same_v<typename IteratorPipe<typename std::vector<std::string*>::iterator>::value_type,
+    static_assert(std::is_same_v<typename IteratorPipe<typename std::vector<std::string*>::iterator>::ValueType,
                                  std::string*>);
     static_assert(!IteratorPipe<typename std::vector<std::string*>::iterator>::is_const);
-    static_assert(std::is_same_v<typename IteratorPipe<typename std::vector<std::string*>::const_iterator>::value_type,
+    static_assert(std::is_same_v<typename IteratorPipe<typename std::vector<std::string*>::const_iterator>::ValueType,
                                  std::string*>);
     static_assert(IteratorPipe<typename std::vector<std::string*>::const_iterator>::is_const);
 }// namespace kstd::streams

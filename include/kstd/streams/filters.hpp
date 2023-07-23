@@ -24,9 +24,9 @@
 
 namespace kstd::streams::filters {
     constexpr auto non_zero = [](auto value) noexcept -> bool {
-        using type = decltype(value);
-        static_assert(std::is_integral_v<type> || std::is_floating_point_v<type>);
-        return value != static_cast<type>(0);
+        using Type = decltype(value);
+        static_assert(std::is_integral_v<Type> || std::is_floating_point_v<Type>);
+        return value != static_cast<Type>(0);
     };
 
     constexpr auto non_null = [](auto value) noexcept -> bool {

@@ -31,32 +31,32 @@ namespace kstd::streams {
     template<typename PIPE, typename CALLBACK>
     struct BufferedPipe final {
         // clang-format off
-        using pipe_type             = PIPE;
-        using callback_type         = CALLBACK;
-        using self                  = BufferedPipe<pipe_type, callback_type>;
-        using buffer_type           = std::vector<
-                                        std::remove_cv_t<std::remove_reference_t<typename pipe_type::value_type>>>;
-        using delegate_iterator     = typename buffer_type::iterator;
-        using delegate_pipe_type    = IteratorPipe<delegate_iterator>;
-        using value_type            = typename delegate_pipe_type::value_type;
+        using PipeType          = PIPE;
+        using CallbackType      = CALLBACK;
+        using Self              = BufferedPipe<PipeType, CallbackType>;
+        using BufferType        = std::vector<
+                                    std::remove_cv_t<std::remove_reference_t<typename PipeType::ValueType>>>;
+        using DelegateIterator  = typename BufferType::iterator;
+        using DelegatePipeType  = IteratorPipe<DelegateIterator>;
+        using ValueType         = typename DelegatePipeType::ValueType;
         // clang-format on
 
-        static_assert(std::is_convertible_v<callback_type, std::function<void(buffer_type&)>>,
+        static_assert(std::is_convertible_v<CallbackType, std::function<void(BufferType&)>>,
                       "Callback signature does not match");
 
         private:
-        buffer_type _buffer;
-        delegate_pipe_type _pipe;
+        BufferType _buffer;
+        DelegatePipeType _pipe;
 
         public:
-        KSTD_DEFAULT_MOVE_COPY(BufferedPipe, self, constexpr)
+        KSTD_DEFAULT_MOVE_COPY(BufferedPipe, Self, constexpr)
 
         constexpr BufferedPipe() noexcept :
                 _buffer {},
                 _pipe {} {
         }
 
-        constexpr BufferedPipe(pipe_type pipe, callback_type&& callback) noexcept :
+        constexpr BufferedPipe(PipeType pipe, CallbackType&& callback) noexcept :
                 _buffer {} {
             auto element = pipe.get_next();
             while(element) {
@@ -64,12 +64,12 @@ namespace kstd::streams {
                 element = pipe.get_next();
             }
             callback(_buffer);
-            _pipe = delegate_pipe_type {_buffer.begin(), _buffer.end()};
+            _pipe = DelegatePipeType {_buffer.begin(), _buffer.end()};
         }
 
         ~BufferedPipe() noexcept = default;
 
-        [[nodiscard]] constexpr auto get_next() noexcept -> Option<value_type> {
+        [[nodiscard]] constexpr auto get_next() noexcept -> Option<ValueType> {
             return _pipe.get_next();
         }
     };
@@ -77,19 +77,19 @@ namespace kstd::streams {
     // clang-format off
     static_assert(std::is_same_v<
             typename BufferedPipe<IteratorPipe<typename std::vector<std::string>::iterator>,
-            decltype([](auto&) {})>::value_type,
+            decltype([](auto&) {})>::ValueType,
             std::string&>);
     static_assert(std::is_same_v<
             typename BufferedPipe<IteratorPipe<typename std::vector<std::string>::const_iterator>,
-            decltype([](auto&) {})>::value_type,
+            decltype([](auto&) {})>::ValueType,
             std::string&>);
     static_assert(std::is_same_v<
             typename BufferedPipe<IteratorPipe<typename std::vector<std::string*>::iterator>,
-            decltype([](auto&) {})>::value_type,
+            decltype([](auto&) {})>::ValueType,
             std::string*>);
     static_assert(std::is_same_v<
             typename BufferedPipe<IteratorPipe<typename std::vector<std::string*>::const_iterator>,
-            decltype([](auto&) {})>::value_type,
+            decltype([](auto&) {})>::ValueType,
             std::string*>);
     // clang-format on
 }// namespace kstd::streams

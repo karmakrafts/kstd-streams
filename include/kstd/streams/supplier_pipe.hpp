@@ -27,28 +27,28 @@ namespace kstd::streams {
     template<typename SUPPLIER>
     struct SupplierPipe final {
         // clang-format off
-        using supplier_type = SUPPLIER;
-        using self          = SupplierPipe<supplier_type>;
-        using value_type    = typename decltype(std::declval<supplier_type&&>()())::value_type;
+        using SupplierType  = SUPPLIER;
+        using Self          = SupplierPipe<SupplierType>;
+        using ValueType     = typename decltype(std::declval<SupplierType&&>()())::value_type;
         // clang-format on
 
         private:
-        supplier_type _supplier;
+        SupplierType _supplier;
 
         public:
-        KSTD_DEFAULT_MOVE_COPY(SupplierPipe, self, constexpr)
+        KSTD_DEFAULT_MOVE_COPY(SupplierPipe, Self, constexpr)
 
         constexpr SupplierPipe() noexcept :
                 _supplier {} {
         }
 
-        explicit constexpr SupplierPipe(supplier_type&& supplier) noexcept :
-                _supplier(std::forward<supplier_type>(supplier)) {
+        explicit constexpr SupplierPipe(SupplierType&& supplier) noexcept :
+                _supplier(std::forward<SupplierType>(supplier)) {
         }
 
         ~SupplierPipe() noexcept = default;
 
-        [[nodiscard]] constexpr auto get_next() noexcept -> Option<value_type> {
+        [[nodiscard]] constexpr auto get_next() noexcept -> Option<ValueType> {
             return _supplier();
         }
     };

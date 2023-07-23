@@ -28,32 +28,32 @@ namespace kstd::streams {
     template<typename PIPE, typename SLEEVE>
     struct Pipe final {
         // clang-format off
-        using pipe_type     = PIPE;
-        using sleeve_type   = SLEEVE;
-        using self          = Pipe<pipe_type, sleeve_type>;
-        using value_type    = typename decltype(std::declval<sleeve_type&&>()(std::declval<pipe_type&>()))::value_type;
+        using PipeType      = PIPE;
+        using SleeveType    = SLEEVE;
+        using Self          = Pipe<PipeType, SleeveType>;
+        using ValueType     = typename decltype(std::declval<SleeveType&&>()(std::declval<PipeType&>()))::ValueType;
         // clang-format on
 
         private:
-        pipe_type _pipe;
-        sleeve_type _sleeve;
+        PipeType _pipe;
+        SleeveType _sleeve;
 
         public:
-        KSTD_DEFAULT_MOVE_COPY(Pipe, self, constexpr)
+        KSTD_DEFAULT_MOVE_COPY(Pipe, Self, constexpr)
 
         constexpr Pipe() noexcept :
                 _pipe {},
                 _sleeve {} {
         }
 
-        constexpr Pipe(pipe_type pipe, sleeve_type&& sleeve) noexcept :
+        constexpr Pipe(PipeType pipe, SleeveType&& sleeve) noexcept :
                 _pipe {std::move(pipe)},
-                _sleeve {std::forward<sleeve_type>(sleeve)} {
+                _sleeve {std::forward<SleeveType>(sleeve)} {
         }
 
         ~Pipe() noexcept = default;
 
-        [[nodiscard]] constexpr auto get_next() noexcept -> Option<value_type> {
+        [[nodiscard]] constexpr auto get_next() noexcept -> Option<ValueType> {
             return _sleeve(_pipe);
         }
     };
