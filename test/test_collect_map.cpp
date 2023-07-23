@@ -22,6 +22,7 @@
 #include <kstd/tuple.hpp>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 TEST(kstd_streams_Stream, TestCollectMapValue) {
     using namespace kstd::streams;

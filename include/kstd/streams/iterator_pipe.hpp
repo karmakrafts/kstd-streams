@@ -25,8 +25,6 @@
 namespace kstd::streams {
     template<typename I>
     struct IteratorPipe final {
-        static constexpr bool is_const = std::is_const_v<std::remove_pointer_t<typename I::iterator_type>>;
-
         // clang-format off
         using Iterator      = I;
         using Self          = IteratorPipe<Iterator>;
@@ -34,7 +32,7 @@ namespace kstd::streams {
                                 std::is_pointer_v<typename Iterator::value_type>,
                                 typename Iterator::value_type,
                                 std::conditional_t<
-                                    is_const,
+                                    std::is_const_v<std::remove_pointer_t<typename I::iterator_type>>,
                                     const std::remove_cv_t<std::remove_reference_t<typename Iterator::value_type>>&,
                                     std::remove_cv_t<std::remove_reference_t<typename Iterator::value_type>>&>>;
         // clang-format on
@@ -62,7 +60,7 @@ namespace kstd::streams {
             if(_current == _end) {
                 return {};
             }
-            if constexpr(is_const) {
+            if constexpr(std::is_const_v<std::remove_pointer_t<typename I::iterator_type>>) {
                 ValueType result = *_current;
                 _current = std::next(_current);
                 return result;
@@ -75,14 +73,10 @@ namespace kstd::streams {
 
     static_assert(std::is_same_v<typename IteratorPipe<typename std::vector<std::string>::iterator>::ValueType,
                                  std::string&>);
-    static_assert(!IteratorPipe<typename std::vector<std::string>::iterator>::is_const);
     static_assert(std::is_same_v<typename IteratorPipe<typename std::vector<std::string>::const_iterator>::ValueType,
                                  const std::string&>);
-    static_assert(IteratorPipe<typename std::vector<std::string>::const_iterator>::is_const);
     static_assert(std::is_same_v<typename IteratorPipe<typename std::vector<std::string*>::iterator>::ValueType,
                                  std::string*>);
-    static_assert(!IteratorPipe<typename std::vector<std::string*>::iterator>::is_const);
     static_assert(std::is_same_v<typename IteratorPipe<typename std::vector<std::string*>::const_iterator>::ValueType,
                                  std::string*>);
-    static_assert(IteratorPipe<typename std::vector<std::string*>::const_iterator>::is_const);
 }// namespace kstd::streams
