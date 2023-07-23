@@ -32,7 +32,7 @@ namespace kstd::streams {
                                 std::is_pointer_v<typename Iterator::value_type>,
                                 typename Iterator::value_type,
                                 std::conditional_t<
-                                    std::is_const_v<std::remove_pointer_t<typename I::iterator_type>>,
+                                    std::is_const_v<std::remove_pointer_t<typename I::pointer>>,
                                     const std::remove_cv_t<std::remove_reference_t<typename Iterator::value_type>>&,
                                     std::remove_cv_t<std::remove_reference_t<typename Iterator::value_type>>&>>;
         // clang-format on
@@ -60,7 +60,7 @@ namespace kstd::streams {
             if(_current == _end) {
                 return {};
             }
-            if constexpr(std::is_const_v<std::remove_pointer_t<typename I::iterator_type>>) {
+            if constexpr(std::is_const_v<std::remove_pointer_t<typename I::pointer>>) {
                 ValueType result = *_current;
                 _current = std::next(_current);
                 return result;
