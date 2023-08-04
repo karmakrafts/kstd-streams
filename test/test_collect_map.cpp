@@ -21,10 +21,10 @@
 #include <kstd/streams/stream.hpp>
 #include <kstd/tuple.hpp>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
-TEST(kstd_streams_Stream, TestCollectMapValue) {
+TEST(kstd_streams_Stream, test_collect_map_value) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 
@@ -51,7 +51,7 @@ TEST(kstd_streams_Stream, TestCollectMapValue) {
     }
 }
 
-TEST(kstd_streams_Stream, TestCollectMapPointer) {
+TEST(kstd_streams_Stream, test_collect_map_pointer) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 
@@ -83,7 +83,7 @@ TEST(kstd_streams_Stream, TestCollectMapPointer) {
     }
 }
 
-TEST(kstd_streams_Stream, TestCollectMapConstPointer) {
+TEST(kstd_streams_Stream, test_collect_map_const_pointer) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 

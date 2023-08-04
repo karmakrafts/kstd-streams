@@ -14,34 +14,33 @@
 
 /**
  * @author Alexander Hinze
- * @since 23/07/2023
+ * @since 24/07/2023
  */
 
 #include <gtest/gtest.h>
 #include <kstd/streams/stream.hpp>
 #include <vector>
 
-TEST(kstd_streams_Stream, test_sort_value) {
+TEST(kstd_streams_Stream, TestSumValue) {
     using namespace kstd::streams;
 
-    const std::vector<kstd::u32> values {4, 5, 6, 1, 3, 2, 8, 7, 0, 9};
+    const std::vector<kstd::u32> values {1, 2, 3, 4, 5, 6, 7, 8, 9, 0};
     const auto num_values = values.size();
-    // clang-format off
-    const auto sorted_values = stream(values)
-        .sort()
-        .collect<std::vector>(collectors::push_back);
-    // clang-format on
-    ASSERT_EQ(sorted_values.size(), num_values);
+
+    const auto sum = stream(values).sum();
+    kstd::u32 expected_sum = 0;
 
     for(kstd::usize index = 0; index < num_values; ++index) {
-        ASSERT_EQ(sorted_values[index], index);
+        expected_sum += values[index];
     }
+
+    ASSERT_EQ(sum, expected_sum);
 }
 
-TEST(kstd_streams_Stream, test_sort_pointer) {
+TEST(kstd_streams_Stream, TestSumPointer) {
     using namespace kstd::streams;
 
-    std::vector<kstd::u32> values {4, 5, 6, 1, 3, 2, 8, 7, 0, 9};
+    std::vector<kstd::u32> values {1, 2, 3, 4, 5, 6, 7, 8, 9, 0};
     std::vector<kstd::u32*> addresses {};
 
     for(auto& value : values) {
@@ -49,22 +48,20 @@ TEST(kstd_streams_Stream, test_sort_pointer) {
     }
 
     const auto num_values = addresses.size();
-    // clang-format off
-    const auto sorted_values = stream(addresses)
-        .sort(comparators::deref_less_than)
-        .collect<std::vector>(collectors::push_back);
-    // clang-format on
-    ASSERT_EQ(sorted_values.size(), num_values);
+    const auto sum = stream(addresses).map(mappers::dereference).sum();
+    kstd::u32 expected_sum = 0;
 
     for(kstd::usize index = 0; index < num_values; ++index) {
-        ASSERT_EQ(*sorted_values[index], index);
+        expected_sum += values[index];
     }
+
+    ASSERT_EQ(sum, expected_sum);
 }
 
-TEST(kstd_streams_Stream, test_sort_const_pointer) {
+TEST(kstd_streams_Stream, TestSumConstPointer) {
     using namespace kstd::streams;
 
-    std::vector<kstd::u32> values {4, 5, 6, 1, 3, 2, 8, 7, 0, 9};
+    std::vector<kstd::u32> values {1, 2, 3, 4, 5, 6, 7, 8, 9, 0};
     std::vector<const kstd::u32*> addresses {};
 
     for(const auto& value : values) {
@@ -72,14 +69,12 @@ TEST(kstd_streams_Stream, test_sort_const_pointer) {
     }
 
     const auto num_values = addresses.size();
-    // clang-format off
-    const auto sorted_values = stream(addresses)
-        .sort(comparators::deref_less_than)
-        .collect<std::vector>(collectors::push_back);
-    // clang-format on
-    ASSERT_EQ(sorted_values.size(), num_values);
+    const auto sum = stream(addresses).map(mappers::dereference).sum();
+    kstd::u32 expected_sum = 0;
 
     for(kstd::usize index = 0; index < num_values; ++index) {
-        ASSERT_EQ(*sorted_values[index], index);
+        expected_sum += values[index];
     }
+
+    ASSERT_EQ(sum, expected_sum);
 }

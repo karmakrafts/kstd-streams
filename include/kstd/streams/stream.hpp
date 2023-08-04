@@ -22,6 +22,8 @@
 #include <algorithm>
 #include <kstd/defaults.hpp>
 #include <kstd/option.hpp>
+#include <kstd/pack.hpp>
+#include <unordered_set>
 
 #include "buffered_pipe.hpp"
 #include "iterator_pipe.hpp"
@@ -32,14 +34,16 @@
 #include "comparators.hpp"
 #include "filters.hpp"
 #include "mappers.hpp"
+#include "reducers.hpp"
 
 namespace kstd::streams {
     template<typename PIPE>
     struct Stream final {
         // clang-format off
-        using PipeType  = PIPE;
-        using ValueType = typename PipeType::ValueType;
-        using Self      = Stream<PipeType>;
+        using PipeType          = PIPE;
+        using ValueType         = typename PipeType::ValueType;
+        using NakedValueType    = std::remove_cv_t<std::remove_reference_t<ValueType>>;
+        using Self              = Stream<PipeType>;
         // clang-format on
 
         private:
@@ -86,14 +90,36 @@ namespace kstd::streams {
         }
 
         template<typename F>
-        [[nodiscard]] constexpr auto make_sort_callback(F&& comparator) noexcept -> decltype(auto) {
+        [[nodiscard]] constexpr auto make_sort_callback(F&& comparator) noexcept -> decltype(auto) {// NOLINT
             return [&comparator](auto& buffer) noexcept -> void {
                 std::sort(buffer.begin(), buffer.end(), std::forward<F>(comparator));
             };
         }
 
+        [[nodiscard]] constexpr auto make_reverse_sort_callback() noexcept -> decltype(auto) {
+            return [](auto& buffer) noexcept -> void {
+                std::sort(buffer.rbegin(), buffer.rend());
+            };
+        }
+
+        template<typename F>
+        [[nodiscard]] constexpr auto make_reverse_sort_callback(F&& comparator) noexcept -> decltype(auto) {// NOLINT
+            return [&comparator](auto& buffer) noexcept -> void {
+                std::sort(buffer.rbegin(), buffer.rend(), std::forward<F>(comparator));
+            };
+        }
+
+        [[nodiscard]] constexpr auto make_distinct_callback() noexcept -> decltype(auto) {
+            return [](auto& buffer) noexcept -> void {
+                using Buffer = std::remove_reference_t<decltype(buffer)>;
+                using Type = std::decay_t<typename Buffer::value_type>;
+                const std::unordered_set<Type> elements {buffer.cbegin(), buffer.cend()};
+                buffer = {elements.cbegin(), elements.cend()};
+            };
+        }
+
         public:
-        KSTD_NO_MOVE_COPY(Stream, Self, constexpr)
+        KSTD_NO_MOVE_COPY(Stream, Self, constexpr)// Streams are temporary only
 
         explicit constexpr Stream(PipeType pipe) noexcept :
                 _pipe {std::move(pipe)} {
@@ -117,10 +143,18 @@ namespace kstd::streams {
             return Stream<Pipe> {Pipe {std::move(_pipe), std::move(sleeve)}};
         }
 
+        [[nodiscard]] constexpr auto deref_all() noexcept -> decltype(auto) {
+            return map(mappers::dereference);
+        }
+
+        [[nodiscard]] constexpr auto address_of_all() noexcept -> decltype(auto) {
+            return map(mappers::address_of);
+        }
+
         template<typename F>
         [[nodiscard]] constexpr auto filter(F&& predicate) noexcept
                 -> Stream<Pipe<PipeType, decltype(make_filter_sleeve(std::forward<F>(predicate)))>> {
-            static_assert(std::is_convertible_v<F, std::function<bool(ValueType&)>>,
+            static_assert(std::is_convertible_v<F, std::function<bool(ValueType)>>,
                           "Predicate signature does not match");
             auto sleeve = make_filter_sleeve(std::forward<F>(predicate));
             using Pipe = Pipe<PipeType, decltype(sleeve)>;
@@ -130,6 +164,8 @@ namespace kstd::streams {
         template<typename F>
         [[nodiscard]] constexpr auto peek(F&& function) noexcept
                 -> Stream<Pipe<PipeType, decltype(make_peek_sleeve(std::forward<F>(function)))>> {
+            static_assert(std::is_convertible_v<F, std::function<void(ValueType)>>,
+                          "Function signature does not match");
             auto sleeve = make_peek_sleeve(std::forward<F>(function));
             using Pipe = Pipe<PipeType, decltype(sleeve)>;
             return Stream<Pipe> {Pipe {std::move(_pipe), std::move(sleeve)}};
@@ -150,6 +186,94 @@ namespace kstd::streams {
             }
         }
 
+        template<typename F>
+        [[nodiscard]] constexpr auto reduce(F&& function, NakedValueType value = NakedValueType {}) noexcept
+                -> NakedValueType {
+            auto element = get_next();
+            while(element) {
+                value = function(value, *element);
+                element = get_next();
+            }
+            return value;
+        }
+
+        [[nodiscard]] constexpr auto distinct() noexcept
+                -> Stream<BufferedPipe<PipeType, decltype(make_distinct_callback())>> {
+            auto callback = make_distinct_callback();
+            using Pipe = BufferedPipe<PipeType, decltype(callback)>;
+            return Stream<Pipe> {Pipe {std::move(_pipe), std::move(callback)}};
+        }
+
+        [[nodiscard]] constexpr auto distinct_by_address() noexcept -> decltype(auto) {
+            return map(mappers::address_of).distinct().map(mappers::dereference);
+        }
+
+        [[nodiscard]] constexpr auto distinct_by_value() noexcept -> decltype(auto) {
+            return map(mappers::dereference).distinct().map(mappers::address_of);
+        }
+
+        [[nodiscard]] constexpr auto sum() noexcept -> decltype(auto) {
+            return reduce(reducers::add);
+        }
+
+        [[nodiscard]] constexpr auto count() noexcept -> usize {
+            usize count = 0;
+            auto element = get_next();
+            while(element) {
+                ++count;
+                element = get_next();
+            }
+            return count;
+        }
+
+        template<typename F>
+        [[nodiscard]] constexpr auto index_of(F&& predicate) noexcept -> usize {
+            usize index = 0;
+            auto element = get_next();
+            while(element && !predicate(*element)) {
+                ++index;
+                element = get_next();
+            }
+            return index;
+        }
+
+        template<typename F>
+        [[nodiscard]] constexpr auto index_of_last(F&& predicate) noexcept -> usize {
+            usize index = 0;
+            usize result = 0;
+            auto element = get_next();
+            while(element) {
+                ++index;
+                if(predicate(*element)) {
+                    result = index;
+                }
+                element = get_next();
+            }
+            return result;
+        }
+
+        template<typename F>
+        [[nodiscard]] constexpr auto find(F&& predicate) noexcept -> Option<ValueType> {
+            auto element = get_next();
+            while(element && !predicate(*element)) {
+                element = get_next();
+            }
+            return element;
+        }
+
+        template<typename F>
+        [[nodiscard]] constexpr auto find_last(F&& predicate) noexcept -> Option<ValueType> {
+            auto element = get_next();
+            Option<ValueType> result {};
+            while(element) {
+                if(predicate(*element)) {
+                    result = std::move(element);
+                }
+                element = get_next();
+            }
+            return result;
+        }
+
         [[nodiscard]] constexpr auto sort() noexcept -> Stream<BufferedPipe<PipeType, decltype(make_sort_callback())>> {
             auto callback = make_sort_callback();
             using Pipe = BufferedPipe<PipeType, decltype(callback)>;
@@ -164,18 +288,37 @@ namespace kstd::streams {
             return Stream<Pipe> {Pipe {std::move(_pipe), std::move(callback)}};
         }
 
-        template<template<typename, typename...> typename CONTAINER, typename COLLECTOR>
-        [[nodiscard]] constexpr auto collect(COLLECTOR&& collector) noexcept
-                -> CONTAINER<std::remove_cv_t<std::remove_reference_t<ValueType>>> {
-            CONTAINER<std::remove_cv_t<std::remove_reference_t<ValueType>>> result {};
+        [[nodiscard]] constexpr auto reverse_sort() noexcept
+                -> Stream<BufferedPipe<PipeType, decltype(make_reverse_sort_callback())>> {
+            auto callback = make_reverse_sort_callback();
+            using Pipe = BufferedPipe<PipeType, decltype(callback)>;
+            return Stream<Pipe> {Pipe {std::move(_pipe), std::move(callback)}};
+        }
+
+        template<typename F>
+        [[nodiscard]] constexpr auto reverse_sort(F&& comparator) noexcept
+                -> Stream<BufferedPipe<PipeType, decltype(make_reverse_sort_callback(std::forward<F>(comparator)))>> {
+            auto callback = make_reverse_sort_callback(std::forward<F>(comparator));
+            using Pipe = BufferedPipe<PipeType, decltype(callback)>;
+            return Stream<Pipe> {Pipe {std::move(_pipe), std::move(callback)}};
+        }
+
+        template<template<typename, typename...> typename CONTAINER, typename... PROPS, typename COLLECTOR,
+                 typename... ARGS>
+        [[nodiscard]] constexpr auto collect(COLLECTOR&& collector, ARGS&&... args) noexcept
+                -> CONTAINER<std::remove_cv_t<std::remove_reference_t<ValueType>>, PROPS...> {
+            CONTAINER<std::remove_cv_t<std::remove_reference_t<ValueType>>, PROPS...> result {
+                    std::forward<ARGS>(args)...};
             collector(*this, result);
             return result;
         }
 
-        template<template<typename, typename, typename...> typename MAP, typename KM, typename VM>
-        [[nodiscard]] constexpr auto collect_map(KM&& key_mapper, VM&& value_mapper) noexcept
-                -> MAP<std::invoke_result_t<KM, ValueType&>, std::invoke_result_t<VM, ValueType&>> {
-            MAP<std::invoke_result_t<KM, ValueType&>, std::invoke_result_t<VM, ValueType&>> result {};
+        template<template<typename, typename, typename...> typename MAP, typename... PROPS, typename KM, typename VM,
+                 typename... ARGS>
+        [[nodiscard]] constexpr auto collect_map(KM&& key_mapper, VM&& value_mapper, ARGS&&... args) noexcept
+                -> MAP<std::invoke_result_t<KM, ValueType&>, std::invoke_result_t<VM, ValueType&>, PROPS...> {
+            MAP<std::invoke_result_t<KM, ValueType&>, std::invoke_result_t<VM, ValueType&>, PROPS...> result {
+                    std::forward<ARGS>(args)...};
             auto element = get_next();
             while(element) {
                 auto& value = *element;
@@ -192,23 +335,33 @@ namespace kstd::streams {
         return Stream<Pipe> {Pipe {begin, end}};
     }
 
+    template<typename SUPPLIER>
+    [[nodiscard]] constexpr auto stream(SUPPLIER&& supplier) noexcept -> Stream<SupplierPipe<SUPPLIER>> {
+        using Pipe = SupplierPipe<SUPPLIER>;
+        return Stream<Pipe> {Pipe {std::forward<SUPPLIER>(supplier)}};
+    }
+
     template<typename CONTAINER>
     [[nodiscard]] constexpr auto stream(CONTAINER& container) noexcept
             -> Stream<IteratorPipe<typename CONTAINER::iterator>> {
-        using Pipe = IteratorPipe<typename CONTAINER::iterator>;
-        return Stream<Pipe> {Pipe {container.begin(), container.end()}};
+        return stream<typename CONTAINER::iterator>(container.begin(), container.end());
     }
 
     template<typename CONTAINER>
     [[nodiscard]] constexpr auto stream(const CONTAINER& container) noexcept
             -> Stream<IteratorPipe<typename CONTAINER::const_iterator>> {
-        using Pipe = IteratorPipe<typename CONTAINER::const_iterator>;
-        return Stream<Pipe> {Pipe {container.cbegin(), container.cend()}};
+        return stream<typename CONTAINER::const_iterator>(container.cbegin(), container.cend());
     }
 
-    template<typename SUPPLIER>
-    [[nodiscard]] constexpr auto stream(SUPPLIER&& supplier) noexcept -> Stream<SupplierPipe<SUPPLIER>> {
-        using Pipe = SupplierPipe<SUPPLIER>;
-        return Stream<Pipe> {Pipe {std::forward<SUPPLIER>(supplier)}};
+    template<typename CONTAINER>
+    [[nodiscard]] constexpr auto reverse_stream(CONTAINER& container) noexcept
+            -> Stream<IteratorPipe<typename CONTAINER::reverse_iterator>> {
+        return stream<typename CONTAINER::reverse_iterator>(container.rbegin(), container.rend());
+    }
+
+    template<typename CONTAINER>
+    [[nodiscard]] constexpr auto reverse_stream(const CONTAINER& container) noexcept
+            -> Stream<IteratorPipe<typename CONTAINER::const_reverse_iterator>> {
+        return stream<typename CONTAINER::const_reverse_iterator>(container.crbegin(), container.crend());
     }
 }// namespace kstd::streams

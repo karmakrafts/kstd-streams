@@ -23,16 +23,16 @@
 #include <kstd/option.hpp>
 
 namespace kstd::streams {
-    template<typename I>
+    template<typename ITERATOR>
     struct IteratorPipe final {
         // clang-format off
-        using Iterator      = I;
+        using Iterator      = ITERATOR;
         using Self          = IteratorPipe<Iterator>;
         using ValueType     = std::conditional_t<
                                 std::is_pointer_v<typename Iterator::value_type>,
                                 typename Iterator::value_type,
                                 std::conditional_t<
-                                    std::is_const_v<std::remove_pointer_t<typename I::pointer>>,
+                                    std::is_const_v<std::remove_pointer_t<typename Iterator::pointer>>,
                                     const std::remove_cv_t<std::remove_reference_t<typename Iterator::value_type>>&,
                                     std::remove_cv_t<std::remove_reference_t<typename Iterator::value_type>>&>>;
         // clang-format on
@@ -60,7 +60,7 @@ namespace kstd::streams {
             if(_current == _end) {
                 return {};
             }
-            if constexpr(std::is_const_v<std::remove_pointer_t<typename I::pointer>>) {
+            if constexpr(std::is_const_v<std::remove_pointer_t<typename Iterator::pointer>>) {
                 ValueType result = *_current;
                 _current = std::next(_current);
                 return result;

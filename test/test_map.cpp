@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-TEST(kstd_streams_Stream, TestMapValue) {
+TEST(kstd_streams_Stream, test_map_value) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 
@@ -44,7 +44,7 @@ TEST(kstd_streams_Stream, TestMapValue) {
     }
 }
 
-TEST(kstd_streams_Stream, TestMapPointer) {
+TEST(kstd_streams_Stream, test_map_pointer) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 
@@ -71,7 +71,7 @@ TEST(kstd_streams_Stream, TestMapPointer) {
     }
 }
 
-TEST(kstd_streams_Stream, TestMapConstPointer) {
+TEST(kstd_streams_Stream, test_map_const_pointer) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 

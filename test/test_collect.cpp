@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-TEST(kstd_streams_Stream, TestCollectValue) {
+TEST(kstd_streams_Stream, test_collect_value) {
     using namespace kstd::streams;
 
     const std::vector<std::string> values {"Hello", "World", "OwO"};
@@ -35,7 +35,7 @@ TEST(kstd_streams_Stream, TestCollectValue) {
     }
 }
 
-TEST(kstd_streams_Stream, TestCollectPointer) {
+TEST(kstd_streams_Stream, test_collect_pointer) {
     using namespace kstd::streams;
 
     std::vector<std::string> values {"Hello", "World", "OwO"};
@@ -54,7 +54,7 @@ TEST(kstd_streams_Stream, TestCollectPointer) {
     }
 }
 
-TEST(kstd_streams_Stream, TestCollectConstPointer) {
+TEST(kstd_streams_Stream, test_collect_const_pointer) {
     using namespace kstd::streams;
 
     std::vector<std::string> values {"Hello", "World", "OwO"};
@@ -71,4 +71,27 @@ TEST(kstd_streams_Stream, TestCollectConstPointer) {
     for(kstd::usize index = 0; index < num_values; ++index) {
         ASSERT_EQ(values[index], *cloned_values[index]);
     }
+}
+
+TEST(kstd_streams_Stream, test_collect_string) {
+    using namespace kstd::streams;
+
+    const std::vector<char> values {'O', 'w', 'O', '!'};
+    const auto value = stream(values).collect<std::basic_string>(collectors::plus_assign);
+    const auto num_values = values.size();
+    ASSERT_EQ(num_values, value.length());
+
+    for(kstd::usize index = 0; index < num_values; ++index) {
+        ASSERT_EQ(values[index], value[index]);
+    }
+}
+
+TEST(kstd_streams_Stream, test_collect_string_joining) {
+    using namespace kstd::streams;
+
+    const std::vector<char> values {'O', 'w', 'O', '!'};
+    const auto value = stream(values).collect<std::basic_string>(collectors::joining('\t'));
+    const auto num_values = values.size();
+    ASSERT_EQ((num_values << 1) - 1, value.length());
+    ASSERT_EQ(value, "O\tw\tO\t!");
 }

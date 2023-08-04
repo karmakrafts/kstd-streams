@@ -20,6 +20,7 @@
 #pragma once
 
 #include <kstd/defaults.hpp>
+#include <kstd/types.hpp>
 #include <type_traits>
 
 namespace kstd::streams::collectors {
@@ -46,4 +47,28 @@ namespace kstd::streams::collectors {
             element = pipe.get_next();
         }
     };
+
+    constexpr auto subscript = [](auto& pipe, auto& result) noexcept -> void {
+        auto element = pipe.get_next();
+        usize index = 0;
+        while(element) {
+            result[index] = *element;
+            ++index;
+            element = pipe.get_next();
+        }
+    };
+
+    [[nodiscard]] constexpr auto joining(auto delimiter) noexcept -> decltype(auto) {
+        static_assert(std::is_integral_v<decltype(delimiter)>);
+        return [delimiter](auto& pipe, auto& result) noexcept -> void {
+            auto element = pipe.get_next();
+            while(element) {
+                result += *element;
+                element = pipe.get_next();
+                if(element) {
+                    result += delimiter;
+                }
+            }
+        };
+    }
 }// namespace kstd::streams::collectors

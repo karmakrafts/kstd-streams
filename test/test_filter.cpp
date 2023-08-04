@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-TEST(kstd_streams_Stream, TestFilterValue) {
+TEST(kstd_streams_Stream, test_filter_value) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 
@@ -61,7 +61,7 @@ TEST(kstd_streams_Stream, TestFilterValue) {
     ASSERT_EQ(filtered_values[0], "Hello"s);
 }
 
-TEST(kstd_streams_Stream, TestFilterPointer) {
+TEST(kstd_streams_Stream, test_filter_pointer) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 
@@ -106,7 +106,7 @@ TEST(kstd_streams_Stream, TestFilterPointer) {
     ASSERT_EQ(*filtered_values[0], "Hello"s);
 }
 
-TEST(kstd_streams_Stream, TestFilterConstPointer) {
+TEST(kstd_streams_Stream, test_filter_const_pointer) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 

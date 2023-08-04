@@ -19,33 +19,30 @@
 
 #include <gtest/gtest.h>
 #include <kstd/streams/stream.hpp>
-#include <string>
 #include <vector>
 
-TEST(kstd_streams_Stream, test_peek_value) {
+TEST(kstd_streams_Stream, test_reverse_sort_value) {
     using namespace kstd::streams;
 
-    std::vector<std::string> values {"Hello", "World", "OwO"};
+    const std::vector<kstd::u32> values {4, 5, 6, 1, 3, 2, 8, 7, 0, 9};
     const auto num_values = values.size();
     // clang-format off
-    const auto peeked_values = stream(values)
-        .peek([](std::string& value) {
-            value += '!';
-        })
+    const auto sorted_values = stream(values)
+        .reverse_sort()
         .collect<std::vector>(collectors::push_back);
     // clang-format on
-    ASSERT_EQ(peeked_values.size(), num_values);
+    ASSERT_EQ(sorted_values.size(), num_values);
 
     for(kstd::usize index = 0; index < num_values; ++index) {
-        ASSERT_EQ(peeked_values[index], values[index]);
+        ASSERT_EQ(sorted_values[index], num_values - 1 - index);
     }
 }
 
-TEST(kstd_streams_Stream, test_peek_pointer) {
+TEST(kstd_streams_Stream, test_reverse_sort_pointer) {
     using namespace kstd::streams;
 
-    std::vector<std::string> values {"Hello", "World", "OwO"};
-    std::vector<std::string*> addresses {};
+    std::vector<kstd::u32> values {4, 5, 6, 1, 3, 2, 8, 7, 0, 9};
+    std::vector<kstd::u32*> addresses {};
 
     for(auto& value : values) {
         addresses.push_back(&value);
@@ -53,42 +50,36 @@ TEST(kstd_streams_Stream, test_peek_pointer) {
 
     const auto num_values = addresses.size();
     // clang-format off
-    const auto peeked_values = stream(addresses)
-        .peek([](std::string* value) {
-            (*value) += '!';
-        })
+    const auto sorted_values = stream(addresses)
+        .reverse_sort(comparators::deref_less_than)
         .collect<std::vector>(collectors::push_back);
     // clang-format on
-    ASSERT_EQ(peeked_values.size(), num_values);
+    ASSERT_EQ(sorted_values.size(), num_values);
 
     for(kstd::usize index = 0; index < num_values; ++index) {
-        ASSERT_EQ(*peeked_values[index], values[index]);
+        ASSERT_EQ(*sorted_values[index], num_values - 1 - index);
     }
 }
 
-TEST(kstd_streams_Stream, test_peek_const_pointer) {
+TEST(kstd_streams_Stream, test_reverse_sort_const_pointer) {
     using namespace kstd::streams;
 
-    std::vector<std::string> values {"Hello", "World", "OwO"};
-    std::vector<const std::string*> addresses {};
+    std::vector<kstd::u32> values {4, 5, 6, 1, 3, 2, 8, 7, 0, 9};
+    std::vector<const kstd::u32*> addresses {};
 
     for(const auto& value : values) {
         addresses.push_back(&value);
     }
 
     const auto num_values = addresses.size();
-    kstd::usize peek_index = 0;
     // clang-format off
-    const auto peeked_values = stream(addresses)
-        .peek([&peek_index, &values](const std::string* value) {
-            ASSERT_EQ(*value, values[peek_index]);
-            ++peek_index;
-        })
+    const auto sorted_values = stream(addresses)
+        .reverse_sort(comparators::deref_less_than)
         .collect<std::vector>(collectors::push_back);
     // clang-format on
-    ASSERT_EQ(peeked_values.size(), num_values);
+    ASSERT_EQ(sorted_values.size(), num_values);
 
     for(kstd::usize index = 0; index < num_values; ++index) {
-        ASSERT_EQ(*peeked_values[index], values[index]);
+        ASSERT_EQ(*sorted_values[index], num_values - 1 - index);
     }
 }
