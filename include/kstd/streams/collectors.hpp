@@ -58,9 +58,13 @@ namespace kstd::streams::collectors {
         }
     };
 
-    [[nodiscard]] constexpr auto joining(auto delimiter) noexcept -> decltype(auto) {
-        static_assert(std::is_integral_v<decltype(delimiter)>);
+    template<typename D>
+    [[nodiscard]] constexpr auto joining(D delimiter) noexcept -> decltype(auto) {
         return [delimiter](auto& pipe, auto& result) noexcept -> void {
+            using PipeType = std::remove_reference_t<decltype(pipe)>;
+            using Type = std::remove_const_t<std::remove_reference_t<typename PipeType::ValueType>>;
+            static_assert(std::is_same_v<Type, D>, "Delimiter type must match pipe value type");
+
             auto element = pipe.get_next();
             while(element) {
                 result += *element;
