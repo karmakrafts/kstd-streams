@@ -21,7 +21,7 @@
 #include <kstd/streams/stream.hpp>
 #include <vector>
 
-TEST(kstd_streams_Stream, TestSumValue) {
+TEST(kstd_streams_Stream, test_sum_value) {
     using namespace kstd::streams;
 
     const std::vector<kstd::u32> values {1, 2, 3, 4, 5, 6, 7, 8, 9, 0};
@@ -37,7 +37,7 @@ TEST(kstd_streams_Stream, TestSumValue) {
     ASSERT_EQ(sum, expected_sum);
 }
 
-TEST(kstd_streams_Stream, TestSumPointer) {
+TEST(kstd_streams_Stream, test_sum_pointer) {
     using namespace kstd::streams;
 
     std::vector<kstd::u32> values {1, 2, 3, 4, 5, 6, 7, 8, 9, 0};
@@ -58,7 +58,7 @@ TEST(kstd_streams_Stream, TestSumPointer) {
     ASSERT_EQ(sum, expected_sum);
 }
 
-TEST(kstd_streams_Stream, TestSumConstPointer) {
+TEST(kstd_streams_Stream, test_sum_const_pointer) {
     using namespace kstd::streams;
 
     std::vector<kstd::u32> values {1, 2, 3, 4, 5, 6, 7, 8, 9, 0};
