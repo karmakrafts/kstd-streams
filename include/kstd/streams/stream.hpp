@@ -127,14 +127,6 @@ namespace kstd::streams {
 
         ~Stream() noexcept = default;
 
-        [[nodiscard]] constexpr auto get_next() noexcept -> Option<ValueType> {
-            return _pipe.get_next();
-        }
-
-        [[nodiscard]] constexpr auto operator*() noexcept -> Option<ValueType> {
-            return get_next();
-        }
-
         template<typename F>
         [[nodiscard]] constexpr auto map(F&& mapper) noexcept
                 -> Stream<Pipe<PipeType, decltype(make_map_sleeve(std::forward<F>(mapper)))>> {
@@ -179,20 +171,20 @@ namespace kstd::streams {
 
         template<typename F>
         constexpr auto for_each(F&& function) noexcept -> void {
-            auto element = get_next();
+            auto element = _pipe.get_next();
             while(element) {
                 function(*element);
-                element = get_next();
+                element = _pipe.get_next();
             }
         }
 
         template<typename F>
         [[nodiscard]] constexpr auto reduce(F&& function, NakedValueType value = NakedValueType {}) noexcept
                 -> NakedValueType {
-            auto element = get_next();
+            auto element = _pipe.get_next();
             while(element) {
                 value = function(value, *element);
-                element = get_next();
+                element = _pipe.get_next();
             }
             return value;
         }
@@ -218,10 +210,10 @@ namespace kstd::streams {
 
         [[nodiscard]] constexpr auto count() noexcept -> usize {
             usize count = 0;
-            auto element = get_next();
+            auto element = _pipe.get_next();
             while(element) {
                 ++count;
-                element = get_next();
+                element = _pipe.get_next();
             }
             return count;
         }
@@ -229,10 +221,10 @@ namespace kstd::streams {
         template<typename F>
         [[nodiscard]] constexpr auto index_of(F&& predicate) noexcept -> usize {
             usize index = 0;
-            auto element = get_next();
+            auto element = _pipe.get_next();
             while(element && !predicate(*element)) {
                 ++index;
-                element = get_next();
+                element = _pipe.get_next();
             }
             return index;
         }
@@ -241,35 +233,35 @@ namespace kstd::streams {
         [[nodiscard]] constexpr auto index_of_last(F&& predicate) noexcept -> usize {
             usize index = 0;
             usize result = 0;
-            auto element = get_next();
+            auto element = _pipe.get_next();
             while(element) {
                 ++index;
                 if(predicate(*element)) {
                     result = index;
                 }
-                element = get_next();
+                element = _pipe.get_next();
             }
             return result;
         }
 
         template<typename F>
         [[nodiscard]] constexpr auto find(F&& predicate) noexcept -> Option<ValueType> {
-            auto element = get_next();
+            auto element = _pipe.get_next();
             while(element && !predicate(*element)) {
-                element = get_next();
+                element = _pipe.get_next();
             }
             return element;
         }
 
         template<typename F>
         [[nodiscard]] constexpr auto find_last(F&& predicate) noexcept -> Option<ValueType> {
-            auto element = get_next();
+            auto element = _pipe.get_next();
             Option<ValueType> result {};
             while(element) {
                 if(predicate(*element)) {
                     result = std::move(element);
                 }
-                element = get_next();
+                element = _pipe.get_next();
             }
             return result;
         }
@@ -309,7 +301,7 @@ namespace kstd::streams {
                 -> CONTAINER<std::remove_cv_t<std::remove_reference_t<ValueType>>, PROPS...> {
             CONTAINER<std::remove_cv_t<std::remove_reference_t<ValueType>>, PROPS...> result {
                     std::forward<ARGS>(args)...};
-            collector(*this, result);
+            collector(_pipe, result);
             return result;
         }
 
@@ -319,11 +311,11 @@ namespace kstd::streams {
                 -> MAP<std::invoke_result_t<KM, ValueType&>, std::invoke_result_t<VM, ValueType&>, PROPS...> {
             MAP<std::invoke_result_t<KM, ValueType&>, std::invoke_result_t<VM, ValueType&>, PROPS...> result {
                     std::forward<ARGS>(args)...};
-            auto element = get_next();
+            auto element = _pipe.get_next();
             while(element) {
                 auto& value = *element;
                 result[key_mapper(value)] = value_mapper(value);
-                element = get_next();
+                element = _pipe.get_next();
             }
             return result;
         }
