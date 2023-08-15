@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <fmt/format.h>
 #include <kstd/non_zero.hpp>
 #include <kstd/option.hpp>
 
@@ -46,4 +47,16 @@ namespace kstd::streams::mappers {
     constexpr auto second = [](auto value) noexcept -> auto& {
         return value.second;
     };
+
+    template<typename... ARGS>
+    [[nodiscard]] constexpr auto format(const std::string& format, ARGS&&... args) noexcept {
+        return [&format, &args...](auto value) -> std::string {
+            if constexpr(sizeof...(ARGS) > 0) {
+                return fmt::format(fmt::runtime(format), fmt::arg("x", value), std::forward<ARGS>(args)...);
+            }
+            else {
+                return fmt::format(fmt::runtime(format), value, std::forward<ARGS>(args)...);
+            }
+        };
+    }
 }// namespace kstd::streams::mappers

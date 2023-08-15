@@ -17,6 +17,7 @@
  * @since 21/07/2023
  */
 
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <kstd/streams/stream.hpp>
 #include <string>
@@ -26,7 +27,7 @@ TEST(kstd_streams_Stream, test_map_value) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 
-    const std::vector<std::string> values {"Hello"s, "World"s, "Test"s};
+    const std::vector values {"Hello"s, "World"s, "Test"s};
 
     // clang-format off
     const auto mapped_values = stream(values)
@@ -48,7 +49,7 @@ TEST(kstd_streams_Stream, test_map_pointer) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 
-    std::vector<std::string> values {"Hello"s, "World"s, "Test"s};
+    std::vector values {"Hello"s, "World"s, "Test"s};
     std::vector<std::string*> addresses {};
 
     for(auto& value : values) {
@@ -75,7 +76,7 @@ TEST(kstd_streams_Stream, test_map_const_pointer) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 
-    std::vector<std::string> values {"Hello"s, "World"s, "Test"s};
+    std::vector values {"Hello"s, "World"s, "Test"s};
     std::vector<const std::string*> addresses {};
 
     for(const auto& value : values) {
@@ -95,5 +96,25 @@ TEST(kstd_streams_Stream, test_map_const_pointer) {
 
     for(kstd::usize index = 0; index < num_values; ++index) {
         ASSERT_EQ(mapped_values[index], values[index] + '!');
+    }
+}
+
+TEST(kstd_streams_Stream, test_map_format_value) {
+    using namespace kstd::streams;
+    using namespace std::string_literals;
+
+    const std::vector values {"Hello"s, "World"s, "Test"s};
+
+    // clang-format off
+    const auto mapped_values = stream(values)
+        .map(mappers::format("{}!"))
+        .collect<std::vector>(collectors::push_back);
+    // clang-format on
+
+    const auto num_values = values.size();
+    ASSERT_EQ(mapped_values.size(), num_values);
+
+    for(kstd::usize index = 0; index < num_values; ++index) {
+        ASSERT_EQ(mapped_values[index], values[index] + "!");
     }
 }

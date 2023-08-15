@@ -26,7 +26,7 @@ TEST(kstd_streams_Stream, test_filter_value) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 
-    const std::vector<std::string> values {"Hello"s, "World"s, "OwO"s};
+    const std::vector values {"Hello"s, "World"s, "OwO"s};
     const auto num_values = values.size();
     // clang-format off
     auto filtered_values = stream(values)
@@ -65,7 +65,7 @@ TEST(kstd_streams_Stream, test_filter_pointer) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 
-    std::vector<std::string> values {"Hello"s, "World"s, "OwO"s};
+    std::vector values {"Hello"s, "World"s, "OwO"s};
     std::vector<std::string*> addresses {};
 
     for(auto& value : values) {
@@ -110,7 +110,7 @@ TEST(kstd_streams_Stream, test_filter_const_pointer) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 
-    std::vector<std::string> values {"Hello"s, "World"s, "OwO"s};
+    std::vector values {"Hello"s, "World"s, "OwO"s};
     std::vector<const std::string*> addresses {};
 
     for(const auto& value : values) {

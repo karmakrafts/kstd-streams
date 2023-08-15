@@ -25,8 +25,9 @@
 
 TEST(kstd_streams_Stream, test_distinct_value) {
     using namespace kstd::streams;
+    using namespace std::string_literals;
 
-    const std::vector<std::string> values {"Hello", "World", "Hello", "!", "Hello", ":3"};
+    const std::vector values {"Hello"s, "World"s, "Hello"s, "!"s, "Hello"s, ":3"s};
     const auto distinct_values = stream(values).distinct().collect<std::vector>(collectors::push_back);
 
     ASSERT_FALSE(distinct_values.empty());
