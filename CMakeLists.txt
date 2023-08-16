@@ -13,7 +13,6 @@ target_include_directories(kstd-streams INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/i
 
 if (${KSTD_STREAMS_BUILD_TESTS})
     cmx_add_tests(kstd-streams-tests "${CMAKE_CURRENT_SOURCE_DIR}/test")
-    cmx_include_gtest(kstd-streams-tests PRIVATE)
     target_link_libraries(kstd-streams-tests PRIVATE kstd-streams)
     add_dependencies(kstd-streams-tests kstd-streams)
 endif ()
