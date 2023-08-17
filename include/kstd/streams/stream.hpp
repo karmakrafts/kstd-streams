@@ -37,6 +37,11 @@
 #include "mappers.hpp"
 #include "reducers.hpp"
 
+#define KSTD_FIELD_FUNCTOR(n)                                                                                          \
+    [](auto* value) noexcept -> auto* {                                                                                \
+        return value->n;                                                                                               \
+    }
+
 namespace kstd::streams {
     template<typename PIPE>
     struct Stream final {
