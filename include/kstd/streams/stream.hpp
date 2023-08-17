@@ -306,6 +306,13 @@ namespace kstd::streams {
             return result;
         }
 
+        template<template<typename, typename...> typename CONTAINER, typename... PROPS, typename COLLECTOR>
+        constexpr auto
+        collect_into(CONTAINER<std::remove_cv_t<std::remove_reference_t<ValueType>>, PROPS...>& container,
+                     COLLECTOR collector) noexcept -> void {
+            collector(_pipe, container);
+        }
+
         template<template<typename, typename, typename...> typename MAP, typename... PROPS, typename KM, typename VM,
                  typename... ARGS>
         [[nodiscard]] constexpr auto collect_map(KM key_mapper, VM value_mapper, ARGS&&... args) noexcept
