@@ -27,8 +27,7 @@ namespace kstd::streams {
     template<typename A, typename F>
     struct LinkedStructPipe final {
         using AddressType = A;
-        using ValueType = std::remove_pointer_t<AddressType>;
-        using Reference = ValueType&;
+        using ValueType = std::remove_pointer_t<AddressType>&;
         using FunctorType = F;
         using Self = LinkedStructPipe<AddressType, FunctorType>;
 
@@ -54,7 +53,7 @@ namespace kstd::streams {
 
         ~LinkedStructPipe() noexcept = default;
 
-        [[nodiscard]] constexpr auto get_next() noexcept -> Option<Reference> {
+        [[nodiscard]] constexpr auto get_next() noexcept -> Option<ValueType> {
             if(_current == nullptr) {
                 return {};
             }
