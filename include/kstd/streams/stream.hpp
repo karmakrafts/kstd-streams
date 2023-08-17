@@ -52,6 +52,16 @@
         return x;                                                                                                      \
     }
 
+#define KSTD_RCAST_FIELD_FUNCTOR(n, t)                                                                                 \
+    [](auto& value) noexcept -> auto {                                                                                 \
+        return reinterpret_cast<t>(value.n);                                                                           \
+    }
+
+#define KSTD_SCAST_FIELD_FUNCTOR(n, t)                                                                                 \
+    [](auto& value) noexcept -> auto {                                                                                 \
+        return static_cast<t>(value.n);                                                                                \
+    }
+
 namespace kstd::streams {
     template<typename PIPE>
     struct Stream final {
