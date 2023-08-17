@@ -31,7 +31,7 @@ namespace kstd::streams {
         using PipeType      = PIPE;
         using SleeveType    = SLEEVE;
         using Self          = Pipe<PipeType, SleeveType>;
-        using ValueType     = typename decltype(std::declval<SleeveType>()(std::declval<PipeType&>()))::ValueType;
+        using ValueType     = typename decltype(std::declval<SleeveType&&>()(std::declval<PipeType&>()))::ValueType;
         // clang-format on
 
         private:

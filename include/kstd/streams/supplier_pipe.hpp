@@ -29,7 +29,7 @@ namespace kstd::streams {
         // clang-format off
         using SupplierType  = SUPPLIER;
         using Self          = SupplierPipe<SupplierType>;
-        using ValueType     = typename decltype(std::declval<SupplierType>()())::value_type;
+        using ValueType     = typename decltype(std::declval<SupplierType&&>()())::value_type;
         // clang-format on
 
         private:
