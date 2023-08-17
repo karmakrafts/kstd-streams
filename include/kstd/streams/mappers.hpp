@@ -32,25 +32,25 @@ namespace kstd::streams::mappers {
         return &value;
     };
 
-    constexpr auto as_option = [](auto value) noexcept -> Option<decltype(value)> {
+    constexpr auto as_option = [](auto& value) noexcept -> Option<decltype(value)> {
         return value;
     };
 
-    constexpr auto as_non_zero = [](auto value) noexcept -> NonZero<decltype(value)> {
+    constexpr auto as_non_zero = [](auto& value) noexcept -> NonZero<decltype(value)> {
         return NonZero<decltype(value)> {value};
     };
 
-    constexpr auto first = [](auto value) noexcept -> auto& {
+    constexpr auto first = [](auto& value) noexcept -> auto& {
         return value.first;
     };
 
-    constexpr auto second = [](auto value) noexcept -> auto& {
+    constexpr auto second = [](auto& value) noexcept -> auto& {
         return value.second;
     };
 
     template<typename... ARGS>
     [[nodiscard]] constexpr auto format(const std::string& format, ARGS&&... args) noexcept {
-        return [&format, &args...](auto value) -> std::string {
+        return [&format, &args...](auto& value) -> std::string {
             if constexpr(sizeof...(ARGS) > 0) {
                 return fmt::format(fmt::runtime(format), fmt::arg("x", value), std::forward<ARGS>(args)...);
             }
