@@ -10,6 +10,8 @@ cppcoreguidelines-*,
 -cppcoreguidelines-owning-memory,
 -cppcoreguidelines-use-default-member-init,
 -cppcoreguidelines-avoid-magic-numbers,
+-cppcoreguidelines-rvalue-reference-param-not-moved,
+-cppcoreguidelines-missing-std-forward,
 bugprone-*,
 -bugprone-assert-side-effect,
 -bugprone-assignment-in-if-condition
