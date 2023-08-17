@@ -50,12 +50,32 @@ namespace kstd::streams::collectors {
 
     constexpr auto subscript = [](auto& pipe, auto& result) noexcept -> void {
         auto element = pipe.get_next();
+        while(element) {
+            auto& [key, value] = *element;
+            result[key] = value;
+            element = pipe.get_next();
+        }
+    };
+
+    constexpr auto subscript_indexed = [](auto& pipe, auto& result) noexcept -> void {
+        auto element = pipe.get_next();
         usize index = 0;
         while(element) {
             result[index] = *element;
             ++index;
             element = pipe.get_next();
         }
+    };
+
+    constexpr auto subscript_indexed_reverse = [](auto& pipe, auto& result) noexcept -> void {
+        auto element = pipe.get_next();
+        usize index = 0;
+        while(element) {
+            result[index] = *element;
+            ++index;
+            element = pipe.get_next();
+        }
+        result = decltype(result) {result.crbegin(), result.crend()};
     };
 
     template<typename D>

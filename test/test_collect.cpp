@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-TEST(kstd_streams_Stream, test_collect_value) {
+TEST(kstd_streams_Stream, test_collect_push_back_value) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 
@@ -36,7 +36,7 @@ TEST(kstd_streams_Stream, test_collect_value) {
     }
 }
 
-TEST(kstd_streams_Stream, test_collect_pointer) {
+TEST(kstd_streams_Stream, test_collect_push_back_pointer) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 
@@ -56,7 +56,7 @@ TEST(kstd_streams_Stream, test_collect_pointer) {
     }
 }
 
-TEST(kstd_streams_Stream, test_collect_const_pointer) {
+TEST(kstd_streams_Stream, test_collect_push_back_const_pointer) {
     using namespace kstd::streams;
     using namespace std::string_literals;
 
@@ -79,7 +79,7 @@ TEST(kstd_streams_Stream, test_collect_const_pointer) {
 TEST(kstd_streams_Stream, test_collect_string) {
     using namespace kstd::streams;
 
-    const std::vector<char> values {'O', 'w', 'O', '!'};
+    const std::vector values {'O', 'w', 'O', '!'};
     const auto value = stream(values).collect<std::basic_string>(collectors::plus_assign);
     const auto num_values = values.size();
     ASSERT_EQ(num_values, value.length());
@@ -92,7 +92,7 @@ TEST(kstd_streams_Stream, test_collect_string) {
 TEST(kstd_streams_Stream, test_collect_string_joining) {
     using namespace kstd::streams;
 
-    const std::vector<char> values {'O', 'w', 'O', '!'};
+    const std::vector values {'O', 'w', 'O', '!'};
     const auto value = stream(values).collect<std::basic_string>(collectors::joining('\t'));
     const auto num_values = values.size();
     ASSERT_EQ((num_values << 1) - 1, value.length());
