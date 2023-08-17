@@ -42,9 +42,9 @@ namespace kstd::streams {
         public:
         KSTD_DEFAULT_MOVE_COPY(LinkedStructPipe, Self, constexpr)
 
-        constexpr LinkedStructPipe(AddressType address, FunctorType functor) noexcept :
+        constexpr LinkedStructPipe(AddressType address, FunctorType&& functor) noexcept :
                 _current {address},
-                _functor {std::move(functor)} {
+                _functor {std::forward<FunctorType>(functor)} {
         }
 
         ~LinkedStructPipe() noexcept = default;
