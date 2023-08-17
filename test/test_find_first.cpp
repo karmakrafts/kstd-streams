@@ -27,7 +27,7 @@ TEST(kstd_streams_Stream, test_find_value) {
     const std::vector<kstd::u32> values {1, 11, 111, 1111, 11111, 111111};
     // clang-format off
     const auto first_value = stream(values)
-        .find([](auto& value) {
+        .find_first([](auto& value) {
             return value << 1 == 222;
         });
     // clang-format on

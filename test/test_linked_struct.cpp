@@ -47,7 +47,7 @@ TEST(kstd_streams_Stream, test_linked_struct_pointer) {
     kstd::usize index = 0;
 
     // clang-format off
-    stream(first, KSTD_FIELD_FUNCTOR(next)).for_each([&](auto& value) {
+    stream(first, KSTD_PTR_FIELD_FUNCTOR(next)).for_each([&](auto& value) {
         switch(index) {
             case 0: ASSERT_EQ(first, &value);   break;
             case 1: ASSERT_EQ(second, &value);  break;
@@ -76,7 +76,7 @@ TEST(kstd_streams_Stream, test_linked_struct_const_pointer) {
     const auto* const_first = reinterpret_cast<const SomeLinkedList*>(first);// NOLINT
 
     // clang-format off
-    stream(const_first, KSTD_FIELD_FUNCTOR(next)).for_each([&](const auto& value) {
+    stream(const_first, KSTD_PTR_FIELD_FUNCTOR(next)).for_each([&](const auto& value) {
         switch(index) {
             case 0: ASSERT_EQ(first, &value);   break;
             case 1: ASSERT_EQ(second, &value);  break;

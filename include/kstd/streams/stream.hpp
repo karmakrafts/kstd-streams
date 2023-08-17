@@ -343,11 +343,10 @@ namespace kstd::streams {
             return result;
         }
 
-        template<template<typename, typename, typename...> typename MAP, typename... PROPS, typename KM, typename VM,
-                 typename... ARGS>
+        template<template<typename, typename, typename...> typename MAP, typename... PROPS, typename KM, typename VM>
         constexpr auto
         collect_map_into(MAP<std::invoke_result_t<KM, ValueType&>, std::invoke_result_t<VM, ValueType&>, PROPS...>& map,
-                         KM&& key_mapper, VM&& value_mapper, ARGS&&... args) noexcept -> void {
+                         KM&& key_mapper, VM&& value_mapper) noexcept -> void {
             auto element = _pipe.get_next();
             while(element) {
                 auto& value = *element;
