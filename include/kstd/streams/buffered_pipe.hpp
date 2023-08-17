@@ -56,7 +56,7 @@ namespace kstd::streams {
                 _pipe {} {
         }
 
-        constexpr BufferedPipe(PipeType pipe, CallbackType&& callback) noexcept :
+        constexpr BufferedPipe(PipeType pipe, CallbackType callback) noexcept :
                 _buffer {} {
             auto element = pipe.get_next();
             while(element) {

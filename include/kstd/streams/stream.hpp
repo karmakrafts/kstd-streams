@@ -27,6 +27,7 @@
 
 #include "buffered_pipe.hpp"
 #include "iterator_pipe.hpp"
+#include "linked_struct_pipe.hpp"
 #include "pipe.hpp"
 #include "supplier_pipe.hpp"
 
@@ -343,6 +344,12 @@ namespace kstd::streams {
     [[nodiscard]] constexpr auto stream(const CONTAINER& container) noexcept
             -> Stream<IteratorPipe<typename CONTAINER::const_iterator>> {
         return stream<typename CONTAINER::const_iterator>(container.cbegin(), container.cend());
+    }
+
+    template<typename A, typename F>
+    [[nodiscard]] constexpr auto stream(A address, F&& functor) noexcept -> Stream<LinkedStructPipe<A, F>> {
+        using Pipe = LinkedStructPipe<A, F>;
+        return Stream<Pipe> {Pipe {address, std::forward<F>(functor)}};
     }
 
     template<typename CONTAINER>

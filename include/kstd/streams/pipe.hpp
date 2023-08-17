@@ -48,7 +48,7 @@ namespace kstd::streams {
 
         constexpr Pipe(PipeType pipe, SleeveType&& sleeve) noexcept :
                 _pipe {std::move(pipe)},
-                _sleeve {std::forward<SleeveType>(sleeve)} {
+                _sleeve {std::move(sleeve)} {
         }
 
         ~Pipe() noexcept = default;
