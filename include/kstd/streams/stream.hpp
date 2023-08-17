@@ -37,9 +37,14 @@
 #include "mappers.hpp"
 #include "reducers.hpp"
 
-#define KSTD_FIELD_FUNCTOR(n)                                                                                          \
-    [](auto* value) noexcept -> auto* {                                                                                \
+#define KSTD_PTR_FIELD_FUNCTOR(n)                                                                                      \
+    [](auto* value) noexcept -> auto {                                                                                 \
         return value->n;                                                                                               \
+    }
+
+#define KSTD_FIELD_FUNCTOR(n)                                                                                          \
+    [](auto& value) noexcept -> auto {                                                                                 \
+        return value.n;                                                                                                \
     }
 
 namespace kstd::streams {
@@ -252,7 +257,7 @@ namespace kstd::streams {
         }
 
         template<typename F>
-        [[nodiscard]] constexpr auto find(F&& predicate) noexcept -> Option<ValueType> {
+        [[nodiscard]] constexpr auto find_first(F&& predicate) noexcept -> Option<ValueType> {
             auto element = _pipe.get_next();
             while(element && !predicate(*element)) {
                 element = _pipe.get_next();
@@ -271,6 +276,10 @@ namespace kstd::streams {
                 element = _pipe.get_next();
             }
             return result;
+        }
+
+        [[nodiscard]] constexpr auto find_any() noexcept -> Option<ValueType> {
+            return _pipe.get_next();
         }
 
         [[nodiscard]] constexpr auto sort() noexcept -> Stream<BufferedPipe<PipeType, decltype(make_sort_callback())>> {
@@ -332,6 +341,19 @@ namespace kstd::streams {
                 element = _pipe.get_next();
             }
             return result;
+        }
+
+        template<template<typename, typename, typename...> typename MAP, typename... PROPS, typename KM, typename VM,
+                 typename... ARGS>
+        constexpr auto
+        collect_map_into(MAP<std::invoke_result_t<KM, ValueType&>, std::invoke_result_t<VM, ValueType&>, PROPS...>& map,
+                         KM&& key_mapper, VM&& value_mapper, ARGS&&... args) noexcept -> void {
+            auto element = _pipe.get_next();
+            while(element) {
+                auto& value = *element;
+                map[key_mapper(value)] = value_mapper(value);
+                element = _pipe.get_next();
+            }
         }
     };
 
