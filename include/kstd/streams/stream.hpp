@@ -47,6 +47,11 @@
         return value.n;                                                                                                \
     }
 
+#define KSTD_CONSTANT_FUNCTOR(x)                                                                                       \
+    [](auto& value) noexcept -> auto {                                                                                 \
+        return x;                                                                                                      \
+    }
+
 namespace kstd::streams {
     template<typename PIPE>
     struct Stream final {
