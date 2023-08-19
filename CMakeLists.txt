@@ -4,7 +4,7 @@ project(kstd-streams LANGUAGES C CXX)
 option(KSTD_STREAMS_BUILD_TESTS "Build unit tests for kstd-streams" OFF)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake;")
-include(cmx)
+include(cmx-bootstrap)
 cmx_include_scripts()
 
 cmx_add_library(kstd-streams INTERFACE)
