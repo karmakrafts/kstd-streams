@@ -2,7 +2,6 @@ Checks: '
 -*,
 readability-*,
 -readability-magic-numbers,
--readability-function-cognitive-complexity,
 modernize-*,
 -modernize-use-trailing-return-type,
 -modernize-use-default-member-init,
@@ -10,11 +9,16 @@ cppcoreguidelines-*,
 -cppcoreguidelines-owning-memory,
 -cppcoreguidelines-use-default-member-init,
 -cppcoreguidelines-avoid-magic-numbers,
--cppcoreguidelines-rvalue-reference-param-not-moved,
+-cppcoreguidelines-pro-type-reinterpret-cast,
+-cppcoreguidelines-pro-bounds-pointer-arithmetic,
+-cppcoreguidelines-macro-usage,
 -cppcoreguidelines-missing-std-forward,
+-google-explicit-constructor,
+-fuchsia-overloaded-operator,
 bugprone-*,
 -bugprone-assert-side-effect,
--bugprone-assignment-in-if-condition
+-bugprone-assignment-in-if-condition,
+-bugprone-easily-swappable-parameters
 '
 WarningsAsErrors: true
 HeaderFilterRegex: ''
