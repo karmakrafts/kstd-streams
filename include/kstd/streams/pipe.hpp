@@ -31,7 +31,7 @@ namespace kstd::streams {
         using PipeType      = PIPE;
         using SleeveType    = SLEEVE;
         using Self          = Pipe<PipeType, SleeveType>;
-        using ValueType     = typename decltype(std::declval<SleeveType&&>()(std::declval<PipeType&>()))::ValueType;
+        using ValueType     = typename decltype(std::declval<SleeveType>()(std::declval<PipeType&>()))::ValueType;
         // clang-format on
 
         private:
@@ -46,9 +46,9 @@ namespace kstd::streams {
                 _sleeve {} {
         }
 
-        constexpr Pipe(PipeType pipe, SleeveType&& sleeve) noexcept :
+        constexpr Pipe(PipeType pipe, SleeveType sleeve) noexcept :
                 _pipe {std::move(pipe)},
-                _sleeve {std::forward<SleeveType>(sleeve)} {
+                _sleeve {std::move(sleeve)} {
         }
 
         ~Pipe() noexcept = default;

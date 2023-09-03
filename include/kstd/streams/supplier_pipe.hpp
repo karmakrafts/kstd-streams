@@ -42,8 +42,8 @@ namespace kstd::streams {
                 _supplier {} {
         }
 
-        explicit constexpr SupplierPipe(SupplierType&& supplier) noexcept :
-                _supplier(std::forward<SupplierType>(supplier)) {
+        explicit constexpr SupplierPipe(SupplierType supplier) noexcept :
+                _supplier(std::move(supplier)) {
         }
 
         ~SupplierPipe() noexcept = default;

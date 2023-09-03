@@ -46,9 +46,9 @@ namespace kstd::streams {
                 _functor {} {
         }
 
-        constexpr LinkedStructPipe(AddressType address, FunctorType&& functor) noexcept :
+        constexpr LinkedStructPipe(AddressType address, FunctorType functor) noexcept :
                 _current {address},
-                _functor {std::forward<FunctorType>(functor)} {
+                _functor {std::move(functor)} {
         }
 
         ~LinkedStructPipe() noexcept = default;
